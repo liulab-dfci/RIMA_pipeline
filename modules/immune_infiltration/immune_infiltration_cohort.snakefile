@@ -1,0 +1,90 @@
+#!/usr/bin/env python
+
+############################Immune Infiltration by Immunedeconv######################3
+def immune_infiltration_targets(wildcards):
+    ls = []
+    ls.append("files/immune_infiltration/quantiseq.txt")
+    ls.append("files/immune_infiltration/xcell.txt")
+    ls.append("files/immune_infiltration/mcp_counter.txt")
+    ls.append("files/immune_infiltration/cibersort_abs.txt")
+    ls.append("files/immune_infiltration/timer.txt")
+    ls.append("files/immune_infiltration/epic.txt")
+    ls.append("files/immune_infiltration/B_cell_corr.png")
+    ls.append("files/immune_infiltration/DC_corr.png")
+    ls.append("files/immune_infiltration/NK_corr.png")
+    ls.append("files/immune_infiltration/CD4_T_cell_corr.png")
+    ls.append("files/immune_infiltration/Neutrophil_corr.png")
+    ls.append("files/immune_infiltration/CD8_T_cell_corr.png")
+    ls.append("files/immune_infiltration/Macrophage_corr.png")
+    ls.append("files/immune_infiltration/Treg_corr.png")
+    ls.append("files/immune_infiltration/ImmuneDeconv_heatmap.png")
+    ls.append("files/multiqc/immune_infiltration/cibersort_abs_immune_multiqc.txt")
+    return ls
+
+rule immune_infiltration__all:
+    input:
+        immune_infiltration_targets
+
+rule ImmuneDeconv_infiltration:
+    input:
+        "analysis/batchremoval/tpm_convertID.txt" 
+        #"analysis/batchremoval/tpm_matrix.batch"
+    output:
+        "files/immune_infiltration/quantiseq.txt",
+        "files/immune_infiltration/xcell.txt",
+        "files/immune_infiltration/mcp_counter.txt",
+        "files/immune_infiltration/cibersort_abs.txt",
+        "files/immune_infiltration/timer.txt",
+        "files/immune_infiltration/epic.txt"
+    log:
+        "logs/immune_infiltration/deconv.log"
+    params:
+        perm = 100,
+        qn = "FALSE",
+        absl = "TRUE",
+        abs_method = "sig.score",
+        out_dir = "files/immune_infiltration",
+        path="set +eu;source activate %s" % config['stat_root']
+    message:
+        "Running immunedeconv on the expression data"
+    benchmark:
+        "benchmarks/immune_infiltration/deconv.benchmark"
+    conda: "../envs/stat_perl_r.yml"
+    shell:
+        "{params.path}; Rscript src/immune_infiltration/immune_infiltration.R -e {input} -t {config[cancer_type]} -p {params.perm} -q {params.qn} -a {params.absl} -m {params.abs_method} -o {params.out_dir}"
+
+rule ImmuneDeconv_plot:
+    input:
+        "files/immune_infiltration/quantiseq.txt",
+        "files/immune_infiltration/xcell.txt",
+        "files/immune_infiltration/mcp_counter.txt",
+        "files/immune_infiltration/cibersort_abs.txt",
+        "files/immune_infiltration/timer.txt",
+        "files/immune_infiltration/epic.txt"
+    output:
+        "files/immune_infiltration/B_cell_corr.png",
+        "files/immune_infiltration/DC_corr.png",
+        "files/immune_infiltration/NK_corr.png",
+        "files/immune_infiltration/CD4_T_cell_corr.png",
+        "files/immune_infiltration/Neutrophil_corr.png",
+        "files/immune_infiltration/CD8_T_cell_corr.png",
+        "files/immune_infiltration/Macrophage_corr.png",
+        "files/immune_infiltration/Treg_corr.png",
+        "files/immune_infiltration/ImmuneDeconv_heatmap.png",
+        "files/multiqc/immune_infiltration/cibersort_abs_immune_multiqc.txt"
+    log:
+        "logs/immune_infiltration/deconv_plot.log"
+    message:
+        "Running immunedeconv plot"
+    benchmark:
+        "benchmarks/immune_infiltration/deconv_plot.benchmark"
+    conda: "../envs/stat_perl_r.yml"
+    params:
+        meta = config["metasheet"],
+        inputdir = "files/immune_infiltration/",
+        outdir = "files/immune_infiltration/",
+        multiqc = "files/multiqc/immune_infiltration/",
+        clinic_phenotype = config["immune_infiltration_clinical_phenotype"],
+        path="set +eu;source activate %s" % config['stat_root']
+    shell:
+        "{params.path}; Rscript src/immune_infiltration/immune_infiltration_plot.R --meta {params.meta} --input_dir {params.inputdir} --output_dir {params.outdir} --clinic_col {params.clinic_phenotype} --multiqc {params.multiqc}"

@@ -1,0 +1,211 @@
+##load package
+suppressMessages(library(ggplot2))
+suppressMessages(library(RColorBrewer))
+suppressMessages(library(dplyr))
+suppressMessages(library(reshape))
+suppressMessages(library(ggpubr))
+suppressMessages(library(optparse))
+
+## make option list and parse command line
+option_list <- list( 
+  make_option(c("-i", "--cdr3"), type="character",
+              help="input cdr3 file path"),
+  make_option(c("-s", "--stat"), type="character",
+              help="input stat file path"),
+  make_option(c("-c", "--clinic_col"), type="character",
+              help="column number of clinic phenotype traits in meta file[Required]"),
+  make_option(c("-m", "--meta"), type="character",
+              help="meta info[Required]"),
+  make_option(c("-o","--output"),type="character",
+                help="Output path [Required]"),
+  make_option(c("-b","--ssbcr_cluster"),type = "character",
+                help = "R object of single sample bcr cluster")
+                )
+opt_parser <- OptionParser(option_list=option_list);
+opt <- parse_args(opt_parser);
+
+##set options
+meta <- opt$meta
+clinic.col <- opt$clinic_col
+outdir <- opt$output
+files <- unlist(strsplit(opt$cdr3,","))
+stat.list <- unlist(strsplit(opt$stat,","))
+ssbcr_cluster <- unlist(strsplit(opt$ssbcr_cluster,","))
+sample.list <- stat.list
+source("src/immune_repertoire/trust4_metric_functions.R")
+
+##meta
+meta <- read.csv(file = meta, sep=",",  header = TRUE, row.names=1)
+print(meta)
+
+###function of processing cdr3 for each separated sample
+cdr3_process <- function(file, meta){
+  #print(file)
+  cdr3 <- read.table(file = file, sep = "\t", header = TRUE, stringsAsFactors = FALSE)
+  print(colnames(cdr3))
+  cdr3 <- subset(cdr3,count >0) %>%
+    mutate(V = as.character(V), J = as.character(J), C = as.character(C), CDR3aa = as.character(CDR3aa)) %>%
+    mutate(clinic = as.character(meta[sample,clinic.col]))
+  #print(table(cdr3$clinic))
+  cdr3$is_complete <- sapply(cdr3$CDR3aa, function(x) ifelse(x != "partial" && x != "out_of_frame" && !grepl("^_",x) && !grepl("^\\?", x),"Y","N"))
+
+  cdr3.bcr <- subset(cdr3, grepl("^IG",V) | grepl("^IG",J) | grepl("^IG",C))
+  cdr3.tcr <- subset(cdr3, grepl("^TR",V) | grepl("^TR",J) | grepl("^TR",C))
+
+  ##add lib size and clinic traits
+  if( dim(cdr3.bcr)[1] != 0 ) {
+  cdr.bcr.new <- cdr3.bcr %>% mutate(lib.size = sum(count))
+  } else {
+  cdr.bcr.new <- cdr3.bcr
+  cdr.bcr.new$lib.size <-  numeric(length=0)
+   }
+
+  if( dim(cdr3.tcr)[1] != 0 ) { cdr.tcr.new <- cdr3.tcr %>% mutate(lib.size = sum(count))
+  } else { cdr.tcr.new <- cdr3.tcr
+  cdr.tcr.new$lib.size <-  numeric(length=0)
+  }
+  ##save tcr and bcr to a list
+  cdr3_list <- list(tcr=cdr.tcr.new, bcr=cdr.bcr.new)
+  return(cdr3_list)
+}
+
+
+
+##main function of merging processed cdr3 data
+cdr3.dat <- lapply(files, function(f) cdr3_process(f,meta))
+##split to TCR and BCR
+cdr3.tcr <- do.call(rbind,do.call("rbind", cdr3.dat)[,1])
+cdr3.bcr <- do.call(rbind,do.call("rbind", cdr3.dat)[,2])
+##split BCR into heavy chain and light chain
+cdr3.bcr.heavy <- subset(cdr3.bcr, grepl("^IGH",V) | grepl("^IGH",J) | grepl("^IGH",C))
+cdr3.bcr.light <- subset(cdr3.bcr, grepl("^IG[K|L]",V) | grepl("^IG[K|L]",J) | grepl("^IG[K|L]",C))
+##save data
+save(cdr3.bcr.light, file = paste(outdir, "TRUST4_BCR_light.Rdata",sep = ""))
+save(cdr3.bcr.heavy, file = paste(outdir, "TRUST4_BCR_heavy.Rdata",sep = ""))
+save(cdr3.tcr, file = paste(outdir, "TRUST4_TCR.Rdata",sep = ""))
+
+
+##############-------------Processing for BCR ------------------------###########################
+################################################################################################
+#########--------------------------BCR clustering ----------------------------########
+all_ids <- rownames(meta)
+#bcr_clusters <- lapply(all_ids,function(ss){
+#  sample_bcr_cluster <- BuildBCRlineage(sampleID = ss, Bdata = cdr3.bcr.heavy, start=3, end=10)
+#  return(sample_bcr_cluster)
+#})
+#names(bcr_clusters) <- all_ids
+#ssbcr_clustr <- list.files("../analysis/trust4",pattern = "Rdata",recursive = TRUE,full.names = TRUE)
+#bcr_clusters <- list()
+#for (i in 1:length(ssbcr_cluster)){
+#  load(ssbcr_cluster[i])
+#  bcr_clusters[[i]] <- sample_bcr_cluster
+#}
+#samples <-unlist(strsplit(ssbcr_cluster,"/"))
+#samples <- samples[grep("Rdata",samples)]
+#names(bcr_clusters) <- samples
+#save(bcr_clusters,file = paste(outdir,"TRUST4_BCR_heavy_cluster.Rdata", sep = ""))
+#
+bcr_clusters <- list()
+tmp_1 <- NULL
+for (i in 1:length(ssbcr_cluster)){
+  load(ssbcr_cluster[i])
+  if (is.null(sample_bcr_cluster)) {
+#extact the empty bcr_cluster info
+    print(paste(ssbcr_cluster[i],"is empty"))
+    emp <- data.frame("sample" = ssbcr_cluster[i], "num" = i)
+    tmp_1 <- rbind(tmp_1, emp)
+    write.table(tmp_1, file = paste(outdir,"bcr_cluster_missing_info.txt", sep = ""),
+    sep = "\t", col.names = FALSE, row.names = FALSE, quote = FALSE)
+    sample_bcr_cluster <- NA
+    #bcr_clusters[[i]] <- sample_bcr_cluster
+  }
+  bcr_clusters[[i]] <- sample_bcr_cluster
+}
+samples <-unlist(strsplit(ssbcr_cluster,"/"))
+samples <- samples[grep("Rdata",samples)]
+names(bcr_clusters) <- samples
+save(bcr_clusters,file = paste(outdir,"TRUST4_BCR_heavy_cluster.Rdata", sep = ""))
+
+##########--------------------------BCR clonality----------------------------########
+bcr_clonality <- lapply(all_ids,function(ss){
+  sample_all_clonality <- getClonality(ss, cdr3.bcr.heavy, start=3, end=10)
+  return(sample_all_clonality)
+})
+names(bcr_clonality) <- all_ids
+save(bcr_clonality,file = paste(outdir,"TRUST4_BCR_heavy_clonality.Rdata", sep = ""))
+
+#########--------------------------BCR SHM----------------------------########
+allID <- names(bcr_clusters)
+SHMRatio <- lapply(allID,function(id){
+  tmp=bcr_clusters[[id]]
+  if(is.null(tmp)){
+    return (NA)
+    next
+  }
+  if(is.na(tmp)){
+    return (NA)
+    next
+  }
+  ss.ratio <- getSHMratio(tmp)
+  return (ss.ratio)
+})
+names(SHMRatio) <- allID
+save(SHMRatio, file = paste(outdir,"TRUST4_BCR_heavy_SHMRatio.Rdata",sep = ""))
+
+#########--------------------------BCR library reads----------------------------########
+stat <- lapply(1:length(stat.list), function(x){
+  tryCatch({
+    print(x)
+    file <- read.table(stat.list[[x]],sep = "\t",row.names = 1)
+    ID <- unlist(strsplit(sample.list[[x]], "/"))[3]
+    mapped.reads <- file["reads mapped:","V2"]
+    res <- cbind.data.frame(sample = ID, map.reads = mapped.reads)
+    return (res)
+  },error = function(e) {cat("ERROR:",conditionMessage(e),"\n")})
+})
+all.stats <- do.call("rbind",stat)
+##extract library size
+lib.size <- cdr3.bcr.heavy %>% group_by(sample) %>%
+  dplyr::summarise(lib = mean(lib.size)) 
+##combine stats and library size
+bcr.lib.reads <- merge(all.stats,lib.size,by = "sample") %>% 
+  mutate(Infil = signif(as.numeric(lib)/as.numeric(map.reads),4))
+save(bcr.lib.reads,file = paste(outdir,"TRUST4_BCR_heavy_lib_reads_Infil.Rdata",sep = ""))
+
+#########--------------------------Ig class switch----------------------------########
+bcr.cluster.cs <- get.bcr.cluster.classswitch(bcr_clusters)
+save(bcr.cluster.cs, file = paste(outdir,"TRUST4_BCR_Ig_CS.Rdata",sep = ""))
+
+
+
+
+##############-------------Processing for TCR ------------------------###########################
+################################################################################################
+######---------------------------------TCR clonality-----------------------------------#######
+all_ids <-  unique(cdr3.tcr$sample)
+tcr_clonality <- lapply(all_ids, function(x){
+  return (getClonalityTCR(x,cdr3.tcr))
+  print (x)
+})
+names(tcr_clonality) <- all_ids
+save(tcr_clonality,file = paste(outdir,"TRUST4_TCR_clonality.Rdata", sep = ""))
+
+#########--------------------------TCR library reads----------------------------########
+stat <- lapply(1:length(stat.list), function(x){
+  tryCatch({
+    print(x)
+    file <- read.table(stat.list[[x]],sep = "\t",row.names = 1)
+    ID <- unlist(strsplit(sample.list[[x]], "/"))[3]
+    mapped.reads <- file["reads mapped:","V2"]
+    res <- cbind.data.frame(sample = ID, map.reads = mapped.reads)
+    return (res)
+  },error = function(e) {cat("ERROR:",conditionMessage(e),"\n")})
+})
+all.stats <- do.call("rbind",stat)
+##extract library size
+lib.size <- cdr3.tcr %>% group_by(sample) %>%
+  dplyr::summarise(lib = mean(lib.size)) 
+##combine stats and library size
+tcr.lib.reads <- merge(all.stats,lib.size,by = "sample") %>% 
+  mutate(Infil = signif(as.numeric(lib)/as.numeric(map.reads),4))
+save(tcr.lib.reads,file = paste(outdir,"TRUST4_TCR_lib_reads_Infil.Rdata",sep = ""))

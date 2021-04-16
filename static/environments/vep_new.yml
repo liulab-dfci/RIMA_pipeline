@@ -1,0 +1,18 @@
+name: vep_env_new
+channels: 
+- bioconda
+- conda-forge
+- defaults
+dependencies:
+- samtools>=1.8
+- vcftools
+- vcf2maf>=1.6.16
+- ensembl-vep=96.0 #required by vcf2maf; tying it to vep.ver91_3
+- perl=5.26.2 #DANGEROUS! vep_91.3 ties us to perl 5.22.0!!!! 
+- perl-bioperl #required by vcf2maf
+- htslib
+- bcftools
+
+###since there is a bug when combining ensemble-vep and vcf2maf, you need to disable one line in
+#$CONDA_PREFIX/bin/vcf2maf.pl, which is:
+#$vep_cmd .= " --regulatory" unless( $species eq "canis_familiaris" or $online ); 

@@ -1,0 +1,32 @@
+#-----------Execution modules for RIMA-------------#
+#--------------Environment module for first time users-------------#
+#Note: This module creates the enviornment necessary to run the remaining modules. Installation required only for first time on any server. For recurring users, the command can be set to false to avoid reinstallations.
+environment: false
+
+#------------Pipeline modules for RNA data--------------------#
+#Note: Preprocess individual and cohort module necessary to get the alignment and quality results. Run the remaining modules only after these two modules.
+preprocess_bam2fastq: false
+preprocess_individual: false
+preprocess_cohort: false
+
+#Note: The below modules are specialized modules, each dealing with specific targets. Make sure to run individual and cohort of each module to get all the results.
+differential_expression_cohort: true
+immune_infiltration_cohort: true
+mutation_individual: false
+mutation_cohort: false
+immune_response_individual: false
+immune_response_cohort: false
+immune_repertoire_individual: true
+immune_repertoire_cohort: true
+neoantigen_individual: false
+neoantigen_cohort: false
+microbiome_individual: false
+microbiome_cohort: false
+
+
+
+##pvacseq
+pvacseq: false
+
+#Note: This module generates a standalone  HTML report. It shows the results from the modules that user decides to run. 
+report: false

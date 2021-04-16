@@ -1,0 +1,266 @@
+
+############################################################
+#                       General                            #
+############################################################
+metasheet: metasheet_new.csv
+ref: ref1.yaml
+assembly: hg38
+#Options are [ACC, BLCA, BRCA, CESC, CHOL, COAD, DLBC, ESCA, GBM, HNSC, KICH, KIRC, KIRP, LGG, LIHC, LUAD, LUSC, MESO, OV, PAAD, PCPG, PRAD, READ, SARC, SKCM, STAD, TGCT, THCA, THYM, UCEC, UCS, UVM]
+cancer_type: LUAD
+
+
+#########User defined parameters needed to run the modules################
+#------- preprocess  module--------#
+#Possible values are [ff-firststrand, ff-secondstrand, ff-unstranded, fr-firststrand, fr-secondstrand, fr-unstranded (default), transfrags]
+library_type: 'fr-firststrand'
+stranded: true
+rseqc_ref: house_keeping  #rseqc ref model
+mate: [1,2] #paired-end([1,2]) or single-end([0])
+
+#----- differential expression module------#
+##batch_removal and pca analysis
+batch_covariates: [Tissue]
+
+###deseq2
+batch: [Tissue] #no or batch colname in metasheet
+designs: [Responder] #condition to do comparsion
+comparison: between ##between or loop. between: compare any two phenotypes in a given condition column;loop: compare one phenotype and all the others
+
+##ssgsea
+ssgsea_comparisons: [Responder]
+ssgsea_top_n_terms: 50
+
+#---------immune infiltration module------#
+immune_infiltration_clinical_phenotype: [Responder]
+immunerepertoire_clinical_phenotype: [Responder]
+
+#---------immune response module---------#
+tide_cancer: NSCLC
+#tide_compare_tcga_cancer: LUAD
+control: true
+msi_clinical_phenotypes: [Responder]
+
+#--------mutation------------#
+fusion_clinical_phenotypes: [Responder]
+
+#--------neoantigen module----------#
+hla_annot_group: [Responder]
+neoantigen_callers: "NetMHC"
+neoantigen_epitope_lengths: "8,9,10,11"
+
+#------Multiqc report-----------#
+#Re-order the sample by phenotype:
+sam_ord: [Responder]
+
+############################################################
+#                     list samples                         #
+############################################################
+
+samples:
+
+  CNTZOUP14.01:
+      #- data/new_fastqs/CNTZOUP14.01.bam
+      - data/fastqs/CNTZOUP14.01_1.fq
+      - data/fastqs/CNTZOUP14.01_2.fq
+  CNTZTZNMR.01:
+      #- data/new_fastqs/CNTZTZNMR.01.bam
+      - data/fastqs/CNTZTZNMR.01_1.fq
+      - data/fastqs/CNTZTZNMR.01_2.fq
+  CNTZVX4S4.01:
+      #- data/new_fastqs/CNTZVX4S4.01.bam
+      - data/fastqs/CNTZVX4S4.01_1.fq
+      - data/fastqs/CNTZVX4S4.01_2.fq
+  CNTZN5PBN.01:
+      #- data/new_fastqs/CNTZN5PBN.01.bam
+      - data/fastqs/CNTZN5PBN.01_1.fq
+      - data/fastqs/CNTZN5PBN.01_2.fq
+  CNTZN5PV3.01: #post
+      - data/fastqs/CNTZN5PV3.01_1.fq
+      - data/fastqs/CNTZN5PV3.01_2.fq
+  CNTZZQDRV.01:
+      #- data/new_fastqs/CNTZZQDRV.01.bam
+      - data/fastqs/CNTZZQDRV.01_1.fq
+      - data/fastqs/CNTZZQDRV.01_2.fq
+  CNTZ36PKR.01:
+      #- data/new_fastqs/CNTZ36PKR.01.bam
+      - data/fastqs/CNTZ36PKR.01_1.fq
+      - data/fastqs/CNTZ36PKR.01_2.fq
+  CNTZBHEVV.01:
+      #- data/new_fastqs/CNTZBHEVV.01.bam
+      - data/fastqs/CNTZBHEVV.01_1.fq
+      - data/fastqs/CNTZBHEVV.01_2.fq
+  CNTZT4BPZ.01:
+      #- data/new_fastqs/CNTZT4BPZ.01.bam
+      - data/fastqs/CNTZT4BPZ.01_1.fq
+      - data/fastqs/CNTZT4BPZ.01_2.fq
+  CNTZ57I16.01:
+      #- data/new_fastqs/CNTZ57I16.01.bam
+      -  data/fastqs/CNTZ57I16.01_1.fq
+      -  data/fastqs/CNTZ57I16.01_2.fq
+  CNTZRWRRR.01:
+      #- data/new_fastqs/CNTZRWRRR.01.bam
+      - data/fastqs/CNTZRWRRR.01_1.fq
+      - data/fastqs/CNTZRWRRR.01_2.fq
+  CNTZOUPNR.01:
+     # - data/new_fastqs/CNTZOUPNR.01.bam
+      - data/fastqs/CNTZOUPNR.01_1.fq
+      - data/fastqs/CNTZOUPNR.01_2.fq
+  CNTZN7FQV.01:
+     # - data/new_fastqs/CNTZN7FQV.01.bam
+      - data/fastqs/CNTZN7FQV.01_1.fq
+      - data/fastqs/CNTZN7FQV.01_2.fq
+  CNTZS2CC7.01:
+     # - data/new_fastqs/CNTZS2CC7.01.bam
+      - data/fastqs/CNTZS2CC7.01_1.fq
+      - data/fastqs/CNTZS2CC7.01_2.fq
+  CNTZ4ZJE8.01:
+     # - data/new_fastqs/CNTZ4ZJE8.01.bam
+      - data/fastqs/CNTZ4ZJE8.01_1.fq
+      - data/fastqs/CNTZ4ZJE8.01_2.fq
+  #CNTZQX4R3.01: #badsamples
+     # - data/new_fastqs/CNTZQX4R3.01.bam
+      #- data/fastqs/CNTZQX4R3.01_1.fq
+      #- data/fastqs/CNTZQX4R3.01_2.fq
+  #CNTZ27ER5.01: #badsamples
+     # - data/new_fastqs/CNTZ27ER5.01.bam
+      #- data/fastqs/CNTZ27ER5.01_1.fq
+      #- data/fastqs/CNTZ27ER5.01_2.fq
+  CNTZGHXE1.01:
+     # - data/new_fastqs/CNTZGHXE1.01.bam
+      - data/fastqs/CNTZGHXE1.01_1.fq
+      - data/fastqs/CNTZGHXE1.01_2.fq
+  CNTZH1HTT.01:
+     #post
+     # - data/new_fastqs/CNTZH1HTT.01.bam
+      - data/fastqs/CNTZH1HTT.01_1.fq
+      - data/fastqs/CNTZH1HTT.01_2.fq
+  CNTZHP55A.01:
+     # - data/new_fastqs/CNTZHP55A.01.bam
+      - data/fastqs/CNTZHP55A.01_1.fq
+      - data/fastqs/CNTZHP55A.01_2.fq
+  CNTZ5KQXS.01:
+     #post
+     # - data/new_fastqs/CNTZ5KQXS.01.bam
+      - data/fastqs/CNTZ5KQXS.01_1.fq
+      - data/fastqs/CNTZ5KQXS.01_2.fq
+  CNTZMZSHB.01:
+     # - data/new_fastqs/CNTZMZSHB.01.bam
+      - data/fastqs/CNTZMZSHB.01_1.fq
+      - data/fastqs/CNTZMZSHB.01_2.fq
+
+
+
+
+############################################################
+#                       run settings                       #
+############################################################
+runs:
+  run_CNTZOUP14.01:
+   - CNTZOUP14.01
+
+  run_CNTZTZNMR.01:
+   - CNTZTZNMR.01
+
+  run_CNTZVX4S4.01:
+   - CNTZVX4S4.01
+
+  run_CNTZN5PBN.01:
+   - CNTZN5PBN.01
+
+  run_CNTZN5PV3.01:
+   - CNTZN5PV3.01
+
+  run_CNTZZQDRV.01:
+   - CNTZZQDRV.01
+
+  run_CNTZ36PKR.01:
+   - CNTZ36PKR.01
+
+  run_CNTZBHEVV.01:
+   - CNTZBHEVV.01
+
+  run_CNTZT4BPZ.01:
+   - CNTZT4BPZ.01
+
+  run_CNTZ57I16.01:
+   - CNTZ57I16.01
+
+  run_CNTZRWRRR.01:
+   - CNTZRWRRR.01
+
+  run_CNTZOUPNR.01:
+   - CNTZOUPNR.01
+
+  run_CNTZN7FQV.01:
+   - CNTZN7FQV.01
+
+  run_CNTZS2CC7.01:
+   - CNTZS2CC7.01
+
+  run_CNTZ4ZJE8.01:
+   - CNTZ4ZJE8.01
+
+  #run_CNTZQX4R3.01:
+   #- CNTZQX4R3.01
+
+  #run_CNTZ27ER5.01:
+   #-# CNTZ27ER5.01
+
+  run_CNTZGHXE1.01:
+   - CNTZGHXE1.01
+
+  run_CNTZH1HTT.01:
+   - CNTZH1HTT.01
+
+  run_CNTZHP55A.01:
+   - CNTZHP55A.01
+
+  run_CNTZ5KQXS.01:
+   - CNTZ5KQXS.01
+
+  run_CNTZMZSHB.01:
+   - CNTZMZSHB.01
+
+
+
+
+############################################################
+#                    Neoantigen testing                    #
+############################################################
+VCF:  #vcf files for tumor samples
+  #SRR8281228:
+    #- /mnt/tem_RIMA/rnaseq_pipeline/analysis/vcf/SRR8281228_tnscope.filter.neoantigen.vep.vcf
+  #SRR8281231:
+    #- /mnt/tem_RIMA/rnaseq_pipeline/analysis/vcf/SRR8281231_tnscope.filter.neoantigen.vep.vcf
+  #SRR8281223:
+   # - /mnt/tem_RIMA/rnaseq_pipeline/analysis/vcf/SRR8281222_tnscope.filter.neoantigen.vep.vcf
+  #SRR8281221:
+   # - /mnt/tem_RIMA/rnaseq_pipeline/analysis/vcf/SRR8281224_tnscope.filter.neoantigen.vep.vcf
+   CNTZ4ZJE8.01:
+     - data/vcf/10021_wes_test_wes_CNTZ4ZJYN.01_analysis_vcf_gz_tnscope_filter.vcf
+   CNTZ5KQXS.01:
+     - data/vcf/10021_wes_test_wes_CNTZ5KQU6.01_analysis_vcf_gz_tnscope_filter.vcf
+   CNTZBHEVV.01:
+     - data/vcf/10021_wes_test_wes_CNTZBHEM9.01_analysis_vcf_gz_tnscope_filter.vcf
+   CNTZH1HTT.01:
+     - data/vcf/10021_wes_test_wes_CNTZH1HZM.01_analysis_vcf_gz_tnscope_filter.vcf
+   CNTZHP55A.01:
+     - data/vcf/10021_wes_test_wes_CNTZHP5OX.01_analysis_vcf_gz_tnscope_filter.vcf
+   CNTZMZSHB.01:
+     - data/vcf/10021_wes_test_wes_CNTZMZS9W.01_analysis_vcf_gz_tnscope_filter.vcf
+   CNTZN5PV3.01:
+     - data/vcf/10021_wes_test_wes_CNTZN5PBL.01_analysis_vcf_gz_tnscope_filter.vcf
+   CNTZN5PBN.01:
+     - data/vcf/10021_wes_test_wes_CNTZN5PTJ.01_analysis_vcf_gz_tnscope_filter.vcf
+   CNTZN7FQV.01:
+     - data/vcf/10021_wes_test_wes_CNTZN7FOQ.01_analysis_vcf_gz_tnscope_filter.vcf
+   CNTZOUPNR.01:
+     - data/vcf/10021_wes_test_wes_CNTZOUPD8.01_analysis_vcf_gz_tnscope_filter.vcf
+   CNTZOUP14.01:
+     - data/vcf/10021_wes_test_wes_CNTZOUPUW.01_analysis_vcf_gz_tnscope_filter.vcf
+   CNTZS2CC7.01:
+     - data/vcf/10021_wes_test_wes_CNTZS2C7U.01_analysis_vcf_gz_tnscope_filter.vcf
+   CNTZVX4S4.01:
+     - data/vcf/10021_wes_test_wes_CNTZVX4Y1.01_analysis_vcf_gz_tnscope_filter.vcf
+   CNTZZQDRV.01:
+     - data/vcf/10021_wes_test_wes_CNTZZQD62.01_analysis_vcf_gz_tnscope_filter.vcf

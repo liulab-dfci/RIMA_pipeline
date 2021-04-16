@@ -1,0 +1,575 @@
+custom_logo: '/mnt/disks/RNA_data/10021/static/multiqc/cimac_logo.png'
+custom_logo_title: 'Dana Farber Cancer Institute'
+title: "RIMA: Modules"
+intro_text: "RIMA (RNA-seq IMmune Analysis) is a comprehensive, integrative pipeline to characterize the tumor environment from bulk RNA-seq data at the cohort and individual level. RIMA includes one module for pre-processing and seven downstream modules for differential expression analysis, immune infiltration estimation, immune repertoire inference, variant identification, neoantigen detection, microbiome characterization, immunotherapy response prediction."
+show_analysis_paths: False
+show_analysis_time: False
+output_fn_name: 'multiqc_report.html'
+make_data_dir: false
+plots_force_interactive: true
+max_table_rows: 2000
+num_datasets_plot_limit: 500
+read_count_multiplier: 0.000001
+read_count_prefix: 'M'
+read_count_desc: 'millions'
+report_header_info:
+      - Contact E-mail: 'cidc-rima@ds.dfci.harvard.edu'
+      - Application Type: 'RNA-seq'
+      - Project Type: 'CIMAC-CIDC network'
+      - Study ID: '10021'
+      - Cancer Type: 'LUAD'
+table_cond_formatting_rules:
+    all_columns:
+        pass:
+            - s_eq: 'pass'
+            - s_eq: 'true'
+        warn:
+            - s_eq: 'warn'
+            - s_eq: 'unknown'
+        fail:
+            - s_eq: 'fail'
+            - s_eq: 'false'
+        Response:
+           - s_eq: 'responder'
+           - s_eq: 'R'
+        Nonresponse:
+           - s_eq: 'non-responder'
+           - s_eq: 'non_responder'
+           - s_eq: 'NR'
+table_cond_formatting_colours:
+    - pass: '#d9534f'
+    - warn: '#f0ad4e'
+    - fail: '#2E86C1'
+    - Response: '#D4AC0D'
+    - Nonresponse: '#5cb85c'
+skip_generalstats: true
+custom_data:
+      Pipeline_Workflow:
+          parent_id: custom_section0
+          #parent_name: 'Pipeline_Figure'
+          parent_description: 'RIMA (RNA-seq IMmune Analysis) is a comprehensive, integrative pipeline to characterize the tumor environment from bulk RNA-seq data at the cohort and individual level. RIMA includes one module for pre-processing and seven downstream modules for differential expression analysis, immune infiltration estimation, immune repertoire inference, variant identification, neoantigen detection, microbiome characterization, immunotherapy response prediction.'
+          section_name: 'Pipeline_Flow'
+      Meta_information:
+          parent_id: custom_section1
+          #parent_name: 'Metasheet
+          section_name: 'Metasheet'
+          section_anchor: 'sample-metasheet'
+          description: 'Clinical and demographic information for each patient including: a unique sample identifier (SampleName), allocated patient identifier (PatName) and response to immunotherapy (R- responder; NR- nonresponder; U-Unknown).'
+          plot_type: 'table'
+          pconfig:
+              id: 'Metasheet Data'
+      QC_status:
+          parent_id: custom_section2
+          #parent_name: 'QC Status'
+          section_name: 'Quality Control'
+          description: 'Quality control status of the samples includes:Total reads(%) and unique mapping rate(%),as calculated by STAR. Median transcript integrity number (MedTIN) and exon ratio(CDs exon) are calculated by RSeQC.'
+          section_anchor: 'QC-status'
+          plot_type: 'table'
+          headers:
+              Total_Reads(M):
+                max: 200
+                min: 20
+                scale: 'Reds'
+                placement: 3000
+              Unique_Mapping(%):
+                max: 100
+                min: 80
+                scale: 'PRGn'
+                placement: 2999
+              median_TIN:
+                max: 100
+                min: 30
+                scale: 'Blues'
+                placement: 4000
+              CDS_Exons(%):
+                max: 100
+                min: 50
+                scale: 'RdPu'
+                placement: 3500
+          pconfig:
+              id: 'QC information'
+      deseq2_description:
+          parent_id: custom_section3
+          parent_name: 'Differential Expression Analysis'
+          #parent_description: 'Differential gene expression analysis'
+          section_name: 'DESeq2 Description'
+          description: 'DESeq2 estimates variance-mean dependence in count data and tests for differential expression based on a model using the negative binomial distribution.'
+          file_format: 'txt'
+          plot_type: 'table'
+          headers:
+              Gene_name:
+                title: 'Gene_name'
+                placement: 1000
+              baseMean:
+                title: 'baseMean'
+                format: '{:,.3f}'
+                scale: False
+                placement: 1500
+              log2FoldChange:
+                title: 'Log2FC'
+                format: '{:,.2f}'
+                placement: 2000
+              lfcSE:
+                title: 'lfcSE'
+                scale: False
+                format: '{:,.3f}'
+                placement: 2500
+              stat:
+                title: 'stat'
+                format: '{:,.3f}'
+                scale: False
+                placement: 3000
+              pvalue:
+                title: 'pvalue'
+                format: '{:,.3f}'
+                scale: False
+                placement: 3500
+              padj:
+                title: 'padj'
+                format: '{:,.3f}'
+                placement: 4000
+              -log10(padj):
+                title: '-log10(padj)'
+                format: '{:,.3f}'
+                scale: 'Blues'
+                placement: 4500
+      DESeq2-Volcano-Plot:
+          parent_id: custom_section3
+          parent_name: 'Differential Expression Analysis'
+          #parent_description: 'Differential gene expression analysis'
+          section_name: 'DESeq2-Volcano-Plot'
+          description: 'The plot shows the differentially expression genes (|logFC| > 1 and FDR < 0.05). Here, X-axis represents the magnitude of change (log of fold change) in the two treatment groups and Y-axis corresponds to statistical significance - negative log of the p-value. The most up-regulated genes are to the right; down-regulated genes are to the left; with the most statistically significant genes towards the top of the plot.'
+          file_format: 'png'
+          pconfig:
+            id: 'Differential Gene Expression: Volcano Plot'
+            #      GSEA_Pathways:
+            #          parent_id: custom_section2
+            #          parent_name: 'Differential Expression Analysis'
+            #          parent_description: 'Differential gene expression analysis based on the negative binomial distribution'
+            #          section_name: 'DESEQ2-GSEA Pathways'
+            #          description: 'This plot describes the top 20 pathways as detected by GSEA.'
+            #          plot_type: 'table'
+      GSEA_NES:
+          parent_id: custom_section3
+          parent_name: 'Differential Expression Analysis'
+          #parent_description: 'Differential gene expression analysis based on the negative binomial distribution'
+          section_name: 'GSEA'
+          description: 'This plot displays the gene-sets in KEGG and GO pathways with the top 10 normalized enrichment score (NES). The up-regulated gene-sets are to the right with positive NES while the down-regulated gene-sets are to the left with negative NES.
+'
+          plot_type: 'bargraph'
+          pconfig:
+            id: 'GSEA_plot'
+            title: 'GSEA: Gene Set Enrichment'
+            cpswitch: False
+            cursor: 'pointer'
+            xlab: 'Pathways'
+            ylab: 'Normalized Enrichment Score'
+            tt_percentages: False
+      ssgsea:
+          parent_id: custom_section3
+          parent_name: 'Differential Expression Analysis'
+          #parent_description: 'Differential gene expression analysis based on the negative binomial distribution'
+          description: 'Single-sample gsea calculates separate enrichment scores for each pairing of a sample and gene set. Each ssGSEA enrichment score represents the degree to which the genes in a particular gene set are coordinately up- or down-regulated within a sample. The plot shows the gene-sets from KEGG with top between-group variation,ranked by hierarchical clustering. '
+          section_name: 'ssGSEA'
+          plot_type: 'heatmap'
+          pconfig:
+              id: 'ssgsea-plot0'
+              square: False
+              xcats_samples: True
+              datalabels: False
+              borderWidth: 0
+          sortRows: True
+      Xcell:
+        parent_id: custom_section4
+        parent_name: 'Immune Infiltration'
+        parent_description: 'Immunedeconv estimates immune cell fractions from the RNAseq data. It integrates six prevalent methods of evaluating transcriptome-based cell components quantification in the tumor microenvironment, including deconvolution-based approaches (CIBERSORT, EPIC, quanTIseq, and TIMER) and marker-gene-based approaches (MCP-counter and xCell). The methods are conceptually different and allow comparisons to be made between-samples, between-cell-types, or both. Between-sample comparisons allow statements to be made about the relative differences between samples (e.g. patient A has more CD8+ T cells than patient B), whereas between-cell-type comparisons allow statements to be made about the relative abundance of immune cells within a single sample (e.g. patient A has more T cells than B cells).'
+        section_name: 'Xcell'
+        #description: 'It represents between-sample comparison, but not between-cell-type comparisons.'
+        plot_type: 'heatmap'
+        pconfig:
+            square: False
+            xcats_samples: True
+            datalabels: False
+            borderWidth: 0
+            colstops: [
+      [0, '#FFFFFF'],
+      [1, '#FF0000'],
+  ]
+        sortRows: True
+      Timer:
+        parent_id: custom_section4
+        parent_name: 'Immune Infiltration'
+        parent_description: 'Immunedeconv estimates immune cell fractions from the RNAseq data. It integrates six prevalent methods of evaluating transcriptome-based cell components quantification in the tumor microenvironment, including deconvolution-based approaches (CIBERSORT, EPIC, quanTIseq, and TIMER) and marker-gene-based approaches (MCP-counter and xCell). The methods are conceptually different and allow comparisons to be made between-samples, between-cell-types, or both. Between-sample comparisons allow statements to be made about the relative differences between samples (e.g. patient A has more CD8+ T cells than patient B), whereas between-cell-type comparisons allow statements to be made about the relative abundance of immune cells within a single sample (e.g. patient A has more T cells than B cells).'
+        section_name: 'Timer'
+        #description: 'It represents between-sample comparison, but not between-cell-type comparisons'
+        plot_type: 'heatmap'
+        pconfig:
+            square: False
+            xcats_samples: True
+            datalabels: False
+            borderWidth: 0
+            colstops: [
+      [0, '#FFFFFF'],
+      [1, '#FF0000'],
+  ]
+        sortRows: True
+      Quantiseq:
+        parent_id: custom_section4
+        parent_name: 'Immune Infiltration'
+        parent_description: 'Immunedeconv estimates immune cell fractions from the RNAseq data. It integrates six prevalent methods of evaluating transcriptome-based cell components quantification in the tumor microenvironment, including deconvolution-based approaches (CIBERSORT, EPIC, quanTIseq, and TIMER) and marker-gene-based approaches (MCP-counter and xCell). The methods are conceptually different and allow comparisons to be made between-samples, between-cell-types, or both. Between-sample comparisons allow statements to be made about the relative differences between samples (e.g. patient A has more CD8+ T cells than patient B), whereas between-cell-type comparisons allow statements to be made about the relative abundance of immune cells within a single sample (e.g. patient A has more T cells than B cells).'
+        section_name: 'Quantiseq'
+        plot_type: 'heatmap'
+        #description: 'It represents both between-sample and between-cell-type comparisons. It also provides an absolute score and estimates the amount of uncharacterized cells.'
+        pconfig:
+            square: False
+            xcats_samples: True
+            datalabels: False
+            borderWidth: 0
+            colstops: [
+      [0, '#FFFFFF'],
+      [1, '#FF0000'],
+  ]
+        sortRows: True
+      Epic:
+        parent_id: custom_section4
+        parent_name: 'Immune Infiltration'
+        parent_description: 'Immunedeconv estimates immune cell fractions from the RNAseq data. It integrates six prevalent methods of evaluating transcriptome-based cell components quantification in the tumor microenvironment, including deconvolution-based approaches (CIBERSORT, EPIC, quanTIseq, and TIMER) and marker-gene-based approaches (MCP-counter and xCell). The methods are conceptually different and allow comparisons to be made between-samples, between-cell-types, or both. Between-sample comparisons allow statements to be made about the relative differences between samples (e.g. patient A has more CD8+ T cells than patient B), whereas between-cell-type comparisons allow statements to be made about the relative abundance of immune cells within a single sample (e.g. patient A has more T cells than B cells).'
+        section_name: 'Epic'
+        plot_type: 'heatmap'
+        #description: 'It represents both between-sample and between-cell-type comparisons. It also provides an absolute score and estimates the amount of uncharacterized cells.'
+        pconfig:
+            square: False
+            xcats_samples: True
+            datalabels: False
+            borderWidth: 0
+            colstops: [
+      [0, '#FFFFFF'],
+      [1, '#FF0000'],
+  ]
+        sortRows: True
+      Cibersort_abs:
+        parent_id: custom_section4
+        parent_name: 'Immune Infiltration'
+        parent_description: 'Immunedeconv estimates immune cell fractions from the RNAseq data. It integrates six prevalent methods of evaluating transcriptome-based cell components quantification in the tumor microenvironment, including deconvolution-based approaches (CIBERSORT, EPIC, quanTIseq, and TIMER) and marker-gene-based approaches (MCP-counter and xCell). The methods are conceptually different and allow comparisons to be made between-samples, between-cell-types, or both. Between-sample comparisons allow statements to be made about the relative differences between samples (e.g. patient A has more CD8+ T cells than patient B), whereas between-cell-type comparisons allow statements to be made about the relative abundance of immune cells within a single sample (e.g. patient A has more T cells than B cells).'
+        section_name: 'Cibersort_abs'
+        plot_type: 'heatmap'
+        #description: 'It represents both between-sample and between-cell-type comparisons. It also generates scores in arbitrary units.'
+        pconfig:
+            square: False
+            xcats_samples: True
+            datalabels: False
+            borderWidth: 0
+            colstops: [
+      [0, '#FFFFFF'],
+      [1, '#FF0000'],
+  ]
+        sortRows: True
+      Mcp_counter:
+        parent_id: custom_section4
+        parent_name: 'Immune Infiltration'
+        parent_description: 'Immunedeconv estimates immune cell fractions from the RNAseq data. It integrates six prevalent methods of evaluating transcriptome-based cell components quantification in the tumor microenvironment, including deconvolution-based approaches (CIBERSORT, EPIC, quanTIseq, and TIMER) and marker-gene-based approaches (MCP-counter and xCell). The methods are conceptually different and allow comparisons to be made between-samples, between-cell-types, or both. Between-sample comparisons allow statements to be made about the relative differences between samples (e.g. patient A has more CD8+ T cells than patient B), whereas between-cell-type comparisons allow statements to be made about the relative abundance of immune cells within a single sample (e.g. patient A has more T cells than B cells).'
+        section_name: 'Mcp_counter'
+        plot_type: 'heatmap'
+        #description: 'It represents between-sample comparison, but not between cell-type comparisons.'
+        pconfig:
+            square: False
+            xcats_samples: True
+            datalabels: False
+            borderWidth: 0
+            colstops: [
+      [0, '#FFFFFF'],
+      [1, '#FF0000'],
+  ]
+        sortRows: True
+      TRUST4-BCR:
+        parent_id: custom_section5
+        parent_name: 'Immune Repertoire'
+        parent_description: 'TRUST4 performs de novo assembly on V, J, C genes including the hypervariable complementarity-determining region 3 (CDR3) and reports consensus of BCR/TCR sequences. TRUST4 then realigns the contigs to IMGT reference gene sequences to report the corresponding information.'
+        section_name: 'TRUST4 BCR_metrics'
+        description: 'BCR metric comparison between different conditions. The four metrics include: the fraction of BCR reads in all mapped reads; number of unique CDR3 sequences; somatic hyper-mutation rate of each sample; and clonality of each sample. Significance level is shown above the violin: (Most Significant: p < 0.001; Significant: p < 0.01; Least Significant: p < 0.05).'
+      TRUST4-TCR:
+        parent_id: custom_section5
+        parent_name: 'Immune Repertoire'
+        parent_description: 'TRUST4 performs de novo assembly on V, J, C genes including the hypervariable complementarity-determining region 3 (CDR3) and reports consensus of BCR/TCR sequences. TRUST4 then realigns the contigs to IMGT reference gene sequences to report the corresponding information.'
+        section_name: 'TRUST4 TCR_metrics'
+        description: 'TCR metric comparison between different conditions. The four metrics include: the fraction of TCR reads in all mapped reads; the number of unique CDR3 sequences; the number of clonotypes per kilo reads; and clonality of each sample. Significance level is shown above the violin:(Most Significant: p < 0.001; Significant: p < 0.01; Least Significant: p < 0.05).'
+      #TRUST_BCR_Ig:
+        #parent_id: custom_section6
+        #parent_name: 'TRUST'
+        #parent_description: 'TRUST4 performs de novo assembly on V, J, C genes including the hypervariable complementarity-determining region 3 (CDR3) and reports consensus of BCR/TCR sequences. TRUST4 then realigns the contigs to IMGT reference gene sequences to report the corresponding information'
+        #section_name: 'TRUST:BCR_Ig_Frequency'
+      TRUST_Ig:
+        parent_id: custom_section5
+        parent_name: 'Immune Repertoire'
+        parent_description: 'TRUST4 performs de novo assembly on V, J, C genes including the hypervariable complementarity-determining region 3 (CDR3) and reports consensus of BCR/TCR sequences. TRUST4 then realigns the contigs to IMGT reference gene sequences to report the corresponding information.'
+        section_name: 'TRUST4 Ig_Frequency'
+        plot_type: 'bargraph'
+        description: 'The stacked bar plot shows the percentage of BCR CDR3s size within different immunoglobulin (Ig) classes.'
+        pconfig:
+          id: 'TRUST_Ig_plot'
+          title: 'TRUST: Ig'
+          cpswitch: True
+          cpswitch_c_active: False
+          stacking: normal
+          cursor: 'pointer'
+          ylab: 'Frequency of IG'
+          tt_percentages: True
+          tt_decimals: 2
+      tide_table:
+          parent_id: custom_section6
+          parent_name: 'Immunotherapy Response'
+          parent_description: 'Analysis of Signatures of T cell dysfunction and exclusion for prediction of immunotherapy response and detection of somatic microsatellite changes.'
+          description: 'The table shows TIDE relevant signatures, including predicted response tag, TIDE score normalizing the pearson correlation of tumor expression profile with T cell dysfunction or exclusion scores, category flag of cytotoxic T lymphocytes score, T cell dysfunction score, T cell exclusion score, signature expression of three cell types restricting T cell infiltration (MAF = myeloid-derived suppressor cells, CAF = cancer-associated fibroblasts, and TAM.M2 = M2 subtype of macrophages), expression of IFNγ response biomarkers, PD1 expression level, CD247 and CD8 expression level, and microsatellite score (MSI).'
+          section_name: 'TIDE Description'
+          section_anchor: 'tide-description_table'
+          plot_type: 'table'
+          headers:
+              Responder:
+                title: 'Actual_Response'
+                Description: 'Actual Response of the samples as mentioned in the meta info'
+                placement: 1000
+              Predicted_response:
+                title: 'Predicted_Response'
+                Description: 'Predicted Response of the samples based on the TIDE score'
+                placement: 1500
+              TIDE:
+                max: 0
+                min: -5
+                scale: False
+                format: '{:,.2f}'
+                placement: 2000
+              CTL.flag:
+                placement: 2500
+              Dysfunction:
+                format: '{:,.2f}'
+                scale: False
+                placement: 3000
+              Exclusion:
+                format: '{:,.2f}'
+                scale: False
+                placement: 3500
+              MDSC:
+                format: '{:,.2f}'
+                scale: False
+                placement: 4000
+              CAF:
+                format: '{:,.2f}'
+                scale: False
+                placement: 4500
+              TAM.M2:
+                format: '{:,.2f}'
+                scale: False
+                placement: 5000
+              IFNG:
+                format: '{:,.2f}'
+                scale: False
+                placement: 5500
+              CD274:
+                format: '{:,.2f}'
+                scale: False
+                placement: 6000
+              CD8:
+                format: '{:,.2f}'
+                scale: False
+                placement: 6500
+              MSI:
+                max: 30
+                min: 20
+                format: '{:,.2f}'
+                scale: False
+                placement: 7000
+          pconfig:
+              scale: False
+              id: 'TIDE Signatures'
+      TIDE-TCGA:
+          parent_id: custom_section6
+          parent_name: 'Immunotherapy Response'
+          parent_description: 'Analysis of Signatures of T cell dysfunction and exclusion for prediction of immunotherapy response and detection of somatic microsatellite changes.'
+          description: 'Heatmaps display TIDE signature scores of user input data and TCGA data of the selected cancer type. User’s tumors and TCGA tumors are ranked by hierarchical clustering, respectively.'
+          section_name: 'TIDE TCGA Plot'
+          section_anchor: 'tide-tcga_plot'
+          description: 'Heatmaps display TIDE signature scores of user input data and TCGA data of the selected cancer type. User’s tumors and TCGA tumors are ranked by hierarchical clustering, respectively. '
+      MSISensor:
+          parent_id: custom_section6
+          parent_name: 'Immunotherapy Response'
+          parent_description: 'Analysis of Signatures of T cell dysfunction and exclusion for prediction of immunotherapy response and detection of somatic microsatellite changes.'
+          description: 'Microsatellite instability is genetic instability in short nucleotide repeats (microsatellites) due to a high mutation rate as a result of abnormal DNA mismatch repair. Length distributions of microsatellites per site in paired tumor and normal are computed and their observed distributions are statistically compared.'
+          section_name: 'MSI Comparison'
+          description: 'MSI score comparison between different phenotypes, such as responders and non-responders.Significance level is shown above the violin:(Most Significant: p < 0.001; Significant: p < 0.01; Least Significant: p < 0.05).'
+      ArcasHLA:
+          parent_id: custom_section7
+          parent_name: 'HLA-Typing'
+          parent_description: 'ArcasHLA performs high resolution genotyping for HLA class I and class II genes from RNA sequencing, supporting both paired and single-end samples.'
+          section_name: 'HLA Alleles'
+          description: 'The table shows the major HLA class I and class II alleles predicted in each individual sample, including A, B, C of class I and DQA1, DQB1, DRB1 of class II,as calculated by ArcasHLA.'
+          file_format: 'csv'
+          plot_type: 'table'
+          pconfig:
+              no_beeswarm: True
+              id: 'HLA alleles'
+      ArcasHLA_heatmap:
+          parent_id: custom_section7
+          parent_name: 'HLA-Typing'
+          parent_description: 'ArcasHLA performs high resolution genotyping for HLA class I and class II genes from RNA sequencing, supporting both paired and single-end samples.'
+          description: 'The plot shows the most frequent HLA alleles across patients. The values in the heatmap represent the frequency of the allele among samples.'
+          section_name: 'HLA Frequency'
+          plot_type: 'heatmap'
+          pconfig:
+              id: 'arcashla-plot0'
+              square: False
+              xcats_samples: True
+              datalabels: False
+              borderWidth: 0
+              colstops: [
+        [0, '#f0f0f0'],
+        [0.2, '#99d8c9'],
+        [0.4, '#fdbb84'],
+        [0.6, '#e34a33'],
+        [0.8, '#c994c7'],
+        [1, '#8856a7'],
+    ]
+          sortRows: True
+      Microbiome_abundance:
+        parent_id: custom_section8
+        parent_name: 'Microbiome'
+        parent_description: 'Centrifuge calculates abundance of microbiomes from RNA-seq data, which enables rapid and sensitive labeling of reads and quantification of species based on the referred microbes for each individual sample.'
+        section_name: 'Abundance'
+        description: 'The stacked plot displays the relative abundance of the top 15 most enriched microbial species, selected according to the inverse Simpson diversity score.
+'
+        plot_type: 'bargraph'
+        read_count_multiplier: 0.000001
+        read_count_prefix: 'M'
+        read_count_desc: 'millions'
+        pconfig:
+            id: 'mircrobiome_abundance_plot'
+            cpswitch: True
+            stacking: normal
+            ylab: Relative abundance
+            tt_percentages: true
+            tt_decimals: 2
+            cpswitch_counts_label: 'Relative abundance'
+      Microbiome_abundance_ratio:
+        parent_id: custom_section8
+        parent_name: 'Microbiome'
+        parent_description: 'Centrifuge calculates abundance of microbiomes from RNA-seq data, which enables rapid and sensitive labeling of reads and quantification of species based on the referred microbes for each individual sample.'
+        section_name: 'Abundance_ratio'
+        description: 'The same top 15 microbial species, grouped by responder/non-responder, presented as a heatmap.'
+        plot_type: 'heatmap'
+        pconfig:
+            id: 'microbiome_abundance_ratio-plot0'
+            square: False
+            xcats_samples: True
+            datalabels: False
+            borderWidth: 0
+            colstops: [
+        [0, '#f0f0f0'],
+        [0.1, '#99d8c9'],
+        [0.7, '#fdbb84'],
+    ]
+        sortRows: True
+sp:
+      Pipeline_Workflow:
+          fn: 'Pipeline_Workflow_mqc.png'
+      Meta_information:
+          fn: 'meta_information.csv'
+      QC_status:
+          fn: 'QC_status.txt'
+      deseq2_description:
+          fn: 'deseq2_description.txt'
+      DESeq2-Volcano-Plot:
+          fn: 'DESeq2-Volcano-Plot_mqc.png'
+          #      GSEA_Pathways:
+          #          fn: 'GSEA_Pathways.txt'
+      GSEA_NES:
+          fn: '*_report.txt'
+      ssgsea:
+          fn: 'ssgsea.txt'
+      ArcasHLA:
+          fn: 'hla_table.csv'
+      ArcasHLA_heatmap:
+          fn: 'hla_heatmap.txt'
+      tide_table:
+          fn: 'tide_table.txt'
+      TIDE-TCGA:
+          fn: 'TIDE-TCGA_mqc.png'
+      MSISensor:
+          fn: 'Biomarker-Evaluation-by-Responder_mqc.png'
+      TRUST4-BCR:
+          fn: 'TRUST4-BCR_mqc.png'
+      TRUST4-TCR:
+          fn: 'TRUST4-TCR_mqc.png'
+      #TRUST_BCR_Ig:
+          #fn: 'TRUST_BCR_Ig_mqc.png'
+      TRUST_Ig:
+          fn: 'TRUST_Ig.txt'
+      Xcell:
+          fn: 'xcell_immune_multiqc.txt'
+      Timer:
+          fn: 'timer_immune_multiqc.txt'
+      Quantiseq:
+          fn: 'quantiseq_immune_multiqc.txt'
+      Epic:
+          fn: 'epic_immune_multiqc.txt'
+      Cibersort_abs:
+          fn: 'cibersort_abs_immune_multiqc.txt'
+      Mcp_counter:
+          fn: 'mcp_counter_immune_multiqc.txt'
+      Microbiome_abundance:
+          fn: 'Microbiome_abundance.txt'
+      Microbiome_abundance_ratio:
+          fn: 'Microbiome_abundance_ratio.txt'
+
+top_modules:
+    - 'Meta_information'
+    - 'custom_data'
+exclude_modules:
+    #- 'salmon'
+    - 'picard'
+    - 'rseqc'
+    #- 'star'
+remove_sections:
+    - rseqc-junction_saturation
+extra_fn_clean_exts:
+    - type: remove
+      pattern: 'CIMAC-DFCI-12357-'
+      module:
+        - custom_data
+sample_names_ignore:
+    - 'SRR8281234'
+custom_plot_config:
+    rseqc_medTIN_plot1:
+       TIN_median:
+          color: '#d84e2f'
+    mircrobiome_abundance_plot:
+       Ralstonia_pickettii:
+          color: '#7fc97f'
+       Acinetobacter_baumannii:
+          color: '#beaed4'
+       Cupriavidus_gilardii:
+          color: '#fdc086'
+       Propionibacterium_acnes:
+          color: '#1b9e77'
+       Ralstonia_insidiosa:
+          color: '#d95f02'
+       Gardnerella_vaginalis:
+          color: '#7570b3'
+       Asticcacaulis_excentricus:
+          color: '#a6cee3'
+       Ralstonia_mannitolilytica:
+          color: '#1f78b4'
+       Acidovorax_sp._RAC01:
+          color: '#b2df8a'
+       Eubacterium]_rectale:
+          color: '#fbb4ae'
+       Acidovorax_sp._KKS102:
+          color: '#b3cde3'
+       Alicycliphilus_denitrificans:
+          color: '#ccebc5'
+       Ochrobactrum_anthropi:
+          color: '#e41a1c'
+       Dermacoccus_nishinomiyaensis:
+          color: '#377eb8'
+       Moraxella_osloensis:
+          color: '#4daf4a'
+       other:
+          color: '#e9a3c9'

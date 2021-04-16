@@ -1,0 +1,10 @@
+name: rseqc_env_new
+channels:
+- bioconda
+#- conda-forge
+- defaults
+dependencies:
+- rseqc
+- samtools
+- bedtools
+- picard
