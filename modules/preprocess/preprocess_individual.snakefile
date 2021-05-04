@@ -37,13 +37,14 @@ def preprocess_individual_targets(wildcards):
         ls.append("analysis/star/%s/%s.sorted.bam.stat.txt" % (sample, sample))
         ls.append("analysis/star/%s/%s.sorted.bam.bai" % (sample, sample))
         ls.append("analysis/salmon/%s/%s.quant.sf" % (sample, sample))
-        ls.append("analysis/rseqc/%s/%s.stat_tmp.txt" % (sample, sample))
-        ls.append("analysis/rseqc/%s/%s_downsampling_housekeeping.bam" % (sample, sample))
-        ls.append("analysis/rseqc/%s/%s_downsampling_housekeeping.bam.bai" % (sample, sample))
+        ls.append("analysis/star/%s/%s.stat_tmp.txt" % (sample, sample))
+        ls.append("analysis/star/%s/%s_downsampling.bam" % (sample, sample))
+        ls.append("analysis/star/%s/%s_downsampling.bam.bai" % (sample, sample))
+        ls.append("analysis/star/%s/%s_downsampling_housekeeping.bam" % (sample, sample))
+        ls.append("analysis/star/%s/%s_downsampling_housekeeping.bam.bai" % (sample, sample))
         ls.append("analysis/rseqc/read_distrib/%s/%s.txt" % (sample, sample))
-        ls.append("files/rseqc/gene_body_cvg/%s/%s.geneBodyCoverage.r" % (sample, sample))
-        ls.append("files/rseqc/junction_saturation/%s/%s.junctionSaturation_plot.pdf" % (sample, sample))
-        ls.append("analysis/rseqc/insert_size/%s/metrics/%s.insert_size_metrics.txt" % (sample, sample))
+        ls.append("analysis/rseqc/gene_body_cvg/%s/%s.geneBodyCoverage.r" % (sample, sample))
+        ls.append("analysis/rseqc/junction_saturation/%s/%s.junctionSaturation_plot.pdf" % (sample, sample))
         ls.append("analysis/rseqc/tin_score/%s/%s.summary.txt" % (sample, sample))
         ls.append("analysis/rseqc/tin_score/%s/%s.tin_score.txt" % (sample, sample))
     return ls
@@ -116,7 +117,7 @@ rule star_align:
         "--twopassMode Basic "
         "{params.gz_support} "
         "--outFileNamePrefix {params.prefix} "
-        "--quantMode TranscriptomeSAM GeneCounts"
+        "--quantMode TranscriptomeSAM"
         " && mv {params.prefix}Aligned.out.bam {output.unsortedBAM}"
         " && samtools sort -T {params.prefix}TMP -o {output.sortedBAM} -@ 8  {output.unsortedBAM} "
         " && mv {params.prefix}Aligned.toTranscriptome.out.bam {output.transcriptomeBAM}"
@@ -161,7 +162,7 @@ rule Size_downsampling:
     input:
         "analysis/star/{sample}/{sample}.sorted.bam.stat.txt"
     output:
-        "analysis/rseqc/{sample}/{sample}.stat_tmp.txt"
+        "analysis/star/{sample}/{sample}.stat_tmp.txt"
     shell:
         """chmod +x src/preprocess/ds_check_size.sh && """
         """src/preprocess/ds_check_size.sh {input} {output} """
@@ -170,7 +171,7 @@ rule bam_downsampling:
     input:
         bam = "analysis/star/{sample}/{sample}.sorted.bam",
         stat = "analysis/star/{sample}/{sample}.sorted.bam.stat.txt",
-        stat_tmp = "analysis/rseqc/{sample}/{sample}.stat_tmp.txt"
+        stat_tmp = "analysis/star/{sample}/{sample}.stat_tmp.txt"
     output:
         Downsampling_bam = "analysis/star/{sample}/{sample}_downsampling.bam",
         Downsampling_bai = "analysis/star/{sample}/{sample}_downsampling.bam.bai"
@@ -194,10 +195,10 @@ rule bam_downsampling:
 rule Downsampling_HouseKeeping:
     input:
         bam = "analysis/star/{sample}/{sample}_downsampling.bam",
-        stat_tmp = "analysis/rseqc/{sample}/{sample}.stat_tmp.txt"
+        stat_tmp = "analysis/star/{sample}/{sample}.stat_tmp.txt"
     output:
-        downsampling_hp_bam = "analysis/rseqc/{sample}/{sample}_downsampling_housekeeping.bam",
-        Downsampling_hp_bai = "analysis/rseqc/{sample}/{sample}_downsampling_housekeeping.bam.bai"
+        downsampling_hp_bam = "analysis/star/{sample}/{sample}_downsampling_housekeeping.bam",
+        Downsampling_hp_bai = "analysis/star/{sample}/{sample}_downsampling_housekeeping.bam.bai"
     message:
         "Running Downsampling on house keeping genes"
     params:
@@ -213,8 +214,8 @@ rule Downsampling_HouseKeeping:
      
 rule tin_score:
     input:
-        bam = getHousekeepingBam,
-        bai = getHousekeepingBai
+        bam = getHousekeepingBam(config["rseqc_ref"]),
+        bai = getHousekeepingBai(config["rseqc_ref"])
     output:
         summary = "analysis/rseqc/tin_score/{sample}/{sample}.summary.txt",
         score = "analysis/rseqc/tin_score/{sample}/{sample}.tin_score.txt"
@@ -243,8 +244,8 @@ rule tin_score:
 
 rule read_distrib_qc:
     input:
-        bam = getHousekeepingBam,
-        bai = getHousekeepingBai
+        bam = getHousekeepingBam(config["rseqc_ref"]),
+        bai = getHousekeepingBai(config["rseqc_ref"])
     output:
         "analysis/rseqc/read_distrib/{sample}/{sample}.txt"
     message:
@@ -265,10 +266,10 @@ rule read_distrib_qc:
 
 rule gene_body_cvg_qc:
     input:
-        bam = getHousekeepingBam,
-        bai = getHousekeepingBai
+        bam = getHousekeepingBam(config["rseqc_ref"]),
+        bai = getHousekeepingBai(config["rseqc_ref"])
     output:
-        "files/rseqc/gene_body_cvg/{sample}/{sample}.geneBodyCoverage.r"
+        "analysis/rseqc/gene_body_cvg/{sample}/{sample}.geneBodyCoverage.r"
     threads: _preprocess_threads
     message:
         "Creating gene body coverage curves"
@@ -278,7 +279,7 @@ rule gene_body_cvg_qc:
         "benchmarks/rseqc/gene_body_cvg/{sample}.gene_body_cvg_qc.benchmark"
     params:
         bed_ref = rseqc_ref,
-        prefix = "files/rseqc/gene_body_cvg/{sample}/{sample}",
+        prefix = "analysis/rseqc/gene_body_cvg/{sample}/{sample}",
         path="set +eu;source activate %s" % config['rseqc_root'],
     conda: "../envs/rseqc_env.yml"
     shell:
@@ -287,10 +288,10 @@ rule gene_body_cvg_qc:
 
 rule junction_saturation:
     input:
-        bam = getHousekeepingBam,
-        bai = getHousekeepingBai
+        bam = getHousekeepingBam(config["rseqc_ref"]),
+        bai = getHousekeepingBai(config["rseqc_ref"])
     output:
-        "files/rseqc/junction_saturation/{sample}/{sample}.junctionSaturation_plot.pdf"
+        "analysis/rseqc/junction_saturation/{sample}/{sample}.junctionSaturation_plot.pdf"
     message:
         "Determining junction saturation for {wildcards.sample}"
     benchmark:
@@ -298,30 +299,12 @@ rule junction_saturation:
     log:
         "logs/rseqc/junction_saturation/{sample}.junction_saturation.log"
     params:
-        prefix = "files/rseqc/junction_saturation/{sample}/{sample}",
+        prefix = "analysis/rseqc/junction_saturation/{sample}/{sample}",
         path="set +eu;source activate %s" % config['rseqc_root'],
     conda: "../envs/rseqc_env.yml"
     shell:
         "{params.path}; junction_saturation.py -i {input.bam} -r {config[bed_path]} -o {params.prefix}"
 
-rule collect_insert_size:
-    input:
-        bam = getHousekeepingBam,
-        bai = getHousekeepingBai
-    output:
-        text="analysis/rseqc/insert_size/{sample}/metrics/{sample}.insert_size_metrics.txt",
-        pdf="analysis/rseqc/insert_size/{sample}/hist/{sample}.insert_size_histogram.pdf"
-    message:
-        "Collecting insert size for {wildcards.sample}"
-    benchmark:
-        "benchmarks/rseqc/insert_size/{sample}.collect_insert_size.benchmark"
-    log:
-        "logs/rseqc/insert_size/{sample}.collect_insert_size.log"
-    params:
-        path="set +eu;source activate %s" % config['rseqc_root'],
-    conda: "../envs/rseqc_env.yml"
-    shell:
-        "{params.path}; picard CollectInsertSizeMetrics O={output.text} I={input.bam}  R={config[fasta_path]} M=0.5 H={output.pdf}"
 
 #----------------------Salmon rules----------------------#
 rule salmon_quantification:

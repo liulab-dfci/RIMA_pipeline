@@ -15,17 +15,17 @@ def merge_sep_inputs(inputs):
 
 def preprocess_cohort_targets(wildcards):
     ls = []
-    ls.append("files/star/STAR_Align_Report.csv" )
+    ls.append("analysis/star/STAR_Align_Report.csv" )
     ls.append("analysis/rseqc/gene_body_cvg/geneBodyCoverage.r")
-    ls.append("files/rseqc/gene_body_cvg/geneBodyCoverage.curves.png")
-    ls.append("files/rseqc/tin_score/tin_score_summary.txt")
+    ls.append("analysis/rseqc/gene_body_cvg/geneBodyCoverage.curves.png")
+    ls.append("analysis/rseqc/tin_score/tin_score_summary.txt")
     ls.append("analysis/rseqc/read_distrib/read_distrib.matrix.tab")
     ls.append("analysis/salmon/salmon_tpm.ensemble.csv")
     ls.append("analysis/batchremoval/tpm.genesymbol.batchremoved.txt")
     ls.append("analysis/salmon/tpm.genesymbol.txt")
     ls.append("analysis/salmon/gencode_tx2_ensemble_gene_symbol.csv")
-    ls.append("files/batchremoval/pca_plot_before.png")
-    ls.append("files/batchremoval/pca_plot_after.png")
+    ls.append("analysis/batchremoval/pca_plot_before.png")
+    ls.append("analysis/batchremoval/pca_plot_after.png")
     return ls
 
 rule preprocess_cohort_all:
@@ -38,7 +38,7 @@ rule STAR_matrix:
       star_log_files=expand( "analysis/star/{sample}/{sample}.Log.final.out", sample=config["samples"] ),
       star_gene_count_files=expand( "analysis/star/{sample}/{sample}.counts.tab", sample=config["samples"] )
     output:
-      csv="files/star/STAR_Align_Report.csv"
+      csv="analysis/star/STAR_Align_Report.csv"
     message:
       "Generating STAR report"
     benchmark:
@@ -56,7 +56,7 @@ rule tin_summary:
     input:
       expand("analysis/rseqc/tin_score/{sample}/{sample}.summary.txt", sample=config['samples'])
     output:
-      score = "files/rseqc/tin_score/tin_score_summary.txt",
+      score = "analysis/rseqc/tin_score/tin_score_summary.txt",
     message:
       "plotting TIN score summary"
     log:
@@ -89,10 +89,10 @@ rule read_distrib_qc_matrix:
 
 rule plot_gene_body_cvg:
     input:
-      samples_list=expand("files/rseqc/gene_body_cvg/{sample}/{sample}.geneBodyCoverage.r", sample=config["samples"] )
+      samples_list=expand("analysis/rseqc/gene_body_cvg/{sample}/{sample}.geneBodyCoverage.r", sample=config["samples"] )
     output:
       rscript="analysis/rseqc/gene_body_cvg/geneBodyCoverage.r",
-      png_curves="files/rseqc/gene_body_cvg/geneBodyCoverage.curves.png"
+      png_curves="analysis/rseqc/gene_body_cvg/geneBodyCoverage.curves.png"
     message: "Plotting gene body coverage"
     benchmark:
       "benchmarks/rseqc/gene_body_cvg/plot_gene_body_cvg.benchmark"
@@ -144,7 +144,7 @@ rule batch_removal:
     input:
         "analysis/salmon/tpm.genesymbol.txt"
     output:
-        combat_expr = "analysis/batchremoval/tpm.genesymbol.batchremoved.txt"
+        "analysis/batchremoval/tpm.genesymbol.batchremoved.txt"
     message:
         "Running batch removal using limma method"
     benchmark:
@@ -165,15 +165,15 @@ rule pca_sample_clustering:
         before_batch = "analysis/salmon/tpm.genesymbol.txt",
         after_batch = "analysis/batchremoval/tpm.genesymbol.batchremoved.txt"
     output:
-        "files/batchremoval/pca_plot_before.png",
-        "files/batchremoval/pca_plot_after.png",
+        "analysis/batchremoval/pca_plot_before.png",
+        "analysis/batchremoval/pca_plot_after.png",
     message:
         "Running PCA for sample clustering"
     benchmark:
         "benchmarks/batchremoval/pca.benchmark"
     params:
         meta_info = config["metasheet"],
-        out_path = "files/batchremoval/",
+        out_path = "analysis/batchremoval/",
         path="set +eu;source activate %s" % config['stat_root'],
         covariates = lambda wildcards: ','.join(str(i) for i in config["batch_covariates"])
     conda: "../envs/stat_perl_r.yml"
