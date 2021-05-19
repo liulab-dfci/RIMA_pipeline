@@ -12,16 +12,16 @@ mate: [1,2] #paired-end([1,2]) or single-end([0])
 
 #----- differential expression module------#
 ##batch_removal and pca analysis
-batch_covariates: [TumorLocation]
+batch_covariates: [syn_batch]
 
 ###deseq2
-batch: no #no or batch colname in metasheet
-designs: [Responder] #condition to do comparsion
-comparison: between ##between or loop. between: compare any two phenotypes in a given condition column;loop: compare one phenotype and all the others
+batch: False #False or batch colname in metasheet
+design: Group #condition to do comparsion
+Treatment: R
+Control: NR
 
 ##ssgsea
 ssgsea_comparisons: [Responder]
-ssgsea_top_n_terms: 50
 
 #---------immune infiltration module------#
 immune_infiltration_clinical_phenotype: Responder

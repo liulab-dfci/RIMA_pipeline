@@ -1,13 +1,13 @@
-SampleName,PatName,Batch,Age,Tissue,Replicate,Gender,Timing,Responder,TumorLocation,OngoingTreatment,PFS,Survival,OS,SampleId,Group,syn_batch
-SRR8281218,P20,1,63,Brain,NA,male,Pre,NR,temporal,no,110,1,278,4790-NL-AS,Y,1
-SRR8281219,P20,1,63,Brain,NA,male,Post,NR,temporal,no,110,1,278,4975-NL-AS,Y,1
-SRR8281226,P53,1,70,Brain,NA,male,Pre,NR,frontal,Yes, 83,1,337,3981-NL-AS,Y,2
-SRR8281236,P53,1,70,Brain, 2,male,Post,NR,frontal,Yes, 83,1,337,4760-D1,Y,2
-SRR8281233,P56,1,54,Brain,NA,female,Pre,NR,Parietal,no, 83,1, 83,4341-D3,Y,3
-SRR8281230,P56,1,54,Brain,NA,female,Post,NR,Parietal,no, 83,1, 83,4680-A1,Y,3
-SRR8281244,P100,1,31,Brain,NA,male,Post,R,Frontal-crossesmidline,yes,151,0,615,4956-NL-AS,Y,2
-SRR8281245,P100,1,31,Brain,NA,male,Pre,R,Frontal-crossesmidline,yes,151,0,615,4595-G1,Y,2
-SRR8281243,P101,1,32,Brain,NA,male,Pre,R,frontal,no,  0,1,414,3542-NL-AS,Y,2
-SRR8281238,P102,1,64,Brain,NA,female,Post,R,Temporal-anterior,yes,519,0,539,5094-NL-AS,Y,1
-SRR8281251,P101,1,32,Brain, 2,male,Post,R,frontal,no,  0,1,414,4943-A1,Y,2
-SRR8281250,P102,1,64,Brain,NA,female,Pre,R,Temporal-anterior,yes,519,0,539,4443-NL-AS,Y,1
+SampleName,PatName,Batch,Group,Age,Tissue,Replicate,Gender,Timing,Responder,TumorLocation,OngoingTreatment,PFS,Survival,OS,SampleId,syn_batch
+SRR8281218,P20,1,NR,63,Brain,NA,male,Pre,NR,temporal,no,110,1,278,4790-NL-AS,1
+SRR8281219,P20,1,NA,63,Brain,NA,male,Post,NR,temporal,no,110,1,278,4975-NL-AS,1
+SRR8281226,P53,1,NR,70,Brain,NA,male,Pre,NR,frontal,Yes,83,1,337,3981-NL-AS,2
+SRR8281236,P53,1,NA,70,Brain,2,male,Post,NR,frontal,Yes,83,1,337,4760-D1,2
+SRR8281233,P56,1,NR,54,Brain,NA,female,Pre,NR,Parietal,no,83,1,83,4341-D3,3
+SRR8281230,P56,1,NA,54,Brain,NA,female,Post,NR,Parietal,no,83,1,83,4680-A1,3
+SRR8281244,P100,1,NA,31,Brain,NA,male,Post,R,Frontal-crossesmidline,yes,151,0,615,4956-NL-AS,2
+SRR8281245,P100,1,R,31,Brain,NA,male,Pre,R,Frontal-crossesmidline,yes,151,0,615,4595-G1,2
+SRR8281243,P101,1,R,32,Brain,NA,male,Pre,R,frontal,no,0,1,414,3542-NL-AS,2
+SRR8281238,P102,1,NA,64,Brain,NA,female,Post,R,Temporal-anterior,yes,519,0,539,5094-NL-AS,1
+SRR8281251,P101,1,NA,32,Brain,2,male,Post,R,frontal,no,0,1,414,4943-A1,2
+SRR8281250,P102,1,R,64,Brain,NA,female,Pre,R,Temporal-anterior,yes,519,0,539,4443-NL-AS,1
