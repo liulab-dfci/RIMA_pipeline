@@ -3,6 +3,8 @@ suppressMessages(library(DESeq2))
 suppressMessages(library(optparse))
 suppressMessages(library(tximport))
 suppressMessages(library(dplyr))
+suppressMessages(library(sva))
+suppressMessages(library(limma))
 
 option_list = list(
   make_option(c("-i", "--input"), type="character", default=NULL,
@@ -10,29 +12,46 @@ option_list = list(
   make_option(c("-b", "--batch"), type="character", default=NULL,
               help="control batch effect or not", metavar="character"),
   make_option(c("-t", "--type"), type="character", default=NULL,
-              help="data source", metavar="character"),
+              help="salmon", metavar="character"),
   make_option(c("-m", "--meta"), type="character", default=NULL,
               help="metasheet info", metavar="character"),
-  make_option(c("-c", "--comparison"), type="character", default=NULL,
-              help="comparison type", metavar="character"),
   make_option(c("-x", "--tx2gene"), type="character", default=NULL,
               help="transcript annotation", metavar="character"),
   make_option(c("-o", "--outpath"), type="character", default="./",
               help="output file path and prefix ", metavar="character"),
-  make_option(c("-p", "--condition"), type="character", default="./",
+  make_option(c("-g", "--condition"), type="character", default="./",
               help="Condition to do comparison", metavar="character"),
-  make_option(c("-r", "--multiqc"), type="character", default="./",
-              help="Condition to do comparison", metavar="character")
+  make_option(c("-r", "--treatment"), type="character", default="./",
+              help="Treatment", metavar="character"),
+  make_option(c("-c", "--control"), type="character", default="./",
+              help="Control", metavar="character")
 )
 	      
 
 opt_parser = OptionParser(option_list=option_list)
 opt = parse_args(opt_parser)
+batch <- opt$batch 
+Condition <- opt$condition
+metadata <- opt$meta
+gene <- opt$tx2gene
+Treatment <- opt$treatment
+Control <- opt$control
+Type <- opt$type
+input <- opt$input
+
+print("Reading meta file ...")
+meta <- read.table(file = metadata, sep=',', header = TRUE, stringsAsFactors = FALSE, row.names = 1)
+print(head(meta))
+samples <- subset(meta,meta[,Condition] == Treatment | meta[,Condition] == Control)
+print(head(samples))
+
+print ("Reading tx2gene file ...")
+tx2gene <- read.table(file = gene,sep = ",",header = TRUE)
 
 
 if (is.null(opt$input) || is.null(opt$tx2gene) || is.null(opt$type)){
   print_help(opt_parser)
-  stop("At least three arguments must be supplied ", call.=FALSE)
+  stop("At least 3 arguments must be supplied ", call.=FALSE)
 }
 
 
@@ -40,120 +59,73 @@ if (is.null(opt$input) || is.null(opt$tx2gene) || is.null(opt$type)){
 ###----If you have transcript quantification files, as produced by Salmon, Sailfish, or kallisto, you would use DESeqDataSetFromTximport.
 
 Transcript <- function(files,samples,tx2gene,Type,batch){
+
   filelist <- strsplit(files, "\\,")[[1]]
+  print(paste("There are ",length(filelist), " samples to be compared", sep = ""))
   filelist.samples <- sapply(rownames(samples), function(x) grep(x, filelist, value = TRUE))
   filelist.samples <- filelist.samples[lapply(filelist.samples,length)>0]
+  
   print(filelist.samples)
-  print(length(filelist.samples))
   txi <- tximport(filelist.samples, type=Type, tx2gene=tx2gene)
   txi$length[txi$length == 0] <- 1
+  
+  print(head(txi$counts))
+  exprsn <- txi$counts
+  exprsn_log <- log2(exprsn + 1)
 
+  
   if(batch != "False"){
+    print (paste("Running DESeq2 with batch effects ",opt$batch," on ",opt$condition,sep=""))  
+     
+    colData <- samples[,c(batch ,Condition)]
+    colnames(colData) <- c("Batch","Condition")
+       
     ddsTxi <- DESeqDataSetFromTximport(txi,
-                                       colData = samples,
+                                       colData = colData,
                                        design = ~ Batch + Condition)
+                                       
+    print (paste("Generating log transformed TPMS after batch correction of ",batch," on ",Condition,sep=""))
+    
+    expr.limma = tryCatch(
+                     removeBatchEffect(exprsn_log,colData$Batch),
+                     error = function(e){
+                     print(e)
+                     })
+      
+    write.table(expr.limma,paste(opt$outpath,opt$condition,'_',opt$treatment,'_vs_',opt$control,'_TPMs.txt',sep = ""),quote = FALSE,sep = "\t")
+    
+      
+
   }else{
+    print(paste("Running DESeq2 on ",opt$condition,sep=""))
+    
+    colData <- cbind(rownames(samples),samples[,Condition])
+    colnames(colData) <- c('sample','Condition')
+    print(colData)
+    
     ddsTxi <- DESeqDataSetFromTximport(txi,
-                                       colData = samples,
+                                       colData = colData,
                                        design = ~ Condition)
+                                       
+    print ("Generating log transformed TPMS ...")
+    write.table(exprsn_log,paste(opt$outpath,opt$condition,'_',opt$treatment,'_vs_',opt$control,'_TPMs.txt',sep = ""),quote = FALSE,sep = "\t")
   }
   dds <- DESeq(ddsTxi)
+  
   return (dds)
 }
 
 
-IDConversion <- function(Type, res, tx2gene){
-	res.convertID <- cbind.data.frame(gene_name =rownames(res),res)
-  return (res.convertID)
-}
+print ("Star running DESeq2 ...")
+dds <- Transcript(files = input,samples, tx2gene = tx2gene, Type = Type, batch = batch)
+print(class(dds))
 
-tx2gene <- read.table(file = opt$tx2gene,sep = ",",header = TRUE)
-
-comp.type <- opt$comparison
-
-comp <- opt$meta
-condition <- opt$condition
-
-samples <- read.table(file = comp, sep='\t', header = TRUE, stringsAsFactors = FALSE, row.names = 1)
-if(ncol(samples) == 0) {
-  samples <- read.table(file = comp, sep=',', header = TRUE, stringsAsFactors = FALSE, row.names = 1)
-}
-
-if("N"%in%samples$Group) {
-  print("Differential gene expression analysis using the subset of samples")
-}
-
-#filter samples based on Group info
-if(opt$batch != "False") {
-  batch <- opt$batch
-  #  samples.all <- subset(samples, Batch != "" & Condition != "")
-  samples.all <- samples[c(batch, condition, "Group")]
-  samples.all <- subset(samples.all, Group == "Y")
-  samples.all <- samples.all[-ncol(samples.all)]
-  colnames(samples.all) <- c("Batch", "Condition")
-  samples.all$Batch <- factor(samples.all$Batch)
-
-} else {
-  samples.all <- samples[c(condition, "Group")]
-  samples.all <- subset(samples.all, Group == "Y")
-  samples.all <- samples.all[-ncol(samples.all)]
-  colnames(samples.all) <- c("Condition")
-}
+print (paste("Comparing ",opt$treatment , " VS ", opt$control, sep = ""))
+res <- results(dds, contrast = c("Condition",c(opt$treatment,opt$control)))
 
 
-print(paste("There are ", dim(samples.all)[1], " samples to be compared", sep = ""))
-
-#subset the samples based on the Group info
-filtered_samples <- rownames(subset(samples, Group == "N"))
-filtered_samples <- paste("analysis/salmon/", filtered_samples,  "/", filtered_samples, ".quant.sf,", sep = "")
-new_input <- opt$input
-for (num in c(1:length(filtered_samples))) {
-  new_input <- gsub(filtered_samples[num], "", new_input)
-}
-
-
-if(comp.type == "between"){
-  samples.all$Condition <- factor(samples.all$Condition)
-  ss <- t(as.matrix(combn(levels(samples.all$Condition),2)))
-  dds <- Transcript(files = new_input, samples = samples.all, tx2gene = tx2gene, Type = opt$type, batch = opt$batch)
-  print(class(dds))
-#saveRDS(dds, file = "Deseq2.RDS")
-  for(i in 1:dim(ss)[1]){
-    print (paste("Compare ", ss[i,1], " and ", ss[i,2], sep = ""))
-    res <- results(dds, contrast = c("Condition",c(ss[i,1],ss[i,2])))
-    res.convertID <- IDConversion(opt$type, res, tx2gene)
-    res_final <- as.data.frame(res)
-    res_final$Gene_name <- rownames(res_final)
-    res_final <- res_final[c(7, 1:6)]
-    res_final$`-log10(padj)` <- -log10(res_final$padj)
-    sub_res <- subset(res_final, abs(log2FoldChange) > 1)
-    sub_res <- sub_res[order(sub_res$`-log10(padj)`, decreasing = TRUE),]
-    sub_res <- head(sub_res, 100)
-    # write.table(sub_res,file=paste(opt$outpath,'deseq2_description.txt',sep= ""),quote=FALSE,sep="\t",row.names=FALSE)
-    #write.table(sub_res, file = paste(opt$outpath,"_",ss[i,1],"_VS_",ss[i,2],'_DESeq2_sub.txt',sep = ""), quote = FALSE,sep = "\t", row.names = FALSE)
-    #write.table(sub_res,file = paste(opt$outpath,"_",ss[i,1],"_VS_",ss[i,2],'_DESeq2_raw.txt',sep = ""), quote = FALSE,sep = "\t", row.names = FALSE)
-    write.table(res.convertID,file = paste(opt$outpath,"_",ss[i,1],"_VS_",ss[i,2],'_DESeq2_ConvertID.txt',sep = ""), quote = FALSE,sep = "\t")
-    write.table(sub_res,file = opt$multiqc, quote = FALSE, sep="\t",row.names=FALSE)
-  }
-}
-
-if(comp.type == "loop"){
-  for(gr in unique(as.character(samples.all$Condition))){
-    samples.loop <- samples.all %>% mutate(Condition_loop = factor(ifelse(Condition == gr, gr, "others"))) %>% mutate(Condition = Condition_loop)
-    print(samples.loop$Condition)
-    dds <- Transcript(files = opt$input, samples = samples.loop, tx2gene = tx2gene, Type = opt$type, batch = opt$batch)
-    print (paste("Compare ", gr, " and others", sep = ""))
-    res <- results(dds, contrast = c("Condition",c(gr,"others")))
-    res.convertID <- IDConversion(opt$type, res, tx2gene)
-    res_final <- as.data.frame(res)
-    res_final$Gene_name <- rownames(res_final)
-    res_final <- res_final[c(7, 1:6)]
-    res_final$`-log10(padj)` <- -log10(res_final$padj)
-    sub_res <- subset(res_final, abs(log2FoldChange) > 1)
-    sub_res <- sub_res[order(sub_res$`-log10(padj)`, decreasing = TRUE),]
-    sub_res <- head(sub_res, 100)
-    #write.table(sub_res,file = paste(opt$outpath,"_",gr,"_VS_others_DESeq2_raw.txt",sep = ""), quote = FALSE,sep = "\t", row.names = FALSE)
-    write.table(res.convertID,file = paste(opt$outpath,"_",gr,"_VS_others_DESeq2_ConvertID.txt",sep = ""), quote = FALSE,sep = "\t")
-    write.table(sub_res,file = opt$multiqc, quote = FALSE, sep="\t",row.names=FALSE)
-  }
-}
+res_final <- as.data.frame(res)
+res_final$Gene_name <- rownames(res_final)
+res_final <- res_final[c(7, 1:6)]
+res_final$`-log10(padj)` <- -log10(res_final$padj)
+write.table(res_final,file = paste(opt$outpath,opt$condition,'_',opt$treatment,'_vs_',opt$control,'_DESeq2.txt',sep = ""), quote = FALSE,sep = "\t")
