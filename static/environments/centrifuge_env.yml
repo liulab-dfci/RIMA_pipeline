@@ -1,9 +1,0 @@
-name: centrifuge_env_new
-channels: 
-- bioconda
-#- conda-forge
-- etetoolkit
-- defaults
-dependencies:
-- centrifuge
-- ete3

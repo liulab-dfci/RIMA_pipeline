@@ -1,0 +1,15 @@
+name: prada_env
+channels:
+  - bioconda
+  - conda-forge
+  - defaults
+dependencies:
+  - python=2.7.13=1
+  - pip:
+    - biopython==1.76
+    - future==0.18.2
+    - genomics-bcftbx==1.11.0
+    - gffutils==0.11.0
+    - pysam==0.16.0.1
+
+

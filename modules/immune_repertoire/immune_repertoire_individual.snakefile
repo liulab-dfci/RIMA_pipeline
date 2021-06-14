@@ -10,15 +10,23 @@ def immune_repertoire_individual_targets(wildcards):
         ls.append("analysis/trust4/%s/%s_report.processed.txt" % (sample, sample))
         
         ls.append("analysis/trust4/%s/%s_TRUST4_BCR_heavy.Rdata" % (sample, sample))
+        ls.append("analysis/trust4/%s/%s_TRUST4_BCR_heavy.txt" % (sample, sample))
         ls.append("analysis/trust4/%s/%s_TRUST4_BCR_light.Rdata" % (sample, sample))
+        ls.append("analysis/trust4/%s/%s_TRUST4_BCR_light.txt" % (sample, sample))
         ls.append("analysis/trust4/%s/%s_TRUST4_BCR_heavy_cluster.Rdata" % (sample, sample))
         ls.append("analysis/trust4/%s/%s_TRUST4_BCR_heavy_clonality.Rdata" % (sample, sample))
+        ls.append("analysis/trust4/%s/%s_TRUST4_BCR_heavy_clonality.txt" % (sample, sample))
         ls.append("analysis/trust4/%s/%s_TRUST4_BCR_heavy_SHMRatio.Rdata" % (sample, sample))
-        ls.append("analysis/trust4/%s/%s_TRUST4_BCR_heavy_lib_reads_Infil.Rdata" % (sample, sample))    
+        ls.append("analysis/trust4/%s/%s_TRUST4_BCR_heavy_SHMRatio.txt" % (sample, sample))
+        ls.append("analysis/trust4/%s/%s_TRUST4_BCR_heavy_lib_reads_Infil.Rdata" % (sample, sample))  
+        ls.append("analysis/trust4/%s/%s_TRUST4_BCR_heavy_lib_reads_Infil.txt" % (sample, sample))   
         
         ls.append("analysis/trust4/%s/%s_TRUST4_TCR.Rdata" % (sample, sample))
+        ls.append("analysis/trust4/%s/%s_TRUST4_TCR.txt" % (sample, sample))
         ls.append("analysis/trust4/%s/%s_TRUST4_TCR_clonality.Rdata" % (sample, sample))
-        ls.append("analysis/trust4/%s/%s_TRUST4_TCR_heavy_lib_reads_Infil.Rdata" % (sample, sample))
+        ls.append("analysis/trust4/%s/%s_TRUST4_TCR_clonality.txt" % (sample, sample))
+        ls.append("analysis/trust4/%s/%s_TRUST4_TCR_lib_reads_Infil.Rdata" % (sample, sample))
+        ls.append("analysis/trust4/%s/%s_TRUST4_TCR_lib_reads_Infil.txt" % (sample, sample))
     return ls
 
 rule trust4_all:
@@ -64,11 +72,16 @@ rule ss_bcr_process:
       stat = "analysis/star/{sample}/{sample}.sorted.bam.stat.txt"
     output:
       "analysis/trust4/{sample}/{sample}_TRUST4_BCR_heavy.Rdata",
+      "analysis/trust4/{sample}/{sample}_TRUST4_BCR_heavy.txt",
       "analysis/trust4/{sample}/{sample}_TRUST4_BCR_light.Rdata",
+      "analysis/trust4/{sample}/{sample}_TRUST4_BCR_light.txt",
       "analysis/trust4/{sample}/{sample}_TRUST4_BCR_heavy_cluster.Rdata",
       "analysis/trust4/{sample}/{sample}_TRUST4_BCR_heavy_clonality.Rdata",
+      "analysis/trust4/{sample}/{sample}_TRUST4_BCR_heavy_clonality.txt",
       "analysis/trust4/{sample}/{sample}_TRUST4_BCR_heavy_SHMRatio.Rdata",
-      "analysis/trust4/{sample}/{sample}_TRUST4_BCR_heavy_lib_reads_Infil.Rdata"
+      "analysis/trust4/{sample}/{sample}_TRUST4_BCR_heavy_SHMRatio.txt",
+      "analysis/trust4/{sample}/{sample}_TRUST4_BCR_heavy_lib_reads_Infil.Rdata",
+      "analysis/trust4/{sample}/{sample}_TRUST4_BCR_heavy_lib_reads_Infil.txt"
     benchmark:
       "benchmarks/trust4/{sample}/{sample}_trust4_bcr_cluster.benchmark"
     params:
@@ -87,8 +100,11 @@ rule ss_tcr_process:
       stat = "analysis/star/{sample}/{sample}.sorted.bam.stat.txt"
     output:
       "analysis/trust4/{sample}/{sample}_TRUST4_TCR.Rdata",
+      "analysis/trust4/{sample}/{sample}_TRUST4_TCR.txt",
       "analysis/trust4/{sample}/{sample}_TRUST4_TCR_clonality.Rdata",
-      "analysis/trust4/{sample}/{sample}_TRUST4_TCR_heavy_lib_reads_Infil.Rdata"
+      "analysis/trust4/{sample}/{sample}_TRUST4_TCR_clonality.txt",
+      "analysis/trust4/{sample}/{sample}_TRUST4_TCR_lib_reads_Infil.Rdata",
+      "analysis/trust4/{sample}/{sample}_TRUST4_TCR_lib_reads_Infil.txt"
     benchmark:
       "benchmarks/trust4/{sample}/{sample}_trust4_bcr_cluster.benchmark"
     params:
