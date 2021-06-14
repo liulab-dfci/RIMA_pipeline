@@ -1,4 +1,4 @@
-name: vep_env
+name: vep_env_new
 channels:
   - bioconda
   - conda-forge
