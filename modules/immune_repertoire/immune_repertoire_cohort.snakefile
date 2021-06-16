@@ -11,9 +11,7 @@ control = config["Control"]
 
 def immune_repertoire_cohort_targets(wildcards):
     ls = []
-    #ls.append("files/multiqc/immunerepertoire/TRUST4-BCR_mqc.png")
-    #ls.append("files/multiqc/immunerepertoire/TRUST4-TCR_mqc.png")
-    #ls.append("files/multiqc/immunerepertoire/TRUST_Ig.txt")
+    
     ls.append("analysis/trust4/%s_%s_vs_%s_TRUST4_BCR_light.txt" % (design,treatment,control))
     ls.append("analysis/trust4/%s_%s_vs_%s_TRUST4_BCR_heavy.txt" % (design,treatment,control))
     ls.append("analysis/trust4/%s_%s_vs_%s_TRUST4_TCR.txt" % (design,treatment,control))
@@ -23,6 +21,12 @@ def immune_repertoire_cohort_targets(wildcards):
     ls.append("analysis/trust4/%s_%s_vs_%s_TRUST4_BCR_Infil.txt" % (design,treatment,control))
     ls.append("analysis/trust4/%s_%s_vs_%s_TRUST4_TCR_clonality.txt" % (design,treatment,control))
     ls.append("analysis/trust4/%s_%s_vs_%s_TRUST4_TCR_Infil.txt" % (design,treatment,control))
+    
+    ls.append("analysis/trust4/%s_%s_vs_%s_TRUST4-BCR_mqc.png" % (design,treatment,control))
+    ls.append("analysis/trust4/%s_%s_vs_%s_TRUST4-TCR_mqc.png" % (design,treatment,control))
+    ls.append("analysis/trust4/%s_%s_vs_%s_TRUST4_Ig.txt" % (design,treatment,control))
+    
+    
     return ls
     
 def getsampleIDs(meta):
@@ -159,7 +163,7 @@ rule merge_bcr_shm:
       
 rule merge_bcr_infil:
     input:
-      shm=expand("analysis/trust4/{sample}/{sample}_TRUST4_BCR_heavy_lib_reads_Infil.txt", sample=getsampleIDs(metadata)),
+      infil=expand("analysis/trust4/{sample}/{sample}_TRUST4_BCR_heavy_lib_reads_Infil.txt", sample=getsampleIDs(metadata)),
     output:
       "analysis/trust4/{design}_{treatment}_vs_{control}_TRUST4_BCR_Infil.txt",
     benchmark:
@@ -170,7 +174,7 @@ rule merge_bcr_infil:
     params:
       meta= config["metasheet"],
       outdir="analysis/trust4/",
-      infil_input=lambda wildcards, input: ','.join(str(i) for i in list({input.shm})[0]),
+      infil_input=lambda wildcards, input: ','.join(str(i) for i in list({input.infil})[0]),
       Condition = design,
       Treatment = treatment,
       Control = control,
@@ -205,46 +209,39 @@ rule merge_tcr_infil:
       --outdir {params.outdir}"
 
 
-
-
-
-
-
-
-
-
-
-
-'''
 rule trust4_cohort_plot:
    input:
-      "files/immune_repertoire/TRUST4_BCR_light.Rdata",
-      "files/immune_repertoire/TRUST4_BCR_heavy.Rdata",
-      "files/immune_repertoire/TRUST4_TCR.Rdata",
-      "files/immune_repertoire/TRUST4_BCR_heavy_cluster.Rdata",
-      "files/immune_repertoire/TRUST4_BCR_heavy_clonality.Rdata",
-      "files/immune_repertoire/TRUST4_BCR_heavy_SHMRatio.Rdata",
-      "files/immune_repertoire/TRUST4_BCR_heavy_lib_reads_Infil.Rdata",
-      "files/immune_repertoire/TRUST4_BCR_Ig_CS.Rdata",
-      "files/immune_repertoire/TRUST4_TCR_clonality.Rdata",
-      "files/immune_repertoire/TRUST4_TCR_lib_reads_Infil.Rdata"
+      bcr_heavy = "analysis/trust4/{design}_{treatment}_vs_{control}_TRUST4_BCR_heavy.txt",
+      bcr_infil = "analysis/trust4/{design}_{treatment}_vs_{control}_TRUST4_BCR_Infil.txt",
+      bcr_clone = "analysis/trust4/{design}_{treatment}_vs_{control}_TRUST4_BCR_clonality.txt",
+      bcr_shm = "analysis/trust4/{design}_{treatment}_vs_{control}_TRUST4_BCR_SHMRatio.txt",
+      tcr = "analysis/trust4/{design}_{treatment}_vs_{control}_TRUST4_TCR.txt",
+      tcr_infil = "analysis/trust4/{design}_{treatment}_vs_{control}_TRUST4_TCR_Infil.txt",
+      tcr_clone = "analysis/trust4/{design}_{treatment}_vs_{control}_TRUST4_TCR_clonality.txt",
    output:
-      "files/multiqc/immunerepertoire/TRUST4-BCR_mqc.png",
-      "files/multiqc/immunerepertoire/TRUST4-TCR_mqc.png",
-      "files/multiqc/immunerepertoire/TRUST_Ig.txt"
+      "analysis/trust4/{design}_{treatment}_vs_{control}_TRUST4-BCR_mqc.png",
+      "analysis/trust4/{design}_{treatment}_vs_{control}_TRUST4-TCR_mqc.png",
+      "analysis/trust4/{design}_{treatment}_vs_{control}_TRUST4_Ig.txt"
    log:
-      "logs/trust4/trust4_plot.log"
+      "logs/trust4/{design}_{treatment}_vs_{control}_trust4_plot.log"
    benchmark:
-      "benchmarks/trust4/trust4_plot.benchmark"
+      "benchmarks/trust4/{design}_{treatment}_vs_{control}_trust4_plot.benchmark"
    conda: "../envs/stat_perl_r.yml"
    params:
-      inputdir = "files/immune_repertoire/",
-      phenotype_col=config["immunerepertoire_clinical_phenotype"],
-      meta=config['metasheet'],
-      plot_dir="files/multiqc/immunerepertoire/",
+      Condition = design,
+      Treatment = treatment,
+      Control = control,
+      plot_dir="analysis/trust4/",
       path="set +eu;source activate %s" % config['stat_root'],
    shell:
-      "{params.path}; Rscript src/immune_repertoire/trust4_plot.R --input_path {params.inputdir} --outdir {params.plot_dir} --meta {params.meta} --clinic_col {params.phenotype_col}"
-'''
+      "{params.path}; Rscript src/immune_repertoire/trust4_plot.R \
+      --infil_bcr {input.bcr_infil} \
+      --heavy_bcr {input.bcr_heavy} \
+      --shm {input.bcr_shm} \
+      --clone_bcr {input.bcr_clone} \
+      --infil_tcr {input.tcr_infil} \
+      --tcr {input.tcr} \
+      --clone_tcr {input.tcr_clone} \
+      --outdir {params.plot_dir} --condition {params.Condition} --treatment {params.Treatment} --control {params.Control}"
 
 
