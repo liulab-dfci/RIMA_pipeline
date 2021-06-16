@@ -30,20 +30,25 @@ option_list = list(
 
 opt_parser = OptionParser(option_list=option_list)
 opt = parse_args(opt_parser)
+
 batch <- opt$batch 
 Condition <- opt$condition
 metadata <- opt$meta
 gene <- opt$tx2gene
 Treatment <- opt$treatment
+print(Treatment)
 Control <- opt$control
+print(Control)
 Type <- opt$type
 input <- opt$input
 
 print("Reading meta file ...")
 meta <- read.table(file = metadata, sep=',', header = TRUE, stringsAsFactors = FALSE, row.names = 1)
-print(head(meta))
-samples <- subset(meta,meta[,Condition] == Treatment | meta[,Condition] == Control)
-print(head(samples))
+#print(head(meta))
+#samples <- subset(meta, meta[,Condition] == Treatment | meta[,Condition] == Control)
+samples <- subset(meta, meta[,Condition] != 'NA')
+print(samples)
+
 
 print ("Reading tx2gene file ...")
 tx2gene <- read.table(file = gene,sep = ",",header = TRUE)
@@ -61,11 +66,14 @@ if (is.null(opt$input) || is.null(opt$tx2gene) || is.null(opt$type)){
 Transcript <- function(files,samples,tx2gene,Type,batch){
 
   filelist <- strsplit(files, "\\,")[[1]]
-  print(paste("There are ",length(filelist), " samples to be compared", sep = ""))
+  print(filelist)
+  print(rownames(samples))
   filelist.samples <- sapply(rownames(samples), function(x) grep(x, filelist, value = TRUE))
-  filelist.samples <- filelist.samples[lapply(filelist.samples,length)>0]
   
+  filelist.samples <- filelist.samples[lapply(filelist.samples,length)>0]
+  print(paste("There are ",length(filelist.samples), " samples to be compared", sep = ""))
   print(filelist.samples)
+  
   txi <- tximport(filelist.samples, type=Type, tx2gene=tx2gene)
   txi$length[txi$length == 0] <- 1
   
@@ -84,17 +92,16 @@ Transcript <- function(files,samples,tx2gene,Type,batch){
                                        colData = colData,
                                        design = ~ Batch + Condition)
                                        
-    print (paste("Generating log transformed TPMS after batch correction of ",batch," on ",Condition,sep=""))
+    #print (paste("Generating log transformed TPMS after batch correction of ",batch," on ",Condition,sep=""))
     
-    expr.limma = tryCatch(
-                     removeBatchEffect(exprsn_log,colData$Batch),
-                     error = function(e){
-                     print(e)
-                     })
-      
-    write.table(expr.limma,paste(opt$outpath,opt$condition,'_',opt$treatment,'_vs_',opt$control,'_TPMs.txt',sep = ""),quote = FALSE,sep = "\t")
+    #expr.limma = tryCatch(
+    #                 removeBatchEffect(exprsn_log,colData$Batch),
+    #                 error = function(e){
+    #                 print(e)
+    #                 })
     
-      
+    print ("Generating TPM matrix ...")
+    write.table(exprsn,paste(opt$outpath,opt$condition,'_',opt$treatment,'_vs_',opt$control,'_TPMs.txt',sep = ""),quote = FALSE,sep = "\t")
 
   }else{
     print(paste("Running DESeq2 on ",opt$condition,sep=""))
@@ -107,8 +114,8 @@ Transcript <- function(files,samples,tx2gene,Type,batch){
                                        colData = colData,
                                        design = ~ Condition)
                                        
-    print ("Generating log transformed TPMS ...")
-    write.table(exprsn_log,paste(opt$outpath,opt$condition,'_',opt$treatment,'_vs_',opt$control,'_TPMs.txt',sep = ""),quote = FALSE,sep = "\t")
+    print ("Generating TPM matrix ...")
+    write.table(exprsn,paste(opt$outpath,opt$condition,'_',opt$treatment,'_vs_',opt$control,'_TPMs.txt',sep = ""),quote = FALSE,sep = "\t")
   }
   dds <- DESeq(ddsTxi)
   

@@ -31,7 +31,7 @@ cdr3_process <- function(file){
   cdr3 <- read.table(file = file, sep = "\t", header = TRUE, stringsAsFactors = FALSE)
   if (dim(cdr3)[1] != 0){  
   cdr3$sample <- ss
-  print(head(cdr3))
+  #print(head(cdr3))
   cdr3 <- subset(cdr3, count > 0) %>% 
     mutate(V = as.character(V), J = as.character(J), C = as.character(C), CDR3aa = as.character(CDR3aa)) 
 
@@ -45,6 +45,7 @@ cdr3_process <- function(file){
 }
 
 
+
 ##main function of merging processed cdr3 data
 cdr3.bcr<- cdr3_process(file)
 
@@ -55,12 +56,26 @@ cdr3.bcr.light <- subset(cdr3.bcr, grepl("^IG[K|L]",V) | grepl("^IG[K|L]",J) | g
 if( dim(cdr3.bcr.light)[1] !=  0 ) {
 print ("Saving BCR light result...")
 cdr3.bcr.light <- cdr3.bcr.light %>% 
-                  mutate(lib.size = sum(count))                            
+                  mutate(lib.size = sum(count))      
+                                        
 save(cdr3.bcr.light, file = paste(outdir, "_TRUST4_BCR_light.Rdata",sep = ""))
+write.table(cdr3.bcr.light, paste(outdir, "_TRUST4_BCR_light.txt",sep=''),sep = '\t',quote=FALSE,row.names = FALSE)
 
 } else {
-cdr3.bcr.light <- NULL
+cdr3.bcr.light <- data.frame(count=integer(),
+                 frequency = double(),
+                 CDR3nt = character(),
+                 CDR3aa = character(),
+                 V = character(),
+                 D = character(),
+                 J = character(),
+                 cid = character(),
+                 sample = character(),
+                 is_complete = character(),
+                 lib.size = integer() )
+                             
 save(cdr3.bcr.light, file = paste(outdir, "_TRUST4_BCR_light.Rdata",sep = ""))
+write.table(cdr3.bcr.light, paste(outdir, "_TRUST4_BCR_light.txt",sep=''),sep = '\t',quote=FALSE,row.names = FALSE)
 
 }
 
@@ -69,10 +84,11 @@ save(cdr3.bcr.light, file = paste(outdir, "_TRUST4_BCR_light.Rdata",sep = ""))
 
 if(  dim(cdr3.bcr.heavy)[1] !=  0 ) {
 
-print ("Saving bcr heavy results ...")
+print ("Saving BCR heavy results ...")
 cdr3.bcr.heavy <- cdr3.bcr.heavy %>% 
                   mutate(lib.size = sum(count))  
 save(cdr3.bcr.heavy, file = paste(outdir, "_TRUST4_BCR_heavy.Rdata",sep = ""))
+write.table(cdr3.bcr.heavy, paste(outdir, "_TRUST4_BCR_heavy.txt",sep=''),sep = '\t',quote=FALSE,row.names = FALSE)
 
 
 print ("Saving cluster results ...")
@@ -84,6 +100,7 @@ save(sample_bcr_cluster,file = paste(outdir, "_TRUST4_BCR_heavy_cluster.Rdata", 
 print ("Saving clonality results ...")
 sample_all_clonality <- getClonality(sampleID = ss, cdr3.bcr.heavy, start=3, end=10)
 save(sample_all_clonality,file = paste(outdir, "_TRUST4_BCR_heavy_clonality.Rdata", sep = ""))
+write.table(t(as.matrix(sample_all_clonality)),paste(outdir, "_TRUST4_BCR_heavy_clonality.txt", sep = ""),sep = '\t',quote=FALSE,row.names = FALSE)
 
 
  
@@ -93,7 +110,23 @@ if( is.null(sample_bcr_cluster)){
   } else if (is.na(sample_bcr_cluster)) {
     ss.ratio <- NULL
   } else { ss.ratio <- getSHMratio(sample_bcr_cluster) } 
-save(ss.ratio,file = paste(outdir, "_TRUST4_BCR_heavy_SHMRatio.Rdata", sep = ""))  
+
+if(!is.null(ss.ratio))
+{
+ss.ratio_file <- data.frame(
+                 sample = ss,
+                 SHMRatio = ss.ratio)
+       
+} else {
+ss.ratio_file <- data.frame(
+                 sample = character(),
+                 SHMRatio = character()
+                 )
+}          
+                 
+
+save(ss.ratio_file,file = paste(outdir, "_TRUST4_BCR_heavy_SHMRatio.Rdata", sep = ""))  
+write.table(ss.ratio_file,paste(outdir, "_TRUST4_BCR_heavy_SHMRatio.txt", sep = ""),sep = '\t',quote=FALSE,row.names = FALSE)
 
 
 
@@ -102,22 +135,55 @@ stat<- read.table(stat_f,sep = "\t",row.names = 1)
 map.reads <- stat["reads mapped:","V2"]
 lib.size <- mean(cdr3.bcr.heavy$lib.size)
 Infil <- signif(as.numeric(lib.size)/as.numeric(map.reads),4)
-bcr.lib.reads <- cbind(map.reads,lib.size,Infil) 
+bcr.lib.reads <- cbind(sample=ss, map.reads,lib.size,Infil) 
 save(bcr.lib.reads,file = paste(outdir, "_TRUST4_BCR_heavy_lib_reads_Infil.Rdata", sep = "")) 
+write.table(bcr.lib.reads,paste(outdir, "_TRUST4_BCR_heavy_lib_reads_Infil.txt", sep = ""),sep = '\t',quote=FALSE,row.names = FALSE)
+
+
 
 } else {
-sample_all_clonality <- NULL
+sample_all_clonality <- data.frame(
+                 sample = character(),
+                 clonality = character()
+                 )
 sample_bcr_cluster  <- NULL
-ss.ratio <- NULL
-bcr.lib.reads <- NULL
-cdr3.bcr.heavy <- NULL
+ss.ratio_file <- data.frame(
+                 sample = character(),
+                 SHMRatio = character()
+                 )
+bcr.lib.reads <- data.frame(
+                 sample = character(),
+                 map.reads = character(),
+                 lib.size = character(),
+                 Infil = character()
+                 )
+
+cdr3.bcr.heavy <- data.frame(count=integer(),
+                 frequency = double(),
+                 CDR3nt = character(),
+                 CDR3aa = character(),
+                 V = character(),
+                 D = character(),
+                 J = character(),
+                 cid = character(),
+                 sample = character(),
+                 is_complete = character(),
+                 lib.size = integer() )
 
 
 save(sample_bcr_cluster,file = paste(outdir, "_TRUST4_BCR_heavy_cluster.Rdata", sep = ""))
+
 save(sample_all_clonality,file = paste(outdir, "_TRUST4_BCR_heavy_clonality.Rdata", sep = ""))
-save(ss.ratio,file = paste(outdir, "_TRUST4_BCR_heavy_SHMRatio.Rdata", sep = "")) 
-save(bcr.lib.reads,file = paste(outdir, "_TRUST4_BCR_heavy_lib_reads_Infil.Rdata", sep = "")) 
+write.table(sample_all_clonality,paste(outdir, "_TRUST4_BCR_heavy_clonality.txt", sep = ""),sep = '\t',quote=FALSE,row.names = FALSE)
+
+save(ss.ratio_file,file = paste(outdir, "_TRUST4_BCR_heavy_SHMRatio.Rdata", sep = "")) 
+write.table(ss.ratio_file,paste(outdir, "_TRUST4_BCR_heavy_SHMRatio.txt", sep = ""),sep = '\t',quote=FALSE,row.names = FALSE)
+
+save(bcr.lib.reads,file = paste(outdir, "_TRUST4_BCR_heavy_lib_reads_Infil.Rdata", sep = ""))
+write.table(bcr.lib.reads,paste(outdir, "_TRUST4_BCR_heavy_lib_reads_Infil.txt", sep = ""),sep = '\t',quote=FALSE,row.names = FALSE)
+ 
 save(cdr3.bcr.heavy, file = paste(outdir, "_TRUST4_BCR_heavy.Rdata",sep = ""))
+write.table(cdr3.bcr.heavy, paste(outdir, "_TRUST4_BCR_heavy.txt",sep=''),sep = '\t',quote=FALSE,row.names = FALSE)
 
 }
 

@@ -24,7 +24,6 @@ opt = parse_args(opt_parser);
 expr_before <- read.table(opt$before,sep = ",", row.names = 1, header = TRUE, check.names = FALSE)
 expr_after <- read.table(opt$after,sep = ",", row.names = 1, header = TRUE, check.names = FALSE)
 annot <- read.table(opt$metainfo,sep = ",",header = TRUE, row.names = 1)
-#Batch <- opt$column
 pca_out_dir <- opt$outdir
 
 if (opt$column == "False") {

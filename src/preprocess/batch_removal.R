@@ -3,16 +3,18 @@ suppressMessages(library(limma))
 suppressMessages(library(optparse))
 
 
+
 # make option list and parse command line
 option_list <- list(
   make_option(c("-e", "--expression_dat"), type="character",
               help="Input path of expression file. [Required]"),
-  make_option(c("-b", "--batch_dat"), type="character",
-              help="Input path of corresponding batch file[Required]"),
   make_option(c("-c", "--covariates"), type="character",
               help="covariates needs to be adjusted for"),
+  make_option(c("-m", "--metasheet"), type="character",
+              help="covariates needs to be adjusted for"),   
   make_option(c("-o","--output",type="character", help="Output files [Required]"))
 )
+
 
 opt_parser <- OptionParser(option_list=option_list);
 opts <- parse_args(opt_parser);
@@ -36,6 +38,7 @@ writeDF <- function(dat,path){
 
 print('Load data done!')
 
+
 ###filtering out genes with low variance among samples
 
 CVFILTER <- 0
@@ -49,48 +52,29 @@ exprZero <- expr.dat
 expr.dat <- expr.dat[rownames(expr.dat) %in% names(filt_genes),]
 exprZero <- subset(exprZero, !(rownames(exprZero) %in% names(filt_genes)))
 
-batch.dat = read.table(opts$batch_dat, sep=',', header = TRUE, stringsAsFactors = FALSE, row.names = 1,check.names = FALSE)
+batch.dat = read.table(opts$metasheet, sep=',', header = TRUE, stringsAsFactors = FALSE, row.names = 1,check.names = FALSE)
 overlap_sample = intersect(colnames(expr.dat),rownames(batch.dat))
-
 print('Load meta done!')
 
 # stop at low sample numbers
-if(length(overlap_sample) < dim(expr.dat)[2]/2) stop("too few samples")
+#if(length(exprZero) <- dim(expr.dat)[2]/2) stop("too few samples")
 
 print('Processing samples:')
 print(overlap_sample)
 
-if(opts$covariates == "False") {
-  print("Skipping batch removal")
-} else {
-  covars <- strsplit(opts$covariates, "\\,")[[1]]
-
-  #add temporary column to fit for model.matrix function
-  batch.dat$tmp <- 1
-  print(paste0("covariates to be adjusted:", covars))
-
-  covars <- append(covars, "tmp")
-  covariates_df <- batch.dat[overlap_sample,covars]
-
-  #add temporary column to fit for model.matrix function
-  fomul <- as.formula(paste("~ ", paste0(covars, collapse = " + "), sep = " "))
-  design <- model.matrix(fomul, data=covariates_df)
-
-  #remove the tmp column
-  design <- design[,c(-1, -ncol(design))]
-}
-
 
 if(opts$covariates == "False"){
-  expr.combat <- expr.dat
+  expr.limma <- expr.dat
     } else {
-      expr.combat = tryCatch(
+      expr.limma = tryCatch(
       removeBatchEffect(as.matrix(expr.dat[,overlap_sample]),
-                          covariates = design),
+                          batch.dat$opt$covariates),
       error = function(e){
       print(e)
       })
     }
 
-expr.combat = rbind(expr.combat,exprZero)
-writeDF(ssgsvaFormat(expr.combat),paste0(opts$output,'.batch'))
+expr.limma = rbind(expr.limma,exprZero)
+writeDF(ssgsvaFormat(expr.limma),opts$output)
+
+
