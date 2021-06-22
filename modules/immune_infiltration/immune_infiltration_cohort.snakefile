@@ -27,7 +27,7 @@ rule immune_infiltration__all:
 
 rule ImmuneDeconv_infiltration:
     input:
-        "analysis/batchremoval/tpm_convertID.txt" 
+        "analysis/salmon/tpm.genesymbol.txt" 
         #"analysis/batchremoval/tpm_matrix.batch"
     output:
         "files/immune_infiltration/quantiseq.txt",
