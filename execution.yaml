@@ -1,7 +1,7 @@
-#-----------Execution modules for RIMA-------------#
+# ----------Execution modules for RIMA-------------#
 #--------------Environment module for first time users-------------#
 #Note: This module creates the enviornment necessary to run the remaining modules. Installation required only for first time on any server. For recurring users, the command can be set to false to avoid reinstallations.
-environment: false
+environment: true
 
 #------------Pipeline modules for RNA data--------------------#
 #Note: Preprocess individual and cohort module. 
@@ -15,9 +15,9 @@ immune_infiltration_cohort: false
 mutation_individual: false
 mutation_cohort: false
 immune_response_individual: false
-immune_response_cohort: false
-immune_repertoire_individual: true
-immune_repertoire_cohort: true
+immune_response_cohort: true
+immune_repertoire_individual: false
+immune_repertoire_cohort: false
 neoantigen_individual: false
 neoantigen_cohort: false
 microbiome_individual: false
