@@ -42,7 +42,7 @@ rule arcasHLA_extr_chr6:
          #outfile1 = "analysis/neoantigen/{sample}/{sample}.1.fq.gz",
          #outfile2 = "analysis/neoantigen/{sample}/{sample}.2.fq.gz"
      shell:
-        """{params.arcasHLA_path}/arcasHLA extract {input.in_sortbamfile} --paired -t {threads} -v -o {params.outpath}"""
+        """{params.arcasHLA_path}/arcasHLA extract {input.in_sortbamfile} -t {threads} -v -o {params.outpath}"""
         """ && cp {output.chr6fastqfile1} {output.outfile1}"""
         """ && cp {output.chr6fastqfile2} {output.outfile2}"""
 
