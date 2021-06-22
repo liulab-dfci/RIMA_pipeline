@@ -1,4 +1,4 @@
-name: prada_env_new
+name: prada_env
 channels:
   - bioconda
   - conda-forge

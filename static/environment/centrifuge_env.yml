@@ -1,4 +1,4 @@
-name: centrifuge_env_new
+name: centrifuge_env
 channels: 
 - bioconda
 #- conda-forge

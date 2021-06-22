@@ -1,4 +1,4 @@
-name: stat_perl_r_new
+name: stat_perl_r
 channels:
 - r
 - bioconda
@@ -37,6 +37,7 @@ dependencies:
 - bioconductor-ggtree
 - r-seqinr
 - r-ape
+- r-dplyr
 - bioconductor-msa
 - r-network
 - r-ggcorrplot

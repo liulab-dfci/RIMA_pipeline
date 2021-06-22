@@ -2,7 +2,7 @@
 
 
 
-for i in "static/environments"/*.yml
+for i in "static/environment"/*.yml
 do
   echo "Creating all environments for the pipeline"  
   mamba  env create -f $i
