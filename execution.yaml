@@ -15,7 +15,7 @@ immune_infiltration_cohort: false
 mutation_individual: false
 mutation_cohort: false
 immune_response_individual: false
-immune_response_cohort: true
+immune_response_cohort: false
 immune_repertoire_individual: false
 immune_repertoire_cohort: false
 neoantigen_individual: false
@@ -23,10 +23,6 @@ neoantigen_cohort: false
 microbiome_individual: false
 microbiome_cohort: false
 
-
-
-##pvacseq
-pvacseq: false
 
 #Note: This module generates a standalone  HTML report. It shows the results from the modules that user decides to run. 
 report: false
