@@ -18,8 +18,8 @@ rule multiqc_all:
 rule QC_Check:
     input:
         distr = "analysis/rseqc/read_distrib/read_distrib.matrix.tab",
-        star = "files/star/STAR_Align_Report.csv",
-        tin = "files/rseqc/tin_score/tin_score_summary.txt"
+        star = "analysis/star/STAR_Align_Report.csv",
+        tin = "analysis/rseqc/tin_score/tin_score_summary.txt"
     output:
         QC_check = "files/multiqc/QC_check/QC_status.txt",
         meta_info = "files/multiqc/QC_check/meta_information.csv"
