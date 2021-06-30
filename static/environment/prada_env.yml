@@ -1,9 +1,0 @@
-name: prada_env
-channels:
-  - bioconda
-  - conda-forge
-  - defaults
-dependencies:
-  - python=2.7.13=1
-
-
