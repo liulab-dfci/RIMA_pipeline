@@ -1,0 +1,11 @@
+name: rseqc_env
+channels:
+  - bioconda
+  - conda-forge
+  - defaults
+dependencies:
+  - gcc_linux-64=7.3.0=h553295d_15
+  - bedtools=2.29.2=hc088bd4_0
+  - picard=2.22.1=0
+  - rseqc=2.6.4=py27hf8a1672_2
+  - samtools=1.9=h10a08f8_12
