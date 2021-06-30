@@ -10,22 +10,22 @@ cancer_type: GBM
 rseqc_ref: house_keeping  #rseqc ref model
 mate: [1,2] #paired-end([1,2]) or single-end([0])
 
-#----- differential expression module------#
-##batch_removal and pca analysis
-batch_covariates: [syn_batch]
 
 ###deseq2
-batch: False #False or batch colname in metasheet
+batch: syn_batch #False or batch colname in metasheet
 design: Group #condition to do comparsion
 Treatment: R
 Control: NR
 
+
+####
+pre-treated : False
 ##ssgsea
-ssgsea_comparisons: [Responder]
+#ssgsea_comparisons: [Responder]
 
 #---------immune infiltration module------#
-immune_infiltration_clinical_phenotype: Responder
-immunerepertoire_clinical_phenotype: [Responder]
+#immune_infiltration_clinical_phenotype: Responder
+#immunerepertoire_clinical_phenotype: [Responder]
 
 #---------immune response module---------#
 tide_cancer: Other
