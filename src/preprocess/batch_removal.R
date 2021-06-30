@@ -10,9 +10,12 @@ option_list <- list(
               help="Input path of expression file. [Required]"),
   make_option(c("-c", "--covariates"), type="character",
               help="covariates needs to be adjusted for"),
+  make_option(c("-d", "--design"), type="character",
+              help="sample to include in the design column"),
   make_option(c("-m", "--metasheet"), type="character",
-              help="covariates needs to be adjusted for"),   
-  make_option(c("-o","--output",type="character", help="Output files [Required]"))
+              help="metasheet"),   
+  make_option(c("-o","--output",type="character", 
+              help="Output files [Required]"))
 )
 
 
@@ -32,10 +35,16 @@ writeDF <- function(dat,path){
   write.table(dat,path,quote = FALSE, sep=',', row.names = FALSE)
 }
 
-# load data
-  expr.dat <- read.table(opts$expression_dat,sep=',', header = TRUE, stringsAsFactors = FALSE, row.names = 1,check.names = FALSE)
-  expr.dat <- log2(expr.dat + 1)
+# Get samples
+Condition <- opts$design
+meta <- read.table(file = opts$metasheet, sep=',', header = TRUE, stringsAsFactors = FALSE, row.names = 1)
+samples <- subset(meta, meta[,Condition] != 'NA')
+print(samples)
 
+# load data
+expr.dat <- read.table(opts$expression_dat,sep=',', header = TRUE, stringsAsFactors = FALSE, row.names = 1,check.names = FALSE)
+expr.dat <- log2(expr.dat + 1)
+expr.dat <- expr.dat[,rownames(samples)]
 print('Load data done!')
 
 
@@ -61,7 +70,6 @@ print('Load meta done!')
 
 print('Processing samples:')
 print(overlap_sample)
-
 
 if(opts$covariates == "False"){
   expr.limma <- expr.dat

@@ -96,8 +96,6 @@ addExecPaths(config)
 #------------------------------------------------------------------------------
 def all_targets(wildcards):
     ls = []
-#    if execution["environment"]:
-#        ls.extend(environment_targets(wildcards))
     if execution["preprocess_individual"]:
         ls.extend(preprocess_individual_targets(wildcards))
     if execution["preprocess_cohort"]:
@@ -136,8 +134,7 @@ rule target:
         all_targets
     message: "Compiling all outputs"
 
-#if execution["environment"]:
-#    include: "./modules/environment/environment.snakefile"
+
 if execution["preprocess_individual"]:
     include: "./modules/preprocess/preprocess_individual.snakefile"
 if execution["preprocess_cohort"]:
