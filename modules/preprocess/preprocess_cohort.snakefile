@@ -5,9 +5,6 @@ _preprocess_threads = 8
 
 #-------------------Preprocess cohort targets----------------------#
 import pandas as pd
-metadata = pd.read_csv(config["metasheet"], index_col=0, sep=',')
-
-
 
 def merge_sep_inputs(inputs):
     inputs_format = ' -f '.join(str(i) for i in list(inputs)[0])
@@ -23,10 +20,10 @@ def preprocess_cohort_targets(wildcards):
     ls.append("analysis/salmon/salmon_tpm.ensemble.csv")
     ls.append("analysis/batchremoval/tpm.genesymbol.batchremoved.txt")
     ls.append("analysis/salmon/tpm.genesymbol.txt")
-    ls.append("analysis/salmon/gencode_tx2_ensemble_gene_symbol.csv")
+    #ls.append("analysis/salmon/gencode_tx2_ensemble_gene_symbol.csv")
     ls.append("analysis/batchremoval/pca_plot_before.png")
     ls.append("analysis/batchremoval/pca_plot_after.png")
-    return ls
+    return lscd  
 
 rule preprocess_cohort_all:
     input:
@@ -103,6 +100,8 @@ rule plot_gene_body_cvg:
       "{params.path};perl src/preprocess/plot_gene_body_cvg.pl --rfile {output.rscript} --curves_png {output.png_curves}"
       
       " {input.samples_list} && {params.path}; Rscript {output.rscript}"
+      
+
 
 #-------------Salmon cohort csv----------------------#
 rule salmon_matrix:
@@ -110,33 +109,21 @@ rule salmon_matrix:
       salmon_tpm_files = expand("analysis/salmon/{sample}/{sample}.quant.sf", sample = config['samples']),
       metasheet = config["metasheet"]
     output:
-      "analysis/salmon/salmon_tpm.ensemble.csv"
+      "analysis/salmon/tpm.genesymbol.csv"
     benchmark:
       "benchmarks/salmon/salmon_gene_matrix.benchmark"
     params:
-      args = lambda wildcards, input: merge_sep_inputs({input.salmon_tpm_files})
+      args = lambda wildcards, input: merge_sep_inputs({input.salmon_tpm_files}),
+      tx2gene = 'static/deseq2/tx2gene.csv',
+      outpath = 'analysis/salmon/',
+      path = "set +eu;source activate %s" % config['stat_root']
+      
     message: "Merge Salmon gene quantification together for all samples "
     shell:
-      "perl src/preprocess/raw_count_fpkm_tpm_matrix.pl --metasheet {input.metasheet} -s --header -f {params.args} 1>{output}"
-    
-rule id_convert:
-    input:
-        raw = "analysis/salmon/salmon_tpm.ensemble.csv"
-    output:
-        gene_convertID = "analysis/salmon/tpm.genesymbol.txt",
-        annotation = "analysis/salmon/gencode_tx2_ensemble_gene_symbol.csv"
-    message:
-        "Convert Ensemble ID or transcript ID to Gene Symbol from salmon matrix"
-    log:
-        "logs/batchremoval/convertID.log"
-    benchmark:
-        "benchmarks/batchremoval/convertID.benchmark"
-    params:
-        tool_type = "salmon"
-    shell:
-        """zless {config[gtf_path]} | grep -v "#" | awk '$3=="transcript"' | cut -f9 | tr -s ";" " \
-" | awk '{{print$4"\t"$2"\t"$10}}' | sort | uniq | sed 's/\"//g' > {output.annotation} """
-        """ && python src/preprocess/ConvertID.py -m {input.raw} -t {params.tool_type} -r {output.annotation} -p {output.gene_convertID} """
+      "{params.path}; Rscript src/preprocess/merge_tpm.R --metasheet {input.metasheet} \
+      --type salmon --tx2gene {params.tx2gene} --outpath {params.outpath}"
+      
+
 
 
 #--------------------Batch removal---------------------#
