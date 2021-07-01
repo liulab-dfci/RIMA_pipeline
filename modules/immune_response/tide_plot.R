@@ -45,10 +45,7 @@ colnames(tide.mat)[1] <- "sample"
 tide.mat$group <- ifelse(tide.mat$TIDE >= 0, "non-responder","responder")
 
 ### read in normalized expression data and calculate CTL
-expr.norm <- read.table(expr, header = TRUE, sep = "\t",check.names = FALSE)
-expr.norm <- subset(expr.norm,entrizid != 'NA')
-row.names(expr.norm) <- expr.norm$entrizid
-expr.norm <- expr.norm[,-1]
+expr.norm <- read.table(expr, header = TRUE, sep = "\t", row.names = 1, check.names = FALSE)
 CTL.entrez <- c("925","926","3001","3002","5551")  #CD8A:925;CD8B:926;GZMA:3001;GZMB:3002;PRF1;5551
 expr.norm.ctl <- colMeans(expr.norm[CTL.entrez,])
 
@@ -133,7 +130,7 @@ if (cc %in% names(TIDE.res)){
             #heatmap_legend_param = list(direction = "horizontal" ), #title_position = "lefttop-rot"
 	    heatmap_legend_param = list( legend_direction="horizontal", legend_width=unit(3,"mm")),
             row_names_gp = gpar(fontsize = 6))
-  png(file=paste(outdir,design,"_TIDE-TCGA_mqc.png",sep = ""), res = 300, width = 2000, height = 700)
+  png(file=paste(outdir,"TIDE-TCGA_mqc.png",sep = ""), res = 300, width = 2000, height = 700)
   draw(ht_list,annotation_legend_side = "bottom", heatmap_legend_side = "bottom",merge_legends = TRUE)
   dev.off()
 } else{

@@ -19,20 +19,7 @@ Control: NR
 
 
 ####
-pre-treated : False
-##ssgsea
-#ssgsea_comparisons: [Responder]
-
-#---------immune infiltration module------#
-#immune_infiltration_clinical_phenotype: Responder
-#immunerepertoire_clinical_phenotype: [Responder]
-
-#---------immune response module---------#
-tide_cancer: Other
-#tide_compare_tcga_cancer: LUAD
-control: true
-msi_clinical_phenotypes: [Responder]
-
+pre-treated : True
 #--------mutation------------#
 fusion_clinical_phenotypes: [Responder]
 
@@ -86,36 +73,6 @@ samples:
   SRR8281250:
     - /mnt/zhao_trial/data/SRR8281250_1.fastq.gz
     - /mnt/zhao_trial/data/SRR8281250_2.fastq.gz
-
-
-############################################################
-#                       run settings                       #
-############################################################
-runs:
-  run1:
-    - SRR8281218
-  run2:
-    - SRR8281219
-  run3:
-    - SRR8281226
-  run4:
-    - SRR8281238
-  run5:
-    - SRR8281236
-  run6:
-    - SRR8281230
-  run7:
-    - SRR8281233
-  run8:
-    - SRR8281244
-  run9:
-    - SRR8281245
-  run10:
-    - SRR8281243
-  run11:
-    - SRR8281251
-  run12:
-    - SRR8281250
 
 ############################################################
 #                    Neoantigen testing                    #

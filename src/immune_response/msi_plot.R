@@ -23,11 +23,6 @@ msi<-read.table(opt$msiscore,stringsAsFactors = FALSE)
 phenotype<-unlist(strsplit(opt$phenotype,","))
 outdir<-opt$outdir
 
-###test
-#meta<-read.csv("~/Desktop/plot/msi/metasheet.csv",header = TRUE,stringsAsFactors = FALSE)
-#msi<-read.table("/Users/morsouron/Desktop/plot/msi/analysis/variant/msi_score.txt",stringsAsFactors = FALSE)
-#outdir <- "/Users/morsouron/Desktop/plot/msi/analysis/"
-#phenotype<-c("Drug","Response")
 
 ###preprocess of the input files
 colnames(msi)<-c("SampleName","msi_score")
@@ -44,18 +39,7 @@ msi_process<- function(phenotype){
   colourCount = length(unique(msi_phenotype[,"Phenotype"]))
   getPalette = colorRampPalette(brewer.pal(8, "Set3"))
   compare_list<-list(unique(msi_phenotype[,"Phenotype"]))
-  #p<-ggplot(msi_phenotype, aes(x="Phenotype", y="msi"),color="Phenotype") + 
-    #geom_boxplot(aes(fill=factor(Phenotype)),size=0.3,outlier.size=0.5)+ 
-    #scale_fill_manual(values = getPalette(colourCount))+
-    #theme_bw()+
-    #labs(title = paste0(phenotype))+
-    #theme(plot.title = element_text(hjust=0.5,vjust = 0.5, size = 6, margin = margin(l=100,r=50,t=10,#b=10),face = "bold", colour = "black"),
-     #theme(axis.text.x=element_text(size=3,,hjust=1),
-        #axis.text.y=element_text(size=3),
-        #axis.title.x = element_text(size = 5),
-        #axis.title.y = element_text(size = 5))+
-    #guides(fill=FALSE)+
-    #stat_compare_means( comparisons = compare_list,aes(label =paste0("p = ", ..p.format..)))
+
   p<-ggboxplot(msi_phenotype, x="Phenotype", y = "MSI_Score",color="Phenotype",add="jitter", size = 0.5) +
      scale_fill_manual(values = getPalette(colourCount))+
      theme_bw()+

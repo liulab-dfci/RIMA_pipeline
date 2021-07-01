@@ -2,43 +2,31 @@
 
 #-------------------------------
 
+metadata = pd.read_csv(config["metasheet"], index_col=0, sep=',')
+options = [config["Treatment"],config["Control"]]
+design = config["design"]
+treatment = config["Treatment"]
+control = config["Control"] 
+pretreat = config["pre-treated"]
+cancer = config["cancer_type"]
 
-def immune_response_input(wildcards):
-    meta_file = "analysis/batchremoval/tide/tide_meta.txt"
-    f = pd.read_csv(meta_file, index_col=0, sep=',')
-    boolean_finding = f['Timing'].str.contains('Pre').any()
-    if boolean_finding:
-        print("Pre-treatment samples detected in the dataset using pre-treatment mode")
-        return ["analysis/batchremoval/tide/tideinput.pre.txt",
-                "analysis/batchremoval/tide/tideinput.others.txt"]
-    else:
-        print("No Pre-treatment detected, running tidepy using default mode")
-        return ["analysis/batchremoval/tide/tpm_convertID_batch_Entrez.txt",
-                "analysis/batchremoval/tide/tpm_convertID_batch_Entrez.txt",
-                "analysis/batchremoval/tide/tpm_convertID_batch_Entrez.txt"]
+if cancer in ['NSCLC','Melanoma']:
+	cancer_type = cancer
+else:
+	cancer_type = 'Other'
+	
+def getsampleIDs(meta):
+	return meta[meta[design].isin(options)].index
 
-def msisensor_input(wildcards):
-    ls=[]
-    for run in config["runs"]:
-        ls.append("analysis/msisensor/single/%s/%s_msisensor" % (run, run))
-    return ls
-
-def get_runs_tumor(wildcards):
-    ls = []
-    for run in config["runs"]:
-        ls.append(config["runs"][run][0])
-    return ls
 
 def immune_response_cohort_targets(wildcards):
     ls = []
-    ls.append("analysis/tide/tpm_convertID_batch_tide_score.txt")
-    ls.append("files/multiqc/immune_response/TIDE-TCGA_mqc.png")
-    #ls.append("files/multiqc/immune_response/tide_score_mqc.png")
-    ls.append("files/multiqc/immune_response/msi_score.txt")
-    ls.append("files/multiqc/immune_response/MSISensor.png")
-    ls.append("files/multiqc/immune_response/msi_score_comparison.png")
-#    if config['control']:
-#        ls.append("analysis/tide/tpm_convertID_batch_Entrez_normalize_control.txt")
+    ls.append("analysis/TIDE/%s_tide_input.txt" % design )
+    ls.append("analysis/TIDE/%s_tide_output.txt" % design )
+    ls.append("analysis/TIDE/%s_TIDE-TCGA_mqc.png" % design)
+    ls.append("analysis/msisensor/%s_msi_score.txt" % design)
+    ls.append("analysis/TIDE/%s_comparison.png" % design)
+
     return ls
 
 rule immune_response_cohort_all:
@@ -46,82 +34,119 @@ rule immune_response_cohort_all:
         immune_response_cohort_targets
 
 #------------------------TIDEpy rules-----------------------------#
-rule immune_response_score:
+rule immune_response_input:
     input:
-        immune_response_input
+        "analysis/batchremoval/tpm.genesymbol.batchremoved.csv"
     output:
-        "analysis/tide/tpm_convertID_batch_tide_score.txt"
+        "analysis/TIDE/{design}_tide_input.txt"
+    message:
+        "Prepare TIDE input"
+    benchmark:
+        "benchmarks/immune_response/{design}_tide_input.benchmark"
+    log:
+        "logs/immune_response/{design}_tide_input.log"
+    params:
+        outdir = "analysis/TIDE/",
+        cancer_type = cancer_type,
+        design = design,
+        pretreat = pretreat,
+        path="set +eu;source activate %s" % config['stat_root'],
+    shell:
+    	"{params.path}; Rscript src/immune_response/tide_run.R --input {input} --design {params.design} \
+    	--cancer {params.cancer_type} --treated {params.pretreat} --outdir {params.outdir}"
+    	
+
+rule immune_response_output:
+    input:
+        "analysis/TIDE/{design}_tide_input.txt"
+    output:
+        "analysis/TIDE/{design}_tide_output.txt"
     message:
         "Running TIDEpy"
     benchmark:
-        "benchmarks/immune_response/tide_score.benchmark"
+        "benchmarks/immune_response/{design}_tide_score.benchmark"
     log:
-        "logs/immune_response/tide_score.log"
+        "logs/immune_response/{design}_tide_score.log"
     params:
-        pre = lambda wildcards,input: input[0],
-        post = lambda wildcards,input: input[1],
-#        length = len(input),
-#        meta_info = config["metasheet"],
-        pre_outdir = "analysis/tide/pre_tpm_convertID_batch_tide_score.txt",
-        post_outdir = "analysis/tide/post_tpm_convertID_batch_tide_score.txt",
-        outdir = "analysis/tide/tpm_convertID_batch_tide_score.txt",
-        cancer = config["tide_cancer"],
-#        run_normalization = normalization
-    # conda: "../envs/py3_env.yml"
+        outdir = "analysis/TIDE/",
+        cancer_type = cancer_type,
+        design = design,
+        path="set +eu;source activate %s" % config['stat_root'],
     run:
-        if len(input) == 2:
-            shell("""tidepy {params.pre} -o {params.pre_outdir} -c {params.cancer} """
-            """ && tidepy {params.post} -o {params.post_outdir} -c {params.cancer}  --pretreat"""
-            """ && awk 'FNR>1 || NR==1' analysis/tide/*_tide_score.txt > analysis/tide/tpm_convertID_batch_tide_score.txt """)
+        if pretreat == 'True':
+            shell("""tidepy -c {params.cancer_type} --pretreat -o {output} {input} """)
         else:
-            shell("""tidepy {params.pre} -o {params.outdir} -c {params.cancer} """)
-
-
+            shell("""tidepy -c {params.cancer_type} -o {output} {input} """)
+    	
+    	
 rule immune_response_plot:
     input:
-        score="analysis/tide/tpm_convertID_batch_tide_score.txt",
-        expr ="analysis/batchremoval/tide/tpm_convertID_batch_Entrez.txt"
+        score = "analysis/TIDE/{design}_tide_output.txt",
+        expr ="analysis/TIDE/{design}_tide_input.txt"
     output:
-        "files/multiqc/immune_response/TIDE-TCGA_mqc.png",
-        #"files/multiqc/immune_response/tide_score_.png"
+        "analysis/TIDE/{design}_TIDE-TCGA_mqc.png"
     message:
         "plot on tide score"
     benchmark:
-        "benchmarks/immune_response/tide_plot.benchmark"
+        "benchmarks/immune_response/{design}_tide_plot.benchmark"
     log:
-        "logs/immune_response/tide_plot.log"
+        "logs/immune_response/{design}_tide_plot.log"
     params:
-        cancer = config["cancer_type"],
-        outpath = "files/multiqc/immune_response/",
+        cancer = config["cancer_type"], 
+        outpath = "analysis/TIDE/",
+        design = design,
         path="set +eu;source activate %s" % config['stat_root']
     conda:
         "../envs/stat_perl_r.yml"
     shell:
-        "{params.path}; Rscript src/immune_response/tide_plot.R --input {input.score} -e {input.expr} --cc {params.cancer} --outdir {params.outpath}"
+        "{params.path}; Rscript src/immune_response/tide_plot.R --input {input.score} \
+        --design {params.design} --expression {input.expr} --cc {params.cancer} --outdir {params.outpath}"
+        
 
-#---------------------------MSIsensor2 rules-----------------------#
-rule msisensor_plot:
+rule merge_msisensor:
     input:
-        msisensor_input
+        files = expand("analysis/msisensor/{sample}/{sample}_msisensor", sample = getsampleIDs(metadata) )
     output:
-        msi_score = "files/multiqc/immune_response/msi_score.txt",
-        msi_density = "files/multiqc/immune_response/MSISensor.png",
-        msi_comparison = "files/multiqc/immune_response/msi_score_comparison.png"
-    log:
-        "analysis/variant/variant_missensor.log"
+        "analysis/msisensor/{design}_msi_score.txt"
     message:
-        "Running msisensor ploting"
+    	"Merging msisensor scores "
     benchmark:
-        "benchmarks/immune_response/msi_plot.benchmark"
+    	"benchmarks/immune_response/{design}_msi_plot.benchmark"
+    log:
+    	"analysis/variant/{design}_variant_missensor.log"
+    conda: 
+    	"../envs/stat_perl_r.yml"
+    params:
+    	outpath = "analysis/msisensor/",
+    	filelist = lambda wildcards, input: ','.join(str(i) for i in list({input.files})[0]),
+    	design = design,
+    	meta = config["metasheet"],
+    	path="set +eu;source activate %s" % config['stat_root']
+    shell:
+    	"{params.path}; Rscript src/immune_response/merge_msi.R --input {params.filelist} \
+    	--meta {params.meta} --outdir {params.outpath} --condition {params.design}"
+
+
+rule immune_comparison_plot:
+    input:
+        msi = "analysis/msisensor/{design}_msi_score.txt",
+        tide = "analysis/TIDE/{design}_tide_output.txt"
+    output:
+        "analysis/TIDE/{design}_comparison.png"
+    log:
+        "logs/TIDE/{design}_compare.log"
+    message:
+        "Running immune response ploting"
+    benchmark:
+        "benchmarks/immune_response/{design}_compare.benchmark"
     conda: "../envs/stat_perl_r.yml"
     params:
-        outpath = "files/multiqc/immune_response/",
-        run = get_runs_tumor,
-        phenotype = lambda wildcards: ','.join(str(i) for i in config["msi_clinical_phenotypes"]),
+        outpath = "analysis/TIDE/",
+        condition = design,
+        treatment = treatment,
+        control = control,
         meta = config["metasheet"],
         path="set +eu;source activate %s" % config['stat_root'],
     shell:
-        """cat {input} | sed '/Total_Number_of_Sites/d' |  awk  '{{print $3}}' FS='\t'  > pmt """ 
-        """&&  echo {params.run}| xargs -n1 | paste - pmt > {output.msi_score}"""
-        """&& rm pmt """
-        """&& {params.path};Rscript src/immune_response/msi_plot.R --msiscore {output.msi_score}  --outdir {params.outpath} --phenotype {params.phenotype} --meta {params.meta}"""
+        "{params.path};Rscript src/immune_response/response_plot.R --msiscore {input.msi} --tidescore {input.tide} \
+        --meta {params.meta} --outdir {params.outpath} --condition {params.condition} --treatment {params.treatment} --control {params.control}"
