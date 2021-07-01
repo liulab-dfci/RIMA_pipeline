@@ -42,7 +42,6 @@ rule STAR_matrix:
     conda: "../envs/stat_perl_r.yml"
     params:
       log_files = lambda wildcards, input: merge_sep_inputs({input.star_log_files}),
-      count_files = lambda wildcards, input: merge_sep_inputs({input.star_gene_count_files}),
       path="set +eu;source activate %s" % config['stat_root'],
     shell:
       """{params.path}; perl src/preprocess/STAR_reports.pl -f {params.log_files} 1>{output.csv} """
@@ -122,6 +121,8 @@ rule salmon_matrix:
       "{params.path}; Rscript src/preprocess/merge_tpm.R --input {params.args} --meta {input.metasheet} \
       --type salmon --tx2gene {params.tx2gene} --outpath {params.outpath}"
       
+      
+
 #--------------------Batch removal---------------------#
 rule batch_removal:
     input:
