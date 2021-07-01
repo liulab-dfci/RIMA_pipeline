@@ -15,6 +15,7 @@ dependencies:
 - r-optparse
 - r-ggfortify
 - r-e1071
+- r-vegan
 - bioconductor-preprocesscore
 - bioconductor-deseq2
 - bioconductor-tximport
