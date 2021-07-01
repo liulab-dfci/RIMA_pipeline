@@ -32,8 +32,7 @@ rule preprocess_cohort_all:
 #--------------------STAR_cohort_csv---------------------------#
 rule STAR_matrix:
     input:
-      star_log_files=expand( "analysis/star/{sample}/{sample}.Log.final.out", sample=config["samples"] ),
-      star_gene_count_files=expand( "analysis/star/{sample}/{sample}.counts.tab", sample=config["samples"] )
+      star_log_files=expand( "analysis/star/{sample}/{sample}.Log.final.out", sample=config["samples"] )
     output:
       csv="analysis/star/STAR_Align_Report.csv"
     message:

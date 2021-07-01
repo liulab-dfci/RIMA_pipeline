@@ -33,7 +33,7 @@ def preprocess_individual_targets(wildcards):
         ls.append("analysis/star/%s/%s.transcriptome.bam" % (sample, sample))
         ls.append("analysis/star/%s/%s.Chimeric.out.junction" % (sample, sample))
         ls.append("analysis/star/%s/%s.Log.final.out" % (sample, sample))
-        ls.append("analysis/star/%s/%s.counts.tab" % (sample, sample))
+        #ls.append("analysis/star/%s/%s.counts.tab" % (sample, sample))
         ls.append("analysis/star/%s/%s.sorted.bam.stat.txt" % (sample, sample))
         ls.append("analysis/star/%s/%s.sorted.bam.bai" % (sample, sample))
         ls.append("analysis/salmon/%s/%s.quant.sf" % (sample, sample))
@@ -79,7 +79,7 @@ rule star_align:
         sortedBAM = "analysis/star/{sample}/{sample}.sorted.bam",
         transcriptomeBAM = "analysis/star/{sample}/{sample}.transcriptome.bam",
         junction_file = "analysis/star/{sample}/{sample}.Chimeric.out.junction",
-        counts = "analysis/star/{sample}/{sample}.counts.tab",
+        #counts = "analysis/star/{sample}/{sample}.counts.tab",
         log_file = "analysis/star/{sample}/{sample}.Log.final.out"
     params:
         gz_support = gz_command,
@@ -121,7 +121,7 @@ rule star_align:
         " && mv {params.prefix}Aligned.out.bam {output.unsortedBAM}"
         " && samtools sort -T {params.prefix}TMP -o {output.sortedBAM} -@ 8  {output.unsortedBAM} "
         " && mv {params.prefix}Aligned.toTranscriptome.out.bam {output.transcriptomeBAM}"
-        " && mv {params.prefix}ReadsPerGene.out.tab {output.counts}"
+        #" && mv {params.prefix}ReadsPerGene.out.tab {output.counts}"
         " && mv {params.prefix}Chimeric.out.junction {output.junction_file}"
         " && mv {params.prefix}Log.final.out {output.log_file}"
 

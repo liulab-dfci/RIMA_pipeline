@@ -7,8 +7,8 @@ def neoantigen_cohort_targets(wildcards):
     ls = []
     ls.append("analysis/neoantigen/merge/genotypes.tsv")
     ls.append("analysis/neoantigen/merge/genotypes.p-group.tsv")
-    ls.append("files/multiqc/neoantigen/hla_typing_frequency_plot.png")
-    ls.append("files/multiqc/neoantigen/hla_heatmap.txt")
+    #ls.append("files/multiqc/neoantigen/hla_typing_frequency_plot.png")
+    #ls.append("files/multiqc/neoantigen/hla_heatmap.txt")
     return ls
 
 rule neoantigen_all:
@@ -36,7 +36,8 @@ rule arcasHLA_convert:
         arcasHLA_path=config["arcasHLA_path"],
     shell:
         """{params.arcasHLA_path}/arcasHLA convert -r p-group {input.res} -o {output.pgroup}"""
-
+        
+'''
 rule arcasHLA_plot:
     input:
         res = "analysis/neoantigen/merge/genotypes.p-group.tsv",
@@ -53,3 +54,4 @@ rule arcasHLA_plot:
     conda: "../../envs/stat_perl_r.yml"
     shell:
         "{params.path}; Rscript src/neoantigen/hla_plot.R --hla {input.res} --meta {params.meta} --expression {input.expr} --group {params.group} --outdir {params.outpath} --multiqc {params.multiqc}"
+'''
