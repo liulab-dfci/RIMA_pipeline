@@ -14,8 +14,8 @@ def neoantigen_individual_targets(wildcards):
         ls.append("analysis/neoantigen/%s/%s.genotype.log" % (sample,sample))
         #ls.append("analysis/neoantigen/%s/%s.sorted.extracted.1.fq.gz" % (sample,sample))
         #ls.append("analysis/neoantigen/%s/%s.sorted.extracted.2.fq.gz" % (sample,sample))
-        ls.append("analysis/neoantigen/%s/%s.1.fq.gz" % (sample,sample))
-        ls.append("analysis/neoantigen/%s/%s.2.fq.gz" % (sample,sample))
+        ls.append("analysis/neoantigen/%s/%s.extracted.1.fq.gz" % (sample,sample))
+        ls.append("analysis/neoantigen/%s/%s.extracted.2.fq.gz" % (sample,sample))
         ls.append("analysis/neoantigen/merge/%s.genotype.json" % (sample))
     return ls
 
@@ -45,15 +45,15 @@ rule arcasHLA_fq_rename:
         chr6fastqfile1 = "analysis/neoantigen/{sample}/{sample}.sorted.extracted.1.fq.gz",
 	chr6fastqfile2 = "analysis/neoantigen/{sample}/{sample}.sorted.extracted.2.fq.gz"
     output:
-        outfile1 = "analysis/neoantigen/{sample}/{sample}.1.fq.gz",
-        outfile2 = "analysis/neoantigen/{sample}/{sample}.2.fq.gz"
+        outfile1 = "analysis/neoantigen/{sample}/{sample}.extracted.1.fq.gz",
+        outfile2 = "analysis/neoantigen/{sample}/{sample}.extracted.2.fq.gz"
     shell:
-        """mv {input.chr6fastqfile1} {output.outfile1} &&  mv {input.chr6fastqfile2} {output.outfile2}"""
+        """cp {input.chr6fastqfile1} {output.outfile1} &&  cp {input.chr6fastqfile2} {output.outfile2}"""
 
 rule arcasHLA_genotype:
     input:
-        fastq1 = "analysis/neoantigen/{sample}/{sample}.1.fq.gz",
-        fastq2 = "analysis/neoantigen/{sample}/{sample}.2.fq.gz"
+        fastq1 = "analysis/neoantigen/{sample}/{sample}.extracted.1.fq.gz",
+        fastq2 = "analysis/neoantigen/{sample}/{sample}.extracted.2.fq.gz"
     output:
         "analysis/neoantigen/{sample}/{sample}.alignment.p",
         "analysis/neoantigen/{sample}/{sample}.genes.json",
