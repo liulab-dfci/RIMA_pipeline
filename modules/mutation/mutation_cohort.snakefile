@@ -3,15 +3,22 @@
 #-------------------------------STAR Fusion cohort-----------------------#
 metadata = pd.read_csv(config["metasheet"], index_col=0, sep=',')
 
+metadata = pd.read_csv(config["metasheet"], index_col=0, sep=',')
+options = [config["Treatment"],config["Control"]]
+design = config["design"]
+
+def getsampleIDs(meta):
+	return meta[meta[design].isin(options)].index
+	
 
 def mutation_cohort_targets(wildcards):
     ls = []
-    ls.append("files/fusion/merged_predictions.abridged_addSample.tsv"),
-    ls.append("files/fusion/pyprada_fusion_table.txt"),
-    ls.append("files/fusion/pyprada_output.txt"),
-    ls.append("files/multiqc/mutation/fusion/fusion_gene_table.txt"),
-    ls.append("files/multiqc/mutation/fusion/fusion_gene_plot.png"),
-    ls.append("files/multiqc/mutation/fusion/prada_homology.png")
+    ls.append("analysis/fusion/merged_%s_predictions.abridged_addSample.tsv" % design),
+    ls.append("analysis/fusion/%s_pyprada_fusion_table.txt" % design),
+    ls.append("analysis/fusion/%s_pyprada_output.txt" % design),
+    #ls.append("analysis/fusion/%s_fusion_gene_table.txt" % design),
+    #ls.append("analysis/fusion/%s_fusion_gene_plot.png" % design),
+    #ls.append("analysis/fusion/%s_prada_homology.png" % design)
     return ls
 
 rule mutation_cohort:
@@ -20,15 +27,15 @@ rule mutation_cohort:
 
 rule merge_starfusion:
     input:
-      expand("analysis/fusion/{sample}/{sample}.fusion_predictions.abridged_addSample.tsv", sample=config["samples"])
+      expand("analysis/fusion/{sample}/{sample}.fusion_predictions.abridged_addSample.tsv", sample=getsampleIDs(metadata))
     output:
-      "files/fusion/merged_predictions.abridged_addSample.tsv"
+      "analysis/fusion/merged_{design}_predictions.abridged_addSample.tsv"
     log:
-      "logs/fusion/merge_fusion.log"
+      "logs/fusion/merge_{design}_fusion.log"
     message:
       "Merging fusion results"
     benchmark:
-      "benchmarks/fusion/merge_fusion.benchmark"
+      "benchmarks/fusion/merge_{design}_fusion.benchmark"
     conda: "../envs/stat_perl_r.yml"
     params:
       meta = config['metasheet']
@@ -37,54 +44,58 @@ rule merge_starfusion:
 
 rule preprocess_prada:
     input:
-      "files/fusion/merged_predictions.abridged_addSample.tsv"
+      "analysis/fusion/merged_{design}_predictions.abridged_addSample.tsv"
     output:
-      "files/fusion/pyprada_fusion_table.txt"
+      "analysis/fusion/{design}_pyprada_fusion_table.txt"
     log:
-      "logs/fusion/preprocess_prada.log"
+      "logs/fusion/{design}_preprocess_prada.log"
     message:
       "Preprocessing prada input file"
     benchmark:
-      "benchmarks/fusion/preprocess_prada.benchmark"
+      "benchmarks/fusion/{design}_preprocess_prada.benchmark"
     conda: "../envs/stat_perl_r.yml"
     params:
-      outdir = "files/fusion/",
+      outdir = "analysis/fusion/",
       path = "set +eu;source activate %s" % config['stat_root'],
+      pheno = config["design"]
     shell:
-      "{params.path}; Rscript src/mutation/preprocess_prada.R --fusion {input}  --outdir {params.outdir}"
+      "{params.path}; Rscript src/mutation/preprocess_prada.R --fusion {input}  --outdir {params.outdir} --phenotype {params.pheno}"
+      
+
 
 
 rule run_prada:
     input:
-      "files/fusion/pyprada_fusion_table.txt"
+      "analysis/fusion/{design}_pyprada_fusion_table.txt"
     output:
-      "files/fusion/pyprada_output.txt"
+      "analysis/fusion/{design}_pyprada_output.txt"
     log:
-      "logs/fusion/run_prada.log"
+      "logs/fusion/{design}_run_prada.log"
     message:
       "Running pyprada"
     benchmark:
-      "benchmarks/fusion/pyprada.benchmark"
+      "benchmarks/fusion/{design}_pyprada.benchmark"
     conda: "../envs/stat_perl_r.yml"
     params:
-      outdir = "files/fusion",
+      outdir = "analysis/fusion",
       config = "static/fusion/prada_config.txt",
-      tmpout= "files/fusion/tmp/",
+      tmpout= "analysis/fusion/tmp/",
       prada_path = config["prada_path"],
       path = "set +eu;source activate %s" % config['prada_root']
     shell:
       "{params.path}"
       "&& {params.prada_path}/prada-homology -i {input} -o {output} -tmpdir {params.tmpout} -conf {params.config}"
 
+'''
 rule fusion_plot:
     input:
-      prada_input = "files/fusion/pyprada_output.txt",
-      fusion = "files/fusion/merged_predictions.abridged_addSample.tsv",
-      tpm_batch = "analysis/batchremoval/tpm_convertID.batch"
+      prada_input = "analysis/fusion/pyprada_output.txt",
+      fusion = "analysis/fusion/merged_predictions.abridged_addSample.tsv",
+      tpm_batch = "analysis/batchremoval/ tpm.genesymbol.batchremoved.csv"
     output:
-      fusion_table = "files/multiqc/mutation/fusion/fusion_gene_table.txt",
-      fusion_plot = "files/multiqc/mutation/fusion/fusion_gene_plot.png",
-      prada_plot = "files/multiqc/mutation/fusion/prada_homology.png",
+      fusion_table = "analysis/fusion/mutation/fusion/fusion_gene_table.txt",
+      fusion_plot = "analysis/fusion/mutation/fusion/fusion_gene_plot.png",
+      prada_plot = "analysis/fusion/mutation/fusion/prada_homology.png",
     log:
       "logs/fusion/fusion_plot.log"
     message:
@@ -93,11 +104,12 @@ rule fusion_plot:
       "benchmarks/fusion/fusion_plot.benchmark"
     conda: "../envs/stat_perl_r.yml"
     params:
-      outdir = "files/multiqc/mutation/fusion/",
+      outdir = "analysis/fusion/mutation/fusion/",
       prada_path=config["prada_path"],
       meta = config["metasheet"],
       path = "set +eu;source activate %s" % config['stat_root'],
       annotation = "static/fusion/cancerGeneList.tsv",
-      phenotype = lambda wildcards: ','.join(str(i) for i in config["fusion_clinical_phenotypes"])
+      phenotype = conifg['design']
     shell:
       "{params.path}; Rscript src/mutation/fusion_plot.R  --pradafusion {input.prada_input}  --meta {params.meta}  --expression {input.tpm_batch}  --annot  {params.annotation}  --outdir  {params.outdir}  --phenotype {params.phenotype}  --input {input.fusion}"
+'''
