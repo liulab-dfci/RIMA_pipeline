@@ -17,8 +17,7 @@ def mutation_cohort_targets(wildcards):
     ls.append("analysis/fusion/%s_pyprada_fusion_table.txt" % design),
     ls.append("analysis/fusion/%s_pyprada_output.txt" % design),
     ls.append("analysis/fusion/%s_pyprada_unique_genelist.txt" % design),
-    #ls.append("analysis/fusion/pyprada_annotation.txt"),
-    #ls.append("analysis/fusion/%s_fusion_gene_table.txt" % design),
+    ls.append("analysis/fusion/%s_fusion_gene_table.txt" % design),
     #ls.append("analysis/fusion/%s_fusion_gene_plot.png" % design),
     #ls.append("analysis/fusion/%s_prada_homology.png" % design)
     return ls
@@ -92,31 +91,28 @@ rule run_prada:
       "&& {params.prada_path}/prada-homology -i {input} -o {output} -tmpdir {params.tmpout} -conf {params.config}"
 
 
-
-'''
 rule fusion_plot:
     input:
-      prada_input = "analysis/fusion/pyprada_output.txt",
-      fusion = "analysis/fusion/merged_predictions.abridged_addSample.tsv",
-      tpm_batch = "analysis/batchremoval/ tpm.genesymbol.batchremoved.csv"
+      prada_input = "analysis/fusion/{design}_pyprada_output.txt",
+      fusion = "analysis/fusion/merged_{design}_predictions.abridged_addSample.tsv",
+      tpm_batch = "analysis/batchremoval/tpm.genesymbol.batchremoved.csv"
     output:
-      fusion_table = "analysis/fusion/mutation/fusion/fusion_gene_table.txt",
-      fusion_plot = "analysis/fusion/mutation/fusion/fusion_gene_plot.png",
-      prada_plot = "analysis/fusion/mutation/fusion/prada_homology.png",
+      fusion_table = "analysis/fusion/{design}_fusion_gene_table.txt",
+      #fusion_plot = "analysis/fusion/design}_fusion_gene_plot.png",
+      #prada_plot = "analysis/fusion/{design}_prada_homology.png"
     log:
-      "logs/fusion/fusion_plot.log"
+      "logs/fusion/{design}_fusion_plot.log"
     message:
       "Running fusion plotting"
     benchmark:
-      "benchmarks/fusion/fusion_plot.benchmark"
+      "benchmarks/fusion/{design}_fusion_plot.benchmark"     
     conda: "../envs/stat_perl_r.yml"
     params:
-      outdir = "analysis/fusion/mutation/fusion/",
-      prada_path=config["prada_path"],
-      meta = config["metasheet"],
+      outdir = "analysis/fusion/",
+      meta = config["metasheet"], 
       path = "set +eu;source activate %s" % config['stat_root'],
       annotation = "static/fusion/cancerGeneList.tsv",
-      phenotype = conifg['design']
+      phenotype = config['design']
     shell:
-      "{params.path}; Rscript src/mutation/fusion_plot.R  --pradafusion {input.prada_input}  --meta {params.meta}  --expression {input.tpm_batch}  --annot  {params.annotation}  --outdir  {params.outdir}  --phenotype {params.phenotype}  --input {input.fusion}"
-'''
+      "{params.path}; Rscript src/mutation/fusion_plot.R  --pradafusion {input.prada_input}  --meta {params.meta}  --expression {input.tpm_batch}  \
+      --annot  {params.annotation}  --outdir  {params.outdir}  --phenotype {params.phenotype}  --input {input.fusion}"

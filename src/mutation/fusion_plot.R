@@ -1,13 +1,13 @@
 #!/usr/bin/env Rscript
 
 #dependencies
-library(dplyr)
-library(ggrepel)
-library(ggnewscale)
-library(optparse)
-library(data.table)
-library(ggplot2)
-library(tidyverse)
+suppressMessages(library(dplyr))
+suppressMessages(library(ggrepel))
+suppressMessages(library(ggnewscale))
+suppressMessages(library(optparse))
+suppressMessages(library(data.table))
+suppressMessages(library(ggplot2))
+suppressMessages(library(tidyverse))
 
 
 option_list = list(
@@ -33,11 +33,13 @@ opt = parse_args(opt_parser);
 
 ###read in input data
 fusion <- read.table(file = opt$input, header = TRUE)
+pheno <- opt$phenotype
 meta <- read.table(file = opt$meta, sep=',', header = TRUE, stringsAsFactors = FALSE, row.names = 1)
+meta <- subset(meta, meta[,pheno] != 'NA')
 gcat <- fread(file=opt$annot, header = TRUE, sep = "\t")
 pradafusion <- read.table(file = opt$pradafusion, sep="\t")
 expr <- read.table(file=opt$expression, header = TRUE, sep = ",", row.names = 1, check.names = FALSE)
-pheno <- opt$phenotype
+expr <- expr[,rownames(meta)]
 outdir <- opt$outdir
 
 
@@ -63,6 +65,7 @@ filter.fusion <- fusion %>% mutate_at(c("LeftGene", "RightGene"), as.character) 
   filter(!grepl("^MT-",LeftGene)) %>% filter(!grepl("^MT-",RightGene)) %>%
   filter(LeftGene != RightGene) %>%
   filter(FFPM > 0.1)
+
 ### add two columns recording gene type and gene fusion gene expression
 TypeExpr <- apply(filter.fusion,1, function(x) {
   name <- as.character(x[["FusionName"]])
@@ -130,7 +133,7 @@ highlight_genes <- pradafusion %>%
   filter((Evalue < 0.05 & Align_Len > 1000) | (Evalue <0.05 & BitScore > 2))
 
 
-png(paste(outdir, "prada_homology.png", sep = ""), width = 800, height = 700)
+png(paste(outdir, pheno, "_prada_homology.png", sep = ""), width = 800, height = 700)
 pradafusion %>% 
   ggplot(aes(x=BitScore,y=Evalue,size=Align_Len)) + 
   geom_point(alpha=0.3) +
@@ -146,10 +149,12 @@ merge.fusion.df <- merge(merge.fusion.df, highlight_genes, by = 1, all = TRUE)
 merge.fusion.df <- subset(merge.fusion.df, is.na(merge.fusion.df$BitScore))
 merge.fusion.df <- merge.fusion.df[c(1:7)]
 merge.fusion.df <- na.omit(merge.fusion.df)
-write.table(merge.fusion.df, paste(outdir, "fusion_gene_table.txt", sep = ""), sep = "\t", quote = FALSE, row.names = FALSE)
+write.table(merge.fusion.df, paste(outdir,pheno,"_fusion_gene_table.txt", sep = ""), sep = "\t", quote = FALSE, row.names = FALSE)
+
+
 
 ### extract expression of oncogene,tsg and protein kinase genes
-png(paste(outdir, "fusion_gene_plot.png", sep = ""), width = 800, height = 700)
+png(paste(outdir, pheno,"_fusion_gene_plot.png", sep = ""), width = 800, height = 700)
 ggplot(merge.fusion.df, aes(x=Phenotype, y=log10(Expression+1))) + 
   geom_violin(trim=TRUE) +
   geom_jitter(aes(color = Type),shape=16#, position=position_jitter(0.15)
