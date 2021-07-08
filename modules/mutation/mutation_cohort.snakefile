@@ -16,6 +16,8 @@ def mutation_cohort_targets(wildcards):
     ls.append("analysis/fusion/merged_%s_predictions.abridged_addSample.tsv" % design),
     ls.append("analysis/fusion/%s_pyprada_fusion_table.txt" % design),
     ls.append("analysis/fusion/%s_pyprada_output.txt" % design),
+    ls.append("analysis/fusion/%s_pyprada_unique_genelist.txt" % design),
+    #ls.append("analysis/fusion/pyprada_annotation.txt"),
     #ls.append("analysis/fusion/%s_fusion_gene_table.txt" % design),
     #ls.append("analysis/fusion/%s_fusion_gene_plot.png" % design),
     #ls.append("analysis/fusion/%s_prada_homology.png" % design)
@@ -46,7 +48,8 @@ rule preprocess_prada:
     input:
       "analysis/fusion/merged_{design}_predictions.abridged_addSample.tsv"
     output:
-      "analysis/fusion/{design}_pyprada_fusion_table.txt"
+      table = "analysis/fusion/{design}_pyprada_fusion_table.txt",
+      uniquegene = "analysis/fusion/{design}_pyprada_unique_genelist.txt"
     log:
       "logs/fusion/{design}_preprocess_prada.log"
     message:
@@ -57,11 +60,13 @@ rule preprocess_prada:
     params:
       outdir = "analysis/fusion/",
       path = "set +eu;source activate %s" % config['stat_root'],
-      pheno = config["design"]
+      pheno = config["design"],
+      gtf = config['annotation_pyprada'],
+      anno = 'analysis/fusion/pyprada_annotation.txt'
     shell:
       "{params.path}; Rscript src/mutation/preprocess_prada.R --fusion {input}  --outdir {params.outdir} --phenotype {params.pheno}"
-      
-
+      """ && cat {output.table} | sed 's/\\t/\\n/g' | sort | uniq > {output.uniquegene}   """
+      """ && grep -f {output.uniquegene} {params.gtf} > {params.anno} """
 
 
 rule run_prada:
@@ -85,6 +90,8 @@ rule run_prada:
     shell:
       "{params.path}"
       "&& {params.prada_path}/prada-homology -i {input} -o {output} -tmpdir {params.tmpout} -conf {params.config}"
+
+
 
 '''
 rule fusion_plot:
