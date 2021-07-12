@@ -3,7 +3,7 @@
 #-------------------------------Preprocessing individual module------------------------#
 #---------------------------Preprocess individual targets----------------------------------#
 threads = 16
-
+_preprocess_threads = 64
 import pandas as pd
 metadata = pd.read_csv(config["metasheet"], index_col=0, sep=',')
 
