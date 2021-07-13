@@ -28,27 +28,28 @@ rule arcasHLA_extr_chr6:
      input:
          in_sortbamfile = "analysis/star/{sample}/{sample}.sorted.bam"
      output:
-         chr6fastqfile1="analysis/neoantigen/{sample}/{sample}.sorted.extracted.1.fq.gz",
-         chr6fastqfile2="analysis/neoantigen/{sample}/{sample}.sorted.extracted.2.fq.gz"
+         chr6fastqfile1="analysis/neoantigen/{sample}/{sample}.extracted.1.fq.gz",
+         chr6fastqfile2="analysis/neoantigen/{sample}/{sample}.extracted.2.fq.gz"
      threads: _neoantigen_individual_threads
      message: "Running ArcasHLA on {wildcards.sample}"
      log:
          "logs/neoantigen/{sample}.arcasHLA.log"
      params:
+         sampleID = lambda wildcards: [wildcards.sample],
          arcasHLA_path=config["arcasHLA_path"],
          outpath = "analysis/neoantigen/{sample}"
      shell:
-        """{params.arcasHLA_path}/arcasHLA extract {input.in_sortbamfile} --paired -t {threads} -v -o {params.outpath}"""
+        """{params.arcasHLA_path}/arcasHLA extract {input.in_sortbamfile} -t {threads} -v --sample {params.sampleID} -o {params.outpath}"""
         
-rule arcasHLA_fq_rename:
-    input:
-        chr6fastqfile1 = "analysis/neoantigen/{sample}/{sample}.sorted.extracted.1.fq.gz",
-	chr6fastqfile2 = "analysis/neoantigen/{sample}/{sample}.sorted.extracted.2.fq.gz"
-    output:
-        outfile1 = "analysis/neoantigen/{sample}/{sample}.extracted.1.fq.gz",
-        outfile2 = "analysis/neoantigen/{sample}/{sample}.extracted.2.fq.gz"
-    shell:
-        """cp {input.chr6fastqfile1} {output.outfile1} &&  cp {input.chr6fastqfile2} {output.outfile2}"""
+#rule arcasHLA_fq_rename:
+#    input:
+#        chr6fastqfile1 = "analysis/neoantigen/{sample}/{sample}.sorted.extracted.1.fq.gz",
+#	chr6fastqfile2 = "analysis/neoantigen/{sample}/{sample}.sorted.extracted.2.fq.gz"
+#    output:
+#        outfile1 = "analysis/neoantigen/{sample}/{sample}.extracted.1.fq.gz",
+#        outfile2 = "analysis/neoantigen/{sample}/{sample}.extracted.2.fq.gz"
+#    shell:
+#        """cp {input.chr6fastqfile1} {output.outfile1} &&  cp {input.chr6fastqfile2} {output.outfile2}"""
 
 rule arcasHLA_genotype:
     input:

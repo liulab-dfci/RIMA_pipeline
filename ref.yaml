@@ -17,12 +17,13 @@ hg38:
   gmt_path: ./static/ssgsea/c2.cp.kegg.v6.1.symbols.gmt
 
 ###index path
-  star_index: ./ref_files/star_gdc_index/hg38/v22
+  star_index: ./ref_files/v22
   star_fusion_index: ./ref_files/fusion_gdc_index/GRCh38_v22_CTAT_lib_GDC_Mar162019/ctat_genome_lib_build_dir
   salmon_index:  ./ref_files/salmon_gdc_index/gencode.v22.ts.fa
   msisensor_index: ./ref_files/msisensor_gdc_index/hg38/microsatellite.list
   centrifuge_index: ./ref_files/centrifuge_index/p_compressed+h+v
   neoantigen_iedb_mhcI: ./ref_files/
+  annotation_pyprada: ./ref_files/pyPRADA/gencode.v22.canonical.gene.exons.tab.txt
 
 ###tool path
   msisensor2_path: ./ref_files/msisensor2
