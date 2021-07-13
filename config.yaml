@@ -37,42 +37,42 @@ sam_ord: [Responder]
 ############################################################
 
 samples:
-  SRR8281218:
-    - /mnt/zhao_trial/data/SRR8281218_1.fastq.gz
-    - /mnt/zhao_trial/data/SRR8281218_2.fastq.gz
+  SRR8281218.01:
+    - /mnt/RIMA/data/SRR8281218_1.fastq.gz
+    - /mnt/RIMA/data/SRR8281218_2.fastq.gz
   SRR8281219:
-    - /mnt/zhao_trial/data/SRR8281219_1.fastq.gz
-    - /mnt/zhao_trial/data/SRR8281219_2.fastq.gz
+    - /mnt/RIMA/data/SRR8281219_1.fastq.gz
+    - /mnt/RIMA/data/SRR8281219_2.fastq.gz
   SRR8281226:
-    - /mnt/zhao_trial/data/SRR8281226_1.fastq.gz
-    - /mnt/zhao_trial/data/SRR8281226_2.fastq.gz
+    - /mnt/RIMA/data/SRR8281226_1.fastq.gz
+    - /mnt/RIMA/data/SRR8281226_2.fastq.gz
   SRR8281236:
-    - /mnt/zhao_trial/data/SRR8281236_1.fastq.gz
-    - /mnt/zhao_trial/data/SRR8281236_2.fastq.gz
+    - /mnt/RIMA/data/SRR8281236_1.fastq.gz
+    - /mnt/RIMA/data/SRR8281236_2.fastq.gz
   SRR8281230:
-    - /mnt/zhao_trial/data/SRR8281230_1.fastq.gz
-    - /mnt/zhao_trial/data/SRR8281230_2.fastq.gz
+    - /mnt/RIMA/data/SRR8281230_1.fastq.gz
+    - /mnt/RIMA/data/SRR8281230_2.fastq.gz
   SRR8281233:
-    - /mnt/zhao_trial/data/SRR8281233_1.fastq.gz
-    - /mnt/zhao_trial/data/SRR8281233_2.fastq.gz
+    - /mnt/RIMA/data/SRR8281233_1.fastq.gz
+    - /mnt/RIMA/data/SRR8281233_2.fastq.gz
   SRR8281244:
-    - /mnt/zhao_trial/data/SRR8281244_1.fastq.gz
-    - /mnt/zhao_trial/data/SRR8281244_2.fastq.gz
+    - /mnt/RIMA/data/SRR8281244_1.fastq.gz
+    - /mnt/RIMA/data/SRR8281244_2.fastq.gz
   SRR8281245:
-    - /mnt/zhao_trial/data/SRR8281245_1.fastq.gz
-    - /mnt/zhao_trial/data/SRR8281245_2.fastq.gz
+    - /mnt/RIMA/data/SRR8281245_1.fastq.gz
+    - /mnt/RIMA/data/SRR8281245_2.fastq.gz
   SRR8281243:
-    - /mnt/zhao_trial/data/SRR8281243_1.fastq.gz
-    - /mnt/zhao_trial/data/SRR8281243_2.fastq.gz
+    - /mnt/RIMA/data/SRR8281243_1.fastq.gz
+    - /mnt/RIMA/data/SRR8281243_2.fastq.gz
   SRR8281251:
-    - /mnt/zhao_trial/data/SRR8281251_1.fastq.gz
-    - /mnt/zhao_trial/data/SRR8281251_2.fastq.gz
+    - /mnt/RIMA/data/SRR8281251_1.fastq.gz
+    - /mnt/RIMA/data/SRR8281251_2.fastq.gz
   SRR8281238:
-    - /mnt/zhao_trial/data/SRR8281238_1.fastq.gz
-    - /mnt/zhao_trial/data/SRR8281238_2.fastq.gz
+    - /mnt/RIMA/data/SRR8281238_1.fastq.gz
+    - /mnt/RIMA/data/SRR8281238_2.fastq.gz
   SRR8281250:
-    - /mnt/zhao_trial/data/SRR8281250_1.fastq.gz
-    - /mnt/zhao_trial/data/SRR8281250_2.fastq.gz
+    - /mnt/RIMA/data/SRR8281250_1.fastq.gz
+    - /mnt/RIMA/data/SRR8281250_2.fastq.gz
 
 ############################################################
 #                    Neoantigen testing                    #
