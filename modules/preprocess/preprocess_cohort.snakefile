@@ -7,7 +7,7 @@ _preprocess_threads = 8
 import pandas as pd
 
 def merge_sep_inputs(inputs):
-    inputs_format = ','.join(str(i) for i in list(inputs)[0])
+    inputs_format = ' -f '.join(str(i) for i in list(inputs)[0])
     return inputs_format
 
 def preprocess_cohort_targets(wildcards):

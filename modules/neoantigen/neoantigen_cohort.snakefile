@@ -6,7 +6,7 @@ def neoantigen_cohort_targets(wildcards):
     """Generates the targets for this module"""
     ls = []
     ls.append("analysis/neoantigen/merge/genotypes.tsv")
-    ls.append("analysis/neoantigen/merge/genotypes.p-group.tsv")
+    #ls.append("analysis/neoantigen/merge/genotypes.p-group.tsv")
     #ls.append("files/multiqc/neoantigen/hla_typing_frequency_plot.png")
     #ls.append("files/multiqc/neoantigen/hla_heatmap.txt")
     return ls
@@ -27,6 +27,7 @@ rule arcasHLA_merge:
     shell:
         """{params.arcasHLA_path}/arcasHLA merge -i {params.outpath} -o {params.outpath}"""
 
+'''
 rule arcasHLA_convert:
     input:
         res = "analysis/neoantigen/merge/genotypes.tsv",
@@ -37,7 +38,6 @@ rule arcasHLA_convert:
     shell:
         """{params.arcasHLA_path}/arcasHLA convert -r p-group {input.res} -o {output.pgroup}"""
         
-'''
 rule arcasHLA_plot:
     input:
         res = "analysis/neoantigen/merge/genotypes.p-group.tsv",
