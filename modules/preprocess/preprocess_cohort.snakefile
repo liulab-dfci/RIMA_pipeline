@@ -6,6 +6,10 @@ _preprocess_threads = 8
 #-------------------Preprocess cohort targets----------------------#
 import pandas as pd
 
+design = config["design"]
+covariates = config["batch"]
+
+
 def merge_sep_inputs(inputs):
     inputs_format = ' -f '.join(str(i) for i in list(inputs)[0])
     return inputs_format
@@ -19,10 +23,11 @@ def preprocess_cohort_targets(wildcards):
     ls.append("analysis/rseqc/read_distrib/read_distrib.matrix.tab")
     
     ls.append("analysis/salmon/tpm.genesymbol.csv")
-    ls.append("analysis/batchremoval/tpm.genesymbol.batchremoved.csv")
+    ls.append("analysis/batchremoval/%s_%s_tpm.genesymbol.csv" % (design,covariates))
+    ls.append("analysis/batchremoval/%s_%s_tpm.genesymbol.batchremoved.csv" % (design,covariates))
     
-    ls.append("analysis/batchremoval/pca_plot_before.png")
-    ls.append("analysis/batchremoval/pca_plot_after.png")
+    ls.append("analysis/batchremoval/pca_plot_before.png" )
+    ls.append("analysis/batchremoval/pca_plot_after.png" )
     return ls 
 
 rule preprocess_cohort_all:
@@ -128,35 +133,36 @@ rule batch_removal:
     input:
         "analysis/salmon/tpm.genesymbol.csv"
     output:
-        "analysis/batchremoval/tpm.genesymbol.batchremoved.csv"
+        after = "analysis/batchremoval/{design}_{covariates}_tpm.genesymbol.batchremoved.csv",
+        before = "analysis/batchremoval/{design}_{covariates}_tpm.genesymbol.csv"
     message:
         "Running batch removal using limma method"
     benchmark:
-        "benchmarks/batchremoval/tpm_combat.benchmark" 
+        "benchmarks/batchremoval/{design}_{covariates}_tpm_limma.benchmark" 
     params:
         covariates = config["batch"],
         design = config["design"],
         path="set +eu;source activate %s" % config['stat_root'],
         meta = config["metasheet"]
     log:
-        "logs/batchremoval/batch_removal.log"
+        "logs/batchremoval/{design}_{covariates}_batch_removal.log"
     conda: "../envs/stat_perl_r.yml"
     shell:
         "{params.path}; Rscript src/preprocess/batch_removal.R -e {input} -c {params.covariates} \
-        -d {params.design} -m {params.meta} -o {output}"
+        -d {params.design} -m {params.meta} -b {output.before} -a {output.after}"
 
         
 rule pca_sample_clustering:
     input:
-        before_batch = "analysis/salmon/tpm.genesymbol.csv",
-        after_batch = "analysis/batchremoval/tpm.genesymbol.batchremoved.csv"
+        before_batch = "analysis/salmon/{design}_{covariates}_tpm.genesymbol.csv",
+        after_batch = "analysis/batchremoval/{design}_{covariates}_tpm.genesymbol.batchremoved.csv"
     output:
-        "analysis/batchremoval/pca_plot_before.png",
-        "analysis/batchremoval/pca_plot_after.png",
+        "analysis/batchremoval/{design}_{covariates}_pca_plot_before.png",
+        "analysis/batchremoval/{design}_{covariates}_pca_plot_after.png",
     message:
         "Running PCA for sample clustering"
     benchmark:
-        "benchmarks/batchremoval/pca.benchmark"
+        "benchmarks/batchremoval/{design}_{covariates}_pca.benchmark"
     params:
         meta_info = config["metasheet"],
         out_path = "analysis/batchremoval/",
@@ -165,4 +171,5 @@ rule pca_sample_clustering:
     conda: "../envs/stat_perl_r.yml"
     shell:
         "{params.path}; Rscript src/preprocess/pca.R -b {input.before_batch} -a {input.after_batch} -m {params.meta_info} -o {params.out_path} -c {params.covariates}"
+
 

@@ -14,7 +14,9 @@ option_list <- list(
               help="sample to include in the design column"),
   make_option(c("-m", "--metasheet"), type="character",
               help="metasheet"),   
-  make_option(c("-o","--output",type="character", 
+  make_option(c("-b","--output_before",type="character", 
+              help="Output files [Required]")),
+  make_option(c("-a","--output_after",type="character",
               help="Output files [Required]"))
 )
 
@@ -37,6 +39,8 @@ writeDF <- function(dat,path){
 
 # Get samples
 Condition <- opts$design
+print(Condition)
+print(opts$covariates)
 meta <- read.table(file = opts$metasheet, sep=',', header = TRUE, stringsAsFactors = FALSE, row.names = 1)
 samples <- subset(meta, meta[,Condition] != 'NA')
 print(samples)
@@ -45,7 +49,9 @@ print(samples)
 expr.dat <- read.table(opts$expression_dat,sep=',', header = TRUE, stringsAsFactors = FALSE, row.names = 1,check.names = FALSE)
 expr.dat <- log2(expr.dat + 1)
 expr.dat <- expr.dat[,rownames(samples)]
+writeDF(ssgsvaFormat(expr.dat),opts$output_before)
 print('Load data done!')
+print(head(expr.dat))
 
 
 ###filtering out genes with low variance among samples
@@ -61,28 +67,21 @@ exprZero <- expr.dat
 expr.dat <- expr.dat[rownames(expr.dat) %in% names(filt_genes),]
 exprZero <- subset(exprZero, !(rownames(exprZero) %in% names(filt_genes)))
 
-batch.dat = read.table(opts$metasheet, sep=',', header = TRUE, stringsAsFactors = FALSE, row.names = 1,check.names = FALSE)
-overlap_sample = intersect(colnames(expr.dat),rownames(batch.dat))
-print('Load meta done!')
-
-# stop at low sample numbers
-#if(length(exprZero) <- dim(expr.dat)[2]/2) stop("too few samples")
-
-print('Processing samples:')
-print(overlap_sample)
 
 if(opts$covariates == "False"){
-  expr.limma <- expr.dat
+        print('No batches used !')
+	expr.limma <- expr.dat
     } else {
+	print('Running limma for batch removal')
       expr.limma = tryCatch(
-      removeBatchEffect(as.matrix(expr.dat[,overlap_sample]),
-                          batch.dat$opt$covariates),
+      removeBatchEffect(as.matrix(expr.dat),
+                          samples$opts$covariates),
       error = function(e){
       print(e)
       })
     }
-
+print(head(expr.limma))
 expr.limma = rbind(expr.limma,exprZero)
-writeDF(ssgsvaFormat(expr.limma),opts$output)
+writeDF(ssgsvaFormat(expr.limma),opts$output_after)
 
 
