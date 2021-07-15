@@ -1,10 +1,10 @@
 
 #############################Script to process immune infiltration #####################
-library(rlang)
-library(R.utils)
-library(dplyr)
-library(immunedeconv)
-library(optparse)
+suppressMessages(library(rlang))
+suppressMessages(library(R.utils))
+suppressMessages(library(dplyr))
+suppressMessages(library(immunedeconv))
+suppressMessages(library(optparse))
 
 
 # make option list and parse command line
@@ -42,39 +42,34 @@ cibersort_abs_method <- opts$abs_method
 
 ###read in data
 df <- read.table(input, sep = ",", row.names = 1,header = TRUE, check.names = FALSE)
-print(df)
-
+df <- 2^df -1 
+print(head(df))
 #quantiseq
 res_quant = as.data.frame(deconvolute(df, "quantiseq"))
-write.table(res_quant,paste0(output,'/quantiseq.txt'),sep='\t',row.names=FALSE, quote = FALSE)
+write.table(res_quant,paste0(output,'quantiseq.txt'),sep='\t',row.names=FALSE, quote = FALSE)
 print("run quantiseq")
 
 
 #xcell
 res_xcell = as.data.frame(deconvolute(df, "xcell"))
-write.table(res_xcell,paste0(output,'/xcell.txt'),sep='\t',row.names=FALSE, quote = FALSE)
+write.table(res_xcell,paste0(output,'xcell.txt'),sep='\t',row.names=FALSE, quote = FALSE)
 print("run xcell")
 
 
 #epic
 res_epic = as.data.frame(deconvolute(df, "epic"))
-write.table(res_epic,paste0(output,'/epic.txt'),sep='\t',row.names=FALSE, quote = FALSE)
+write.table(res_epic,paste0(output,'epic.txt'),sep='\t',row.names=FALSE, quote = FALSE)
 print("run epic")
 
 #mcp_counter
 res_mcp = as.data.frame(deconvolute(df, "mcp_counter"))
-write.table(res_mcp,paste0(output,'/mcp_counter.txt'),sep='\t',row.names=FALSE, quote = FALSE)
+write.table(res_mcp,paste0(output,'mcp_counter.txt'),sep='\t',row.names=FALSE, quote = FALSE)
 print('run mcp_counter')
 
-#cibersort##removing this as it is replaced by cibersort_abs
-#print('s')
-#results <- CIBERSORT("LM22.txt",tempfile,100)
-#write.table(results, file = paste0(output,'/cibersort.txt'),col.names=NA, quote = FALSE, sep="\t")
-#cibersort_abs
 source('src/immune_infiltration/CIBERSORT.R')
 res_ciber <- CIBERSORT("static/cibersort/LM22.txt",input,perm = cibersort_perm, QN = cibersort_qn, absolute = cibersort_abs, abs_method = cibersort_abs_method)
-write.table(res_ciber, file = paste0(output,'/cibersort_abs.txt'), sep="\t", quote = FALSE)
+write.table(res_ciber, file = paste0(output,'cibersort_abs.txt'), sep="\t", quote = FALSE)
 print("run cibersort absolution mode")
 
 res_timer = as.data.frame(deconvolute(df, "timer",indications=rep(tolower(cancertype),ncol(df))))
-write.table(res_timer,paste0(output,'/timer.txt'),sep='\t', row.names=FALSE, quote = FALSE)
+write.table(res_timer,paste0(output,'timer.txt'),sep='\t', row.names=FALSE, quote = FALSE)
