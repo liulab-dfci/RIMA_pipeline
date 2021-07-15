@@ -26,8 +26,8 @@ def preprocess_cohort_targets(wildcards):
     ls.append("analysis/batchremoval/%s_%s_tpm.genesymbol.csv" % (design,covariates))
     ls.append("analysis/batchremoval/%s_%s_tpm.genesymbol.batchremoved.csv" % (design,covariates))
     
-    ls.append("analysis/batchremoval/pca_plot_before.png" )
-    ls.append("analysis/batchremoval/pca_plot_after.png" )
+    ls.append("analysis/batchremoval/%s_%s_pca_plot_before.png" % (design,covariates))
+    ls.append("analysis/batchremoval/%s_%s_pca_plot_after.png" % (design,covariates))
     return ls 
 
 rule preprocess_cohort_all:
@@ -154,22 +154,23 @@ rule batch_removal:
         
 rule pca_sample_clustering:
     input:
-        before_batch = "analysis/salmon/{design}_{covariates}_tpm.genesymbol.csv",
-        after_batch = "analysis/batchremoval/{design}_{covariates}_tpm.genesymbol.batchremoved.csv"
+        before_batch = "analysis/batchremoval/{design}_{covariates}_tpm.genesymbol.batchremoved.csv",
+        after_batch = "analysis/batchremoval/{design}_{covariates}_tpm.genesymbol.csv"
     output:
-        "analysis/batchremoval/{design}_{covariates}_pca_plot_before.png",
-        "analysis/batchremoval/{design}_{covariates}_pca_plot_after.png",
+        before_pca = "analysis/batchremoval/{design}_{covariates}_pca_plot_before.png",
+        after_pca = "analysis/batchremoval/{design}_{covariates}_pca_plot_after.png",
     message:
         "Running PCA for sample clustering"
     benchmark:
         "benchmarks/batchremoval/{design}_{covariates}_pca.benchmark"
     params:
         meta_info = config["metasheet"],
-        out_path = "analysis/batchremoval/",
         path="set +eu;source activate %s" % config['stat_root'],
         covariates = config["batch"],
+        design = config["design"]
     conda: "../envs/stat_perl_r.yml"
     shell:
-        "{params.path}; Rscript src/preprocess/pca.R -b {input.before_batch} -a {input.after_batch} -m {params.meta_info} -o {params.out_path} -c {params.covariates}"
+        "{params.path}; Rscript src/preprocess/pca.R -b {input.before_batch} -a {input.after_batch} -m {params.meta_info}  -c {params.covariates} \
+                -g {params.design} -i {output.before_pca} -j {output.after_pca}"
 
 

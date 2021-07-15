@@ -12,10 +12,14 @@ option_list = list(
               help="expression matrix after batch removal", metavar="character"),
   make_option(c("-m", "--metainfo"), type="character", default=NULL, 
               help="meta file", metavar="character"),
-  make_option(c("-o", "--outdir"), type="character", default=NULL, 
-              help="output directory", metavar="character"),
+  make_option(c("-i", "--out_before"), type="character", default=NULL, 
+              help="PCA plot before batch removal", metavar="character"),
+  make_option(c("-j", "--out_after"), type="character", default=NULL,
+              help="PCA plot after batch removal", metavar="character"),
   make_option(c("-c", "--column"), type="character", default=NULL, 
-              help="batch column", metavar="character")   
+              help="batch column", metavar="character"),
+  make_option(c("-g", "--group"), type="character", default=NULL,
+              help="group column", metavar="character")  
 ); 
 
 opt_parser = OptionParser(option_list=option_list);
@@ -24,7 +28,7 @@ opt = parse_args(opt_parser);
 expr_before <- read.table(opt$before,sep = ",", row.names = 1, header = TRUE, check.names = FALSE)
 expr_after <- read.table(opt$after,sep = ",", row.names = 1, header = TRUE, check.names = FALSE)
 annot <- read.table(opt$metainfo,sep = ",",header = TRUE, row.names = 1)
-pca_out_dir <- opt$outdir
+
 
 if (opt$column == "False") {
   annot$Batch <- 1
@@ -54,11 +58,11 @@ pca_plot <- function(exprTable, annot,title, Batch) {
 
 
 ###print pca plot
-png(file = paste(pca_out_dir,"pca_plot_before.png",sep = ""), res = 300, height = 1200, width = 1500)
+png(file = opt$out_before, res = 300, height = 1200, width = 1500)
 pca_plot(exprTable = expr_before, annot = annot, title = "PCA plot Before Batch Removal",Batch=Batch)
 dev.off()
 
-png(file = paste(pca_out_dir,"pca_plot_after.png",sep = ""), res = 300, height = 1200, width = 1500)
+png(file = opt$out_after, res = 300, height = 1200, width = 1500)
 pca_plot(exprTable = expr_after, annot = annot, title = "PCA plot After Batch Removal",Batch = Batch)
 dev.off()
 
