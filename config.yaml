@@ -20,24 +20,12 @@ Control: NR
 
 ####
 pre-treated : True
-#--------mutation------------#
-fusion_clinical_phenotypes: [Responder]
-
-#--------neoantigen module----------#
-hla_annot_group: [Responder, Gender]
-neoantigen_callers: "NetMHC"
-neoantigen_epitope_lengths: "8,9,10,11"
-
-#------Multiqc report-----------#
-#Re-order the sample by phenotype:
-sam_ord: [Responder]
-
 ############################################################
 #                     list samples                         #
 ############################################################
 
 samples:
-  SRR8281218.01:
+  SRR8281218:
     - /mnt/RIMA/data/SRR8281218_1.fastq.gz
     - /mnt/RIMA/data/SRR8281218_2.fastq.gz
   SRR8281219:
