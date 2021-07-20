@@ -13,6 +13,7 @@ dependencies:
 - r-reshape2
 - bioconductor-sva
 - r-optparse
+- r-ggnewscale
 - r-ggfortify
 - r-e1071
 - r-vegan

@@ -6,6 +6,7 @@ metadata = pd.read_csv(config["metasheet"], index_col=0, sep=',')
 metadata = pd.read_csv(config["metasheet"], index_col=0, sep=',')
 options = [config["Treatment"],config["Control"]]
 design = config["design"]
+#batch = config["batch"]
 
 def getsampleIDs(meta):
 	return meta[meta[design].isin(options)].index
@@ -57,13 +58,13 @@ rule preprocess_prada:
       "benchmarks/fusion/{design}_preprocess_prada.benchmark"
     conda: "../envs/stat_perl_r.yml"
     params:
-      outdir = "analysis/fusion/",
+      outdir = "analysis/fusion/{design}_",
       path = "set +eu;source activate %s" % config['stat_root'],
-      pheno = config["design"],
+      #pheno = config["design"],
       gtf = config['annotation_pyprada'],
       anno = 'analysis/fusion/pyprada_annotation.txt'
     shell:
-      "{params.path}; Rscript src/mutation/preprocess_prada.R --fusion {input}  --outdir {params.outdir} --phenotype {params.pheno}"
+      "{params.path}; Rscript src/mutation/preprocess_prada.R --fusion {input}  --outdir {params.outdir} "
       """ && cat {output.table} | sed 's/\\t/\\n/g' | sort | uniq > {output.uniquegene}   """
       """ && grep -f {output.uniquegene} {params.gtf} > {params.anno} """
 

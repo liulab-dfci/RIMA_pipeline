@@ -13,7 +13,7 @@ suppressMessages(library(tidyverse))
 option_list = list(
   make_option(c("-i", "--input"), type="character", default=NULL,
                help="merged fusion prediction file", metavar="character"),
-  make_option(c("-pf", "--pradafusion"), type="character",default=NULL,
+  make_option(c("-f", "--pradafusion"), type="character",default=NULL,
               help="prada fusion prediction file", metavar="character"),
   make_option(c("-m", "--meta"), type="character", default=NULL, 
               help="metasheet file", metavar="character"),

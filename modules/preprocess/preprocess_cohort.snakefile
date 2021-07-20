@@ -139,7 +139,7 @@ rule batch_removal:
         "analysis/salmon/tpm.genesymbol.csv"
     output:
         after = "analysis/batchremoval/{design}_{covariates}_tpm.genesymbol.batchremoved.csv",
-        before = "analysis/batchremoval/{design}_{covariates}_tpm.genesymbol.csv"
+        before = "analysis/batchremoval/{design}_{covariates}_tpm.genesymbol.csv",
     message:
         "Running batch removal using limma method"
     benchmark:
@@ -148,13 +148,16 @@ rule batch_removal:
         covariates = config["batch"],
         design = config["design"],
         path="set +eu;source activate %s" % config['stat_root'],
-        meta = config["metasheet"]
+        meta = config["metasheet"],
+        rename = "analysis/batchremoval/tpm.genesymbol.batchremoved.csv"
     log:
         "logs/batchremoval/{design}_{covariates}_batch_removal.log"
     conda: "../envs/stat_perl_r.yml"
     shell:
         "{params.path}; Rscript src/preprocess/batch_removal.R -e {input} -c {params.covariates} \
-        -d {params.design} -m {params.meta} -b {output.before} -a {output.after}"
+        -d {params.design} -m {params.meta} -b {output.before} -a {output.after} \
+        && cp {output.after} {params.rename}"
+
 
         
 rule pca_sample_clustering:

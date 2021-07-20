@@ -1,17 +1,17 @@
 #!/usr/bin/env Rscript
 
 #dependencies
-library(dplyr)
-library(ggrepel)
-library(optparse)
-library(ggplot2)
-library(tidyverse)
-library(data.table)
+suppressMessages(library(dplyr))
+suppressMessages(library(ggrepel))
+suppressMessages(library(optparse))
+suppressMessages(library(ggplot2))
+suppressMessages(library(tidyverse))
+suppressMessages(library(data.table))
 
 option_list = list(
   make_option(c("-f", "--fusion"), type="character", default=NULL, 
               help="merged fusion prediction file", metavar="character"),
-  make_option(c("-out", "--outdir"), type="character", default=NULL, 
+  make_option(c("-o", "--outdir"), type="character", default=NULL, 
               help="output directory", metavar="character")
   
 ); 
