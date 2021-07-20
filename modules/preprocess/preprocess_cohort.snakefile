@@ -14,6 +14,11 @@ def merge_sep_inputs(inputs):
     inputs_format = ' -f '.join(str(i) for i in list(inputs)[0])
     return inputs_format
 
+def merge_sal_inputs(inputs):
+    inputs_format = ','.join(str(i) for i in list(inputs)[0])
+    return inputs_format
+
+
 def preprocess_cohort_targets(wildcards):
     ls = []
     ls.append("analysis/star/STAR_Align_Report.csv" )
@@ -116,7 +121,7 @@ rule salmon_matrix:
     benchmark:
       "benchmarks/salmon/salmon_gene_matrix.benchmark"
     params:
-      args = lambda wildcards, input: merge_sep_inputs({input.salmon_tpm_files}),
+      args = lambda wildcards, input: merge_sal_inputs({input.salmon_tpm_files}),
       tx2gene = 'static/deseq2/tx2gene.csv',
       outpath = 'analysis/salmon/',
       path = "set +eu;source activate %s" % config['stat_root']
