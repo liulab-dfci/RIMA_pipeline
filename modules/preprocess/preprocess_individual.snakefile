@@ -94,7 +94,7 @@ rule star_align:
     conda:
         "../envs/star_env.yml"
     shell:
-        "STAR --runThreadN 8 --genomeDir {config[star_index]} "
+        "STAR --runThreadN 32 --genomeDir {config[star_index]} "
         "--outReadsUnmapped None "
         "--chimSegmentMin 12 "
         "--chimJunctionOverhangMin 12 "
