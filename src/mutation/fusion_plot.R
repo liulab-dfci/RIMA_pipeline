@@ -154,27 +154,29 @@ write.table(merge.fusion.df, paste(outdir,pheno,"_fusion_gene_table.txt", sep = 
 
 
 ### extract expression of oncogene,tsg and protein kinase genes
-png(paste(outdir, pheno,"_fusion_gene_plot.png", sep = ""), width = 800, height = 700)
+png(paste(outdir, pheno,"_fusion_gene_plot.png", sep = ""), width = 1600, height = 1400)
+#pdf(paste(outdir, pheno,"_fusion_gene_plot.pdf", sep = ""), width = 8, height = 7)
 ggplot(merge.fusion.df, aes(x=Phenotype, y=log10(Expression+1))) + 
   geom_violin(trim=TRUE) +
-  geom_jitter(aes(color = Type),shape=16#, position=position_jitter(0.15)
+  geom_jitter(aes(color = Type),shape=16, size = 4#, position=position_jitter(0.15)
   )+
   theme_bw()+
   scale_colour_manual(name = "Type", values = c(Oncogene="#a6bddb",Tumor_Suppressor="#99d8c9", Both="#4DAF4A",Cancer_Driver="grey"))+
   new_scale_color() +
-  geom_label_repel(data = subset(merge.fusion.df, Type != "Cancer_Driver" & Type != "Others"), 
+  geom_label_repel(data = subset(merge.fusion.df, Type != "Others"), 
                    aes(label = Gene, fill = Type), #alpha = 0.5,#fill = "white", 
                    fontface = 'bold',label.size = 0.15, family = "serif"
   )+
   scale_fill_manual(values = c(Oncogene="#a6bddb",Tumor_Suppressor="#99d8c9", Both="#4DAF4A",Cancer_Driver="grey"),guide = FALSE)+
   scale_colour_manual(name = "Target", values = c(left_target="#636363",right_target="#e6550d"))+
   scale_x_discrete(name ="", labels=c("APre" = "Pre")) + 
-  theme(axis.text.x=element_text(angle=0,size=12,face = "bold",hjust=0.5),
-        axis.text.y=element_text(size=12,face = "bold",hjust=1),
+  theme(axis.text.x=element_text(angle=0,size=20,face = "bold",hjust=0.5),
+        axis.text.y=element_text(size=20,face = "bold",hjust=1),
         axis.title.x = element_blank(),
-        axis.title.y = element_text(size = 12,face = "bold"),
-        legend.text = element_text(size = 12),
-        strip.text = element_text(size = 12, face = "bold"),
+        axis.title.y = element_text(size = 20,face = "bold"),
+        legend.text = element_text(size = 20),
+	legend.title = element_text(size = 20),
+        strip.text = element_text(size = 20, face = "bold"),
         legend.position = "right") 
 dev.off()
 
