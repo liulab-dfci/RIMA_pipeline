@@ -58,12 +58,23 @@ pca_plot <- function(exprTable, annot,title, Batch) {
 
 
 ###print pca plot
-png(file = opt$out_before, res = 300, height = 1200, width = 1500)
-pca_plot(exprTable = expr_before, annot = annot, title = "PCA plot Before Batch Removal",Batch=Batch)
-dev.off()
 
-png(file = opt$out_after, res = 300, height = 1200, width = 1500)
-pca_plot(exprTable = expr_after, annot = annot, title = "PCA plot After Batch Removal",Batch = Batch)
-dev.off()
+if (opt$column != "False") {
+	png(file = opt$out_before, res = 300, height = 1200, width = 1500)
+	pca_plot(exprTable = expr_before, annot = annot, title = "PCA plot Before Batch Removal",Batch=Batch)
+	dev.off()
 
+	png(file = opt$out_after, res = 300, height = 1200, width = 1500)
+	pca_plot(exprTable = expr_after, annot = annot, title = "PCA plot After Batch Removal",Batch = Batch)
+	dev.off()
+} else
+{
+	png(file = opt$out_before, res = 300, height = 1200, width = 1500)
+	plot.new()
+	dev.off()
+
+	png(file = opt$out_after, res = 300, height = 1200, width = 1500)
+	plot.new()
+	dev.off()
+}
 ###
