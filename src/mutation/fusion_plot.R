@@ -8,6 +8,8 @@ suppressMessages(library(optparse))
 suppressMessages(library(data.table))
 suppressMessages(library(ggplot2))
 suppressMessages(library(tidyverse))
+suppressMessages(library(reshape))
+suppressMessages(library(stringr))
 
 
 option_list = list(
@@ -127,20 +129,26 @@ colnames(pradafusion) <- c("Gene1", "Gene2", "Transcript1_Len", "Transcript2_Len
 ###process the file for plotting
 pradafusion<-na.omit(pradafusion)
 pradafusion$BitScore <- log(pradafusion$BitScore, 10)
+
 pradafusion<-pradafusion%>%
   unite(FusionName, Gene1, Gene2, sep="--")
 highlight_genes <- pradafusion %>% 
   filter((Evalue < 0.05 & Align_Len > 1000) | (Evalue <0.05 & BitScore > 2))
 
 
-png(paste(outdir, pheno, "_prada_homology.png", sep = ""), width = 800, height = 700)
+png(paste(outdir, pheno, "_prada_homology.png", sep = ""), width = 1600, height = 1400, res = 300)
 pradafusion %>% 
   ggplot(aes(x=BitScore,y=Evalue,size=Align_Len)) + 
   geom_point(alpha=0.3) +
   geom_point(data=highlight_genes, 
              aes(x=BitScore,y=Evalue), 
              color="#e6550d", alpha=0.6)+
-  labs(x ="log10(BitScore)", y = "Evalue") + theme_bw()
+  geom_label_repel(data = highlight_genes, aes(label = FusionName), size = 1.5) +
+  labs(x ="log10(BitScore)", y = "Evalue") + theme_bw() + 
+  theme(axis.text=element_text(angle=0,size=8,face = "bold",hjust=0.5),
+      axis.title = element_text(size = 8,face = "bold"),
+      legend.text = element_text(size = 8),
+      legend.title = element_text(size = 8))
 dev.off()
 
 #remove the homogous fusion gene pair 
@@ -154,32 +162,106 @@ write.table(merge.fusion.df, paste(outdir,pheno,"_fusion_gene_table.txt", sep = 
 
 
 ### extract expression of oncogene,tsg and protein kinase genes
-png(paste(outdir, pheno,"_fusion_gene_plot.png", sep = ""), width = 1600, height = 1400)
+png(paste(outdir, pheno,"_fusion_gene_plot.png", sep = ""), width = 1600, height = 1400, res = 300)
 #pdf(paste(outdir, pheno,"_fusion_gene_plot.pdf", sep = ""), width = 8, height = 7)
 ggplot(merge.fusion.df, aes(x=Phenotype, y=log10(Expression+1))) + 
   geom_violin(trim=TRUE) +
-  geom_jitter(aes(color = Type),shape=16, size = 4#, position=position_jitter(0.15)
+  geom_jitter(aes(color = Type),shape=16#, size = 4#, position=position_jitter(0.15)
   )+
   theme_bw()+
   scale_colour_manual(name = "Type", values = c(Oncogene="#a6bddb",Tumor_Suppressor="#99d8c9", Both="#4DAF4A",Cancer_Driver="grey"))+
   new_scale_color() +
   geom_label_repel(data = subset(merge.fusion.df, Type != "Others"), 
                    aes(label = Gene, fill = Type), #alpha = 0.5,#fill = "white", 
-                   fontface = 'bold',label.size = 0.15, family = "serif"
+                   fontface = 'bold',label.size = 0.15, family = "serif",size = 2.5
   )+
   scale_fill_manual(values = c(Oncogene="#a6bddb",Tumor_Suppressor="#99d8c9", Both="#4DAF4A",Cancer_Driver="grey"),guide = FALSE)+
   scale_colour_manual(name = "Target", values = c(left_target="#636363",right_target="#e6550d"))+
   scale_x_discrete(name ="", labels=c("APre" = "Pre")) + 
-  theme(axis.text.x=element_text(angle=0,size=20,face = "bold",hjust=0.5),
-        axis.text.y=element_text(size=20,face = "bold",hjust=1),
+  theme(axis.text.x=element_text(angle=0,size=8,face = "bold",hjust=0.5),
+        axis.text.y=element_text(size=8,face = "bold",hjust=1),
         axis.title.x = element_blank(),
-        axis.title.y = element_text(size = 20,face = "bold"),
-        legend.text = element_text(size = 20),
-	legend.title = element_text(size = 20),
-        strip.text = element_text(size = 20, face = "bold"),
+        axis.title.y = element_text(size = 8,face = "bold"),
+        legend.text = element_text(size = 8),
+	legend.title = element_text(size = 8),
+        strip.text = element_text(size = 8, face = "bold"),
         legend.position = "right") 
 dev.off()
 
+
+
+
+##fusion box plot
+type <- c("Oncogene", "Tumor_Suppressor", "Cancer_Driver", "Others")
+
+ta <- merge.fusion.df
+
+#preprocess the data
+processed_ta <- NULL
+for (i in unique(ta$Phenotype)) {
+  tmp_ta <- ta[ta$Phenotype == i,]
+  tmp_ta_others <- tmp_ta[tmp_ta$Type == "Others",]
+  tmp_ta_sig <- tmp_ta[tmp_ta$Type != "Others",]
+
+  #remove the duplicates for others pairs, and calculating their average expression
+  tmp_ta_others <- tmp_ta_others %>% group_by(Gene) %>% mutate(Expression = mean(Expression))
+  tmp_ta_others <- tmp_ta_others[!duplicated(tmp_ta_others$Gene),]
+  tmp_ta_others <- tmp_ta_others %>% group_by(Gene) %>% mutate(ID=1:n())
+
+  #group multiple hits for signifcant gene pairs
+  tmp_ta_sig <- tmp_ta_sig %>% group_by(Gene) %>% mutate(ID=1:n())
+
+  tmp_ta <- rbind(tmp_ta_others, tmp_ta_sig)
+
+  processed_ta <- rbind(processed_ta, tmp_ta)
+}
+
+#re-order the figure followed: Oncogenes, Tumor suppressor, Cancer driver, Others
+reorder_ta <- NULL
+for (t in type) {
+  tmp <- processed_ta[processed_ta$Type ==t,]
+  tmp <- tmp[order(tmp$Expression, decreasing = TRUE),]
+  reorder_ta <- rbind(reorder_ta, tmp)
+}
+
+
+reorder_ta$Gene <- factor(reorder_ta$Gene, levels = rev(unique(reorder_ta$Gene)))
+reorder_ta <- reorder_ta[reorder_ta$Expression != 0,]
+
+
+####labeling
+label <- reorder_ta[reorder_ta$Pos != "Others",]
+test <- str_split_fixed(label$Gene, "--", 2)
+label$left <- test[,1]
+label$right <- test[,2]
+label$Pos <- ifelse(label$Pos == "left_target", label$left, ifelse(label$Pos == "right_target", label$right, "both"))
+label <- label[colnames(reorder_ta)]
+label <- label[!duplicated(label$Gene),]
+###
+
+
+###define the color
+color_ta <- data.frame(terms = type, color = c("#e34a33", "#a6bddb", "#fc9272", "#bdbdbd"))
+iterms <- as.character(color_ta[color_ta$terms %in% unique(reorder_ta$Type),]$terms)
+color <- as.character(color_ta[color_ta$terms %in% iterms,]$color)
+
+png(paste(outdir, "fusion_boxplot.png", sep = ""), width = 2000, height = 1400, res = 300)
+p <- ggplot(reorder_ta, aes(x = Gene, y = Expression, fill = Type, group=factor(ID))) +
+       geom_bar(stat = "identity",position=position_dodge(), color = "#636363") +
+       facet_grid(Phenotype ~ ., scales = "free_y", space = "free_y") + #, scales = "free_y", space = "free_y") +
+       #facet_wrap(~Phenotype, ncol = 1, strip.position="right", scales = "free_y") + coord_flip() + theme_bw() +
+       geom_text(data = label, aes(label=Pos), position = position_dodge(.9), hjust = -0.1, size = 2) +
+       coord_flip() + theme_bw() +
+       scale_fill_manual(breaks = iterms, values = color) +
+       labs(x = "Gene Pairs") +
+        theme(axis.text.x= element_text(size=8),
+              axis.text.y = element_text(size=6),
+              axis.title = element_text(size = 8,face = "bold"),
+              legend.title = element_text(size = 8),
+              legend.text = element_text(size = 6),
+              strip.text = element_text(size = 8, face = "bold"))
+p + expand_limits(y = c(min(reorder_ta$Expression), max(reorder_ta$Expression)*1.1))
+dev.off()
 
 
 
