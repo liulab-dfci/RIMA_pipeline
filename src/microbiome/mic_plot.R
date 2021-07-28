@@ -112,6 +112,7 @@ for (t in 1:ncol(final_matrix)) {
   final_ta <- rbind(final_ta, tmp_ta)
 }
 
+
 #reorder sample 
 ord_sa <- NULL
 for (sa in unique(final_ta$sample)) {
@@ -122,7 +123,7 @@ for (sa in unique(final_ta$sample)) {
 
 final_ta <- merge(final_ta, ord_sa, by = "sample")
 final_ta <- final_ta[order(final_ta$sum_ab, decreasing = FALSE),]
-final_ta$sample <- factor(final_ta$sample, levels = unique(final_ta$sample))
+final_ta$sample <- factor(final_ta$sample, levels = rev(unique(final_ta$sample)))
 #ggplot(final_ta, aes(x= abundance, y = sample, fill = species)) + geom_bar(stat = "identity")
 
 #calculate the ratio
@@ -136,15 +137,28 @@ for (rat in unique(final_ta$sample)) {
   final_rat <- rbind(final_rat, tmp)
 }
 
+#define the legend order and color 
+final_sub <- final_rat[final_rat$species != "other",]
+other <- final_rat[final_rat$species == "other",]
+
+final_rat <- rbind(final_sub, other)
+final_rat$species <- factor(final_rat$species, levels = rev(unique(final_rat$species)))
+
+#create the color palette
+color <- c("#FF68A1", "#FF61CC", "#ED68ED", "#C77CFF", "#8494FF", "#00A9FF", "#00B8E7", "#00BFC4",
+           "#00C19A", "#00BE67", "#0CB702", "#7CAE00", "#ABA300", "#CD9600", "#E68613", "#bdbdbd")
+species <- as.character(unique(final_rat$species))
+
+
+print(final_rat)
 png(paste(outdir, "microbes_abundance.png", sep = ""), res = 300, width = 1600, height = 1300, pointsize = 12)
-ggplot(final_rat, aes(x= ratio, y = sample, fill = species)) + geom_col() +
+ggplot(final_rat, aes(x= ratio, y = sample, fill = species)) + geom_col() + theme_bw() + 
+  scale_fill_manual(breaks = species, values = color) +
   theme(
-    axis.text.x=element_text(size=6, face = "bold"),
-    axis.text.y=element_text(size=6, face = "bold"),
-    axis.title.y = element_text(size = 6, face = "bold"),
-    axis.title.x = element_text(size = 6, face = "bold"),
-    legend.title = element_text(size=6, face = "bold"),
-    legend.text = element_text(size=6, face = "bold")
+    axis.text=element_text(size=6),
+    axis.title = element_text(size = 8, face = "bold"),
+    legend.title = element_text(size=8, face = "bold"),
+    legend.text = element_text(size=6)
   )
   
 dev.off()
