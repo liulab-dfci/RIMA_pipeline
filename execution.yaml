@@ -1,23 +1,28 @@
-# ----------Execution modules for RIMA-------------#
-#Note: Preprocess individual and cohort module. 
-#Run the remaining modules only after these two modules.
+
+##Note: Preprocess individual and cohort module necessary to get the alignment and quality results.
+##Run the remaining modules only after these two modules.
 preprocess_individual: true
 preprocess_cohort: true
 
-#Note: The below modules are specialized modules, each dealing with specific targets. Make sure to run individual and cohort of each module to get all the results.
+##Optional modules
+##Note: The below modules are specialized modules, each dealing with specific targets.
+##Make sure to run individual and cohort of each module to get all the results.
+
+##Individual runs
+mutation_individual: false
+immune_response_individual: false
+immune_repertoire_individual: false
+microbiome_individual: false
+neoantigen_individual: false
+
+
+
+##Cohort runs
 differential_expression_cohort: false
 immune_infiltration_cohort: false
-mutation_individual: false
 mutation_cohort: false
-immune_response_individual: true
-immune_response_cohort: true
-immune_repertoire_individual: false
+immune_response_cohort: false
 immune_repertoire_cohort: false
-neoantigen_individual: false
-neoantigen_cohort: false
-microbiome_individual: false
 microbiome_cohort: false
+neoantigen_cohort: false
 
-
-#Note: This module generates a standalone  HTML report. It shows the results from the modules that user decides to run. 
-report: false
