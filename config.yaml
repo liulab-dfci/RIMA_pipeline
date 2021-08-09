@@ -1,21 +1,25 @@
----
-metasheet: metasheet.csv
-ref: ref.yaml
+#########Fixed and user-defined parameters################
+metasheet: metasheet.csv  # Meta info 
+ref: ref.yaml             # Reference config 
 assembly: hg38
-cancer_type: GBM
+cancer_type: GBM          #TCGA cancer type abbreviations
+rseqc_ref: house_keeping  #Option: 'house_keeping' or 'false'. 
+                          #By default, a subset of housekeeping genes is used by RSeQC to assess alignment quality.  
+                          #This reduces the amount of time needed to run RSeQC.  
+mate: [1,2]               #paired-end fastq format, we recommend naming paired-end reads with _1.fq.gz and _2.fq.gz
 
 
-#########User defined parameters needed to run the modules################
-#------- preprocess  module--------#
-rseqc_ref: house_keeping  #rseqc ref model
-mate: [1,2] #paired-end([1,2]) or single-end([0])
+#########Cohort level analysis parameters################
+design: Group             # Condition on which to do comparsion (as set up in metasheet.csv)
+Treatment: R              # Treatment use in DESeq2, corresponding to positive log fold change
+Control: NR               # Control use in DESeq2, corresponding to negative log fold change
+batch: syb_batch          # Options: 'false' or a column name from the metasheet.csv.  
+                          # If set to a column name in the metasheet.csv, the column name will be used for batch effect analysis                                (limma).  
+                          # It will also be used as a covariate for differential analysis (DESeq2) to account for batch effect.  
 
-
-###deseq2
-batch: syn_batch #False or batch colname in metasheet
-design: Group #condition to do comparsion
-Treatment: R
-Control: NR
+pre_treated: false        # Option: true or false. 
+                          # If set to false, patients are treatment naive.  
+                          # If set to true, patients have received some form of therapy prior to the current study.
 
 
 ####
