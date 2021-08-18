@@ -1,83 +1,100 @@
-#########Fixed and user-defined parameters################
-metasheet: metasheet.csv  # Meta info 
-ref: ref.yaml             # Reference config 
-assembly: hg38
-cancer_type: GBM          #TCGA cancer type abbreviations
-rseqc_ref: house_keeping  #Option: 'house_keeping' or 'false'. 
-                          #By default, a subset of housekeeping genes is used by RSeQC to assess alignment quality.  
-                          #This reduces the amount of time needed to run RSeQC.  
-mate: [1,2]               #paired-end fastq format, we recommend naming paired-end reads with _1.fq.gz and _2.fq.gz
+---
+############################################################
+#                   Data information                       #
+############################################################
+
+ref: ref.yaml
+assembly: mm10 #hg38 or mm10
+
+cancer_type: AUTO #short name of cancer type
+metasheet: metasheet.txt
+designs: [Condition] #the column from metasheet which is used to do comparsion
+
+############################################################
+#                     Data Processing                      #
+############################################################
+
+### star 
+#Possible values are [ff-firststrand, ff-secondstrand, ff-unstranded, fr-firststrand, fr-secondstrand, fr-unstranded (default), transfrags]
+library_type: 'fr-firststrand'
+stranded: true
+threads: 8
+
+### rseqc parameters
+rseqc_ref: house_keeping  #rseqc ref model
+
+############################################################
+#             Differential Gene Expression                 #
+############################################################
 
 
-#########Cohort level analysis parameters################
-design: Group             # Condition on which to do comparsion (as set up in metasheet.csv)
-Treatment: R              # Treatment use in DESeq2, corresponding to positive log fold change
-Control: NR               # Control use in DESeq2, corresponding to negative log fold change
-batch: syb_batch          # Options: 'false' or a column name from the metasheet.csv.  
-                          # If set to a column name in the metasheet.csv, the column name will be used for batch effect analysis                                (limma).  
-                          # It will also be used as a covariate for differential analysis (DESeq2) to account for batch effect.  
+### batch_removal and PCA analysis
+#If you don't need to do batch removal, just setting [no] 
+batch_covariates: [no]
 
-pre_treated: false        # Option: true or false. 
-                          # If set to false, patients are treatment naive.  
-                          # If set to true, patients have received some form of therapy prior to the current study.
+neoantigen_callers: "NetMHC"
+neoantigen_epitope_lengths: "8,9,10,11"
 
+### deseq2
+batch: [no] #[Clinical Phenotype] or [no], Clinical phenotype could be the column from metasheet which accounts for batch effect
+comparison: between ##between or loop. between: compare any two phenotypes in a given condition column;loop: compare one phenotype and all the others 
 
-####
-pre-treated : True
+############################################################
+#                       level3                             #
+############################################################
+
+### microbiota
+centrifuge: true  #run centrifuge or pathseq
+
+### Trust4
+trust4_clinical_phenotype: [Condition]
+
+### arcasHLA
+##specifying group imformation annotated in HLA oncoplot
+hla_annot_group: [Responder, Gender]
+
 ############################################################
 #                     list samples                         #
 ############################################################
-
 samples:
-  SRR8281218:
-    - /mnt/RIMA/data/SRR8281218_1.fastq.gz
-    - /mnt/RIMA/data/SRR8281218_2.fastq.gz
-  SRR8281219:
-    - /mnt/RIMA/data/SRR8281219_1.fastq.gz
-    - /mnt/RIMA/data/SRR8281219_2.fastq.gz
-  SRR8281226:
-    - /mnt/RIMA/data/SRR8281226_1.fastq.gz
-    - /mnt/RIMA/data/SRR8281226_2.fastq.gz
-  SRR8281236:
-    - /mnt/RIMA/data/SRR8281236_1.fastq.gz
-    - /mnt/RIMA/data/SRR8281236_2.fastq.gz
-  SRR8281230:
-    - /mnt/RIMA/data/SRR8281230_1.fastq.gz
-    - /mnt/RIMA/data/SRR8281230_2.fastq.gz
-  SRR8281233:
-    - /mnt/RIMA/data/SRR8281233_1.fastq.gz
-    - /mnt/RIMA/data/SRR8281233_2.fastq.gz
-  SRR8281244:
-    - /mnt/RIMA/data/SRR8281244_1.fastq.gz
-    - /mnt/RIMA/data/SRR8281244_2.fastq.gz
-  SRR8281245:
-    - /mnt/RIMA/data/SRR8281245_1.fastq.gz
-    - /mnt/RIMA/data/SRR8281245_2.fastq.gz
-  SRR8281243:
-    - /mnt/RIMA/data/SRR8281243_1.fastq.gz
-    - /mnt/RIMA/data/SRR8281243_2.fastq.gz
-  SRR8281251:
-    - /mnt/RIMA/data/SRR8281251_1.fastq.gz
-    - /mnt/RIMA/data/SRR8281251_2.fastq.gz
-  SRR8281238:
-    - /mnt/RIMA/data/SRR8281238_1.fastq.gz
-    - /mnt/RIMA/data/SRR8281238_2.fastq.gz
-  SRR8281250:
-    - /mnt/RIMA/data/SRR8281250_1.fastq.gz
-    - /mnt/RIMA/data/SRR8281250_2.fastq.gz
-
-############################################################
-#                    Neoantigen testing                    #
-############################################################
-VCF:  #vcf files for tumor samples
   SRR8281228:
-    - /mnt/zhao_trial/test_lin/analysis/vcf/SRR8281228_tnscope.filter.neoantigen.vep.vcf
-  SRR8281231:
-    - /mnt/zhao_trial/test_lin/analysis/vcf/SRR8281231_tnscope.filter.neoantigen.vep.vcf
+    - /liulab/yang/Immunotherapy/toDIGEST/rawRNASeq/fastq/Zhao2019_PD1_Glioblastoma_RNASeq/SRR8281228_1.fastq.gz
+    - /liulab/yang/Immunotherapy/toDIGEST/rawRNASeq/fastq/Zhao2019_PD1_Glioblastoma_RNASeq/SRR8281228_2.fastq.gz
   SRR8281222:
-    - /mnt/zhao_trial/test_lin/analysis/vcf/SRR8281222_tnscope.filter.neoantigen.vep.vcf
+    - /liulab/yang/Immunotherapy/toDIGEST/rawRNASeq/fastq/Zhao2019_PD1_Glioblastoma_RNASeq/SRR8281222_1.fastq.gz
+    - /liulab/yang/Immunotherapy/toDIGEST/rawRNASeq/fastq/Zhao2019_PD1_Glioblastoma_RNASeq/SRR8281222_2.fastq.gz
   SRR8281224:
-    - /mnt/zhao_trial/test_lin/analysis/vcf/SRR8281224_tnscope.filter.neoantigen.vep.vcf
+    - /liulab/yang/Immunotherapy/toDIGEST/rawRNASeq/fastq/Zhao2019_PD1_Glioblastoma_RNASeq/SRR8281224_1.fastq.gz
+    - /liulab/yang/Immunotherapy/toDIGEST/rawRNASeq/fastq/Zhao2019_PD1_Glioblastoma_RNASeq/SRR8281224_2.fastq.gz
   SRR8281225:
-    - /mnt/zhao_trial/test_lin/analysis/vcf/SRR8281225_tnscope.filter.neoantigen.vep.vcf
+    - /liulab/yang/Immunotherapy/toDIGEST/rawRNASeq/fastq/Zhao2019_PD1_Glioblastoma_RNASeq/SRR8281225_1.fastq.gz
+    - /liulab/yang/Immunotherapy/toDIGEST/rawRNASeq/fastq/Zhao2019_PD1_Glioblastoma_RNASeq/SRR8281225_2.fastq.gz
+  SRR8281218:
+    - /liulab/yang/Immunotherapy/toDIGEST/rawRNASeq/fastq/Zhao2019_PD1_Glioblastoma_RNASeq/SRR8281218_1.fastq.gz
+    - /liulab/yang/Immunotherapy/toDIGEST/rawRNASeq/fastq/Zhao2019_PD1_Glioblastoma_RNASeq/SRR8281218_2.fastq.gz
+  SRR8281219:
+    - /liulab/yang/Immunotherapy/toDIGEST/rawRNASeq/fastq/Zhao2019_PD1_Glioblastoma_RNASeq/SRR8281219_1.fastq.gz
+    - /liulab/yang/Immunotherapy/toDIGEST/rawRNASeq/fastq/Zhao2019_PD1_Glioblastoma_RNASeq/SRR8281219_2.fastq.gz
+  SRR8281220:
+    - /liulab/yang/Immunotherapy/toDIGEST/rawRNASeq/fastq/Zhao2019_PD1_Glioblastoma_RNASeq/SRR8281220_1.fastq.gz
+    - /liulab/yang/Immunotherapy/toDIGEST/rawRNASeq/fastq/Zhao2019_PD1_Glioblastoma_RNASeq/SRR8281220_2.fastq.gz
+
+###########################################################
+#                      run settings                       #
+###########################################################
+runs:
+  run1:
+    - SRR8281228
+  run3:
+    - SRR8281222
+  run4:
+    - SRR8281224
+  run5:
+    - SRR8281225
+  run6:
+    - SRR8281218
+  run7:
+    - SRR8281219
+  run8:
+    - SRR8281220
 

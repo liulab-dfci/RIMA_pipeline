@@ -33,28 +33,28 @@ star_final<- star_final[-1, ]
 star_final$Total_Reads_QC_check <- ifelse(star_final$Total_Reads >= 2000000, "PASS", "FAIL")
 star_final$Unique_Mapping_QC_check <- ifelse(star_final$Unique_Mapping >=80 , "PASS", "FAIL")
 star_final$Sample_Name<- rownames(star_final)
+star_final$Sample_Name <- gsub("\\.", "-", star_final$Sample_Name)
 star_final$Total_Reads <- as.numeric(star_final$Total_Reads)/1000000
 star_final$Unique_Mapping<- gsub("%","", star_final$Unique_Mapping)
-print(star_final)
+
 ############################ tin reads
 tin.data$tin_QC_check <- ifelse(tin.data$TIN.median. >=30, "PASS", "FAIL")
-#tin.data$Bam_file=str_remove_all(tin.data$Bam_file, "[_downsampling.bam]")
+tin.data$Bam_file <- sub("_downsampling.bam$","",tin.data$Bam_file)
 names(tin.data)=c("Sample_Name","mean_TIN","median_TIN","stdev_TIN","tin_QC_check")
 tin_final=tin.data[,c(1,3,5)]
-print(tin_final)
 
 ###################rseqc reads
 rseqc_reads= as.data.frame(t(rseqc.reads),stringsAsFactors=FALSE)
 colnames(rseqc_reads) <- rseqc_reads[1,]
 rseqc_reads<- rseqc_reads[-1, ]
 rseqc_reads$Sample_Name<- rownames(rseqc_reads)
-#rseqc_reads$Sample_Name <- gsub("\\.", "-", rseqc_reads$Sample_Name)
+rseqc_reads$Sample_Name <- gsub("\\.", "-", rseqc_reads$Sample_Name)
 rseqc_reads$CDR_QC_check <- ifelse(rseqc_reads$CDS_Exons >= 0.50 , "PASS", "FAIL")
 rseqc_reads$CDS_Exons <- as.numeric(rseqc_reads$CDS_Exons) * 100
-print(rseqc_reads)
 
 ####################
-m=Reduce(merge, list(star_final,tin_final,rseqc_reads))
+m=Reduce(merge, list(star_final,rseqc_reads))
+m <- merge(m, tin_final, by = "Sample_Name", all = FALSE)
 m1= m %>%
   dplyr::select(Sample_Name, Total_Reads, Unique_Mapping, median_TIN, CDS_Exons,Total_Reads_QC_check,Unique_Mapping_QC_check,tin_QC_check,CDR_QC_check)
 colnames(m1)[2] = "Total_Reads(M)"

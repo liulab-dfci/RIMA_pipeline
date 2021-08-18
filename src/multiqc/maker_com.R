@@ -27,13 +27,13 @@ opt <- parse_args(opt_parser);
 #msi<-read.table("/Users/linyang/Documents/Liulab/msi/msi_score.txt",stringsAsFactors = FALSE)
 #reading the data
 meta <- read.table(opt$meta, sep = ",", stringsAsFactors = FALSE, header = TRUE)
-msi <- read.table(opt$msi, sep="\t", stringsAsFactors = FALSE)
+msi <- read.table(paste(opt$msi, "msi_score.txt", sep = ""), stringsAsFactors = FALSE)
 colnames(msi)<-c("SampleName","MSI")
 #decide whether the pre condition exist
 
 if ("Timing" %in% colnames(meta)) {
- tide_pre <- read.table(paste(opt$tide,"pre_tpm_convertID_batch_tide_score.txt",sep=""),, sep = "\t", header = TRUE)
- tide_post <- read.table(paste(opt$tide,"post_tpm_convertID_batch_tide_score.txt",sep=""), sep = "\t", header = TRUE)
+ tide_pre <- read.table(paste0(opt$tide, "pre/", "pre_tpm_convertID_batch_tide_score.txt", sep = ""), sep = "\t", header = TRUE)
+ tide_post <- read.table(paste0(opt$tide, "post/", "post_tpm_convertID_batch_tide_score.txt", sep = ""), sep = "\t", header = TRUE)
  tide <- rbind(tide_pre, tide_post)
  colnames(tide)[c(1,3)] <- c("SampleName", "Predicted_Response") 
  tide <- tide[c(-2,-6)]

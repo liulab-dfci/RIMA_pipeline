@@ -1,0 +1,8 @@
+SampleName,PatName,Responder,Age,Gender
+SRR8281228,P3,responder,41,0
+SRR8281222,P13,non-responder,55,1
+SRR8281224,P13,non-responder,55,1
+SRR8281225,P13,non-responder,55,1
+SRR8281218,P20,non-responder,63,0
+SRR8281219,P20,non-responder,63,0
+SRR8281220,P21,non-responder,59,0

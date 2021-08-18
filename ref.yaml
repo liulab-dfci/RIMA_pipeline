@@ -7,28 +7,49 @@
 
 hg38:
 ###annotation path
-  fasta_path: ./ref_files/GRCh38.d1.vd1.fa 
-  gtf_path: ./ref_files/gencode.v22.annotation.gtf
-  bed_path: ./ref_files/refseqGenes.bed
-  driver_bed_path: ./ref_files/driverGene_refseqGenes.bed
-  housekeeping_bed_path: ./ref_files/housekeeping_refseqGenes.bed
-  trust4_reper_path: ./ref_files/TRUST4/hg38_bcrtcr.fa
-  trust4_IMGT_path: ./ref_files/TRUST4/human_IMGT+C.fa
-  gmt_path: ./static/ssgsea/c2.cp.kegg.v6.1.symbols.gmt
-
+  fasta_path: /liulab/RIMA_kraken/reference/GRCh38.d1.vd1.fa 
+  gtf_path: /liulab/RIMA_kraken/reference/gencode.v22.annotation.gtf
+  bed_path: /liulab/RIMA_kraken/reference/refseqGenes.bed
+  driver_bed_path: /liulab/RIMA_kraken/reference/driverGene_refseqGenes.bed
+  housekeeping_bed_path: /liulab/RIMA_kraken/reference/housekeeping_refseqGenes.bed
+###microbe ref
+  microbe_fa_path: /liulab/RIMA_kraken/reference/pathseq_gdc_index/hg38/pathseq_microbe.fa
+  microbe_img_path: /liulab/RIMA_kraken/reference/pathseq_gdc_index/hg38/pathseq_microbe.fa.img
+  taxonomy_path: /liulab/RIMA_kraken/reference/pathseq_gdc_index/hg38/pathseq_microbe.db
+  host_img_path: /liulab/RIMA_kraken/reference/pathseq_gdc_index/hg38/GRCh38.d1.vd1.fa.img
+  host_kmer_path: /liulab/RIMA_kraken/reference/pathseq_gdc_index/hg38/hg38_k31.hss
+###
+  trust4_reper_path: /liulab/RIMA_kraken/TRUST4/hg38_bcrtcr.fa
+  trust4_IMGT_path: /liulab/RIMA_kraken/TRUST4/human_IMGT+C.fa
 ###index path
-  star_index: ./ref_files/v22
-  star_fusion_index: ./ref_files/fusion_gdc_index/GRCh38_v22_CTAT_lib_GDC_Mar162019/ctat_genome_lib_build_dir
-  salmon_index:  ./ref_files/salmon_index/gencode.v22.ts.fa
-  msisensor_index: ./ref_files/msisensor_gdc_index/hg38/microsatellite.list
-  centrifuge_index: ./ref_files/centrifuge_index/p_compressed+h+v
-  neoantigen_iedb_mhcI: ./ref_files/
-  annotation_pyprada: ./ref_files/pyPRADA/gencode.v22.canonical.gene.exons.tab.txt
+  star_index: /liulab/RIMA_kraken/reference/star_gdc_index/hg38
+  star_fusion_index: /liulab/RIMA_kraken/reference/fusion_gdc_index/GRCh38_v22_CTAT_lib_GDC_Mar162019/ctat_genome_lib_build_dir
+  salmon_index: /liulab/RIMA_kraken/reference/gencode.v22.ts.fa
+  msisensor_index: /liulab/RIMA_kraken/reference/msisensor_gdc_index/hg38/microsatellite.list
+  centrifuge_index: /liulab/RIMA_kraken/reference/centrifuge_index/p_compressed+h+v
+  vep_plugins: /liulab/RIMA_kraken/reference/VEP_plugins
+  vep_custom_enst: /liulab/RIMA_kraken/reference/isoform_overrides_uniprot
+  vep_germinal_var: /liulab/RIMA_kraken/reference/ExAC_nonTCGA.r0.3.1.sites.vep.vcf.gz
+  vep_data: /liulab/RIMA_kraken/reference/vep_gdc_v84/
+  cfg_init: /liulab/jinwang/pipeline_test/rnaseq_pipeline/static/optitype/config.ini
 
-###tool path
-  msisensor2_path: ./ref_files/msisensor2
-  trust4_path: ./ref_files/TRUST4
-  arcasHLA_path: ./ref_files/arcasHLA
-  prada_path: ./ref_files/pyPRADA/pyPRADA_1.2
+mm10:
+  fasta_path: /liulab/RIMA_mouse/reference/GRCm38.primary_assembly.genome.fa
+  gtf_path: /liulab/RIMA_mouse/reference/gencode.vM25.primary_assembly.annotation.gtf
+  bed_path: /liulab/RIMA_mouse/reference/mm10_RefSeq.bed
+  housekeeping_bed_path: /liulab/RIMA_mouse/reference/housekeepingMM.bed
 
+  trust4_reper_path: /liulab/RIMA_kraken/TRUST4/mouse/GRCm38_bcrtcr.fa
+  trust4_IMGT_path: /liulab/RIMA_kraken/TRUST4/mouse/mouse_IMGT+C.fa
+
+##index path
+  star_index: /liulab/RIMA_mouse/reference/star_index/mm10
+  salmon_index: /liulab/RIMA_mouse/reference/salmon_index/salmon.tx.fa
+  centrifuge_index: /liulab/RIMA_mouse/reference/p_compressed+m+v/p_compressed+m+v
+
+  microbe_fa_path: /liulab/RIMA_kraken/reference/pathseq_gdc_index/hg38/pathseq_microbe.fa
+  microbe_img_path: /liulab/RIMA_kraken/reference/pathseq_gdc_index/hg38/pathseq_microbe.fa.img
+  taxonomy_path: /liulab/RIMA_kraken/reference/pathseq_gdc_index/hg38/pathseq_microbe.db
+  host_img_path: /liulab/RIMA_kraken/reference/pathseq_gdc_index/hg38/GRCh38.d1.vd1.fa.img
+  host_kmer_path: /liulab/RIMA_kraken/reference/pathseq_gdc_index/hg38/hg38_k31.hss
 
