@@ -10,10 +10,10 @@ mate: [1,2]               #paired-end fastq format, we recommend naming paired-e
 
 
 #########Cohort level analysis parameters################
-design: Group             # Condition on which to do comparsion (as set up in metasheet.csv)
-Treatment: R              # Treatment use in DESeq2, corresponding to positive log fold change
-Control: NR               # Control use in DESeq2, corresponding to negative log fold change
-batch: syb_batch          # Options: 'false' or a column name from the metasheet.csv.  
+design: Group,Timing             # Condition on which to do comparsion (as set up in metasheet.csv)
+Treatment: R,Post              # Treatment use in DESeq2, corresponding to positive log fold change
+Control: NR,Pre               # Control use in DESeq2, corresponding to negative log fold change
+batch: false             # Options: 'false' or a column name from the metasheet.csv.  
                           # If set to a column name in the metasheet.csv, the column name will be used for batch effect analysis                                (limma).  
                           # It will also be used as a covariate for differential analysis (DESeq2) to account for batch effect.  
 
