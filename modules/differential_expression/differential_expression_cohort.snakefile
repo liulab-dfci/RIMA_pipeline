@@ -5,18 +5,18 @@
 import itertools
 import pandas as pd
 
-metadata = pd.read_csv(config["metasheet"], index_col=0, sep=',')
-options = [config["Treatment"],config["Control"]]
-design = config["design"]
-treatment = config["Treatment"]
-control = config["Control"] 
 
+metadata = pd.read_csv(config["metasheet"], index_col=0, sep=',')
+
+design = config["design"].split(",")[0]
+treatment = config["Treatment"].split(",")[0]
+control = config["Control"].split(",")[0]
 
 def diffexpr_targets(wildcards):
     ls=[]
-    ls.append("analysis/deseq2//%s_%s_vs_%s_volcano_plot.png" % (design,treatment,control))
+    ls.append("analysis/deseq2/%s_%s_vs_%s_volcano_plot.png" % (design,treatment,control))
     ls.append("analysis/deseq2/%s_%s_vs_%s_DESeq2.txt" % (design,treatment,control))
-    ls.append("analysis/deseq2/%s_%s_vs_%s_TPMs.txt" % (design,treatment,control))
+    ls.append("analysis/deseq2/%s_%s_vs_%s_estimated_genelevel_count.txt" % (design,treatment,control))
     ls.append("analysis/gsea/%s_%s_vs_%s_BP_terms.txt" % (design,treatment,control))
     ls.append("analysis/gsea/%s_%s_vs_%s_MF_terms.txt" % (design,treatment,control))
     ls.append("analysis/gsea/%s_%s_vs_%s_CC_terms.txt" % (design,treatment,control))
@@ -33,7 +33,7 @@ def diffexpr_targets(wildcards):
     return ls
 
 def getsampleIDs(meta):
-	return meta[meta[design].isin(options)].index
+    return meta.index
 
 
 rule differential_all:
@@ -45,7 +45,7 @@ rule deseq2_differential_genes:
     	files = expand("analysis/salmon/{sample}/{sample}.quant.sf",sample=getsampleIDs(metadata))
     output:
         deseq2_res = "analysis/deseq2/{design}_{treatment}_vs_{control}_DESeq2.txt",
-        deseq2_tpm = "analysis/deseq2/{design}_{treatment}_vs_{control}_TPMs.txt"
+        deseq2_tpm = "analysis/deseq2/{design}_{treatment}_vs_{control}_estimated_genelevel_count.txt"
     log:
         "logs/deseq2/{design}.{treatment}.{control}.deseq2.log"
     params:
@@ -53,9 +53,9 @@ rule deseq2_differential_genes:
         batch = config["batch"],
         out_path = "analysis/deseq2/",
         tx_annot = "static/deseq2/tx2gene.csv",
-        condition = design,
-        treatment = treatment,
-        control = control,
+        condition = config["design"],
+        treatment = config["Treatment"],
+        control = config["Control"],
         meta = config["metasheet"],
         path = "set +eu;source activate %s" % config['stat_root']
     message:
@@ -64,7 +64,7 @@ rule deseq2_differential_genes:
         "benchmarks/deseq2/{design}.{treatment}.{control}.deseq2.benchmark"
     conda: "../envs/stat_perl_r.yml"
     shell:
-    	"{params.path}; Rscript src/differentialexpr/DESeq2.R --input {params.filelist} --type salmon \
+    	"{params.path}; Rscript src/differentialexpr/DESeq2.R --input {params.filelist} \
         --batch {params.batch} --meta {params.meta} --tx2gene {params.tx_annot} \
         --condition {params.condition} --treatment {params.treatment} --control {params.control} --outpath {params.out_path}"
         
@@ -78,9 +78,9 @@ rule volcano_plot:
         "analysis/deseq2/{design}_{treatment}_vs_{control}_volcano_plot.png"
     params:
         path = "set +eu;source activate %s" % config['stat_root'],
-        treatment = treatment,
-        control = control,
-        condition = design
+        treatment = config["Treatment"],
+        control = config["Control"],
+        condition = config["design"]
     log:
         "logs/deseq2/{design}_{treatment}_vs_{control}.deseq2.volcano.log"
     message:
@@ -136,7 +136,7 @@ rule gsea_plot:
 
 rule ssgsea:
     input:
-        "analysis/deseq2/{design}_{treatment}_vs_{control}_TPMs.txt"
+        tpm_files = expand("analysis/batchremoval/{design}_{batch}_tpm.genesymbol.batchremoved.csv", design = config['design'].split(",")[0], batch = config['batch'])
     output:
         score = "analysis/deseq2/{design}_{treatment}_vs_{control}_ssgsea.txt",
         ssgsea_plot = "analysis/deseq2/{design}_{treatment}_vs_{control}_ssgsea.png"

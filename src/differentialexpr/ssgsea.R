@@ -54,7 +54,7 @@ top_n <- opt$top
 
 ###parameters
 geneSets <- getGmt(gmt_file)
-expr.dat <- read.table(exprsn, sep = "\t", header = TRUE, row.names = 1, check.names = FALSE)
+expr.dat <- read.table(exprsn, sep = ",", header = TRUE, row.names = 1, check.names = FALSE)
 
 meta <- read.table(file = metadata, sep=',', header = TRUE, stringsAsFactors = FALSE, row.names = 1, check.names = FALSE)
 samples <- subset(meta,meta[,Condition] == Treatment | meta[,Condition] == Control)
@@ -99,7 +99,7 @@ ssgsea.sort <- ssgsea[names(gr.diff.sort),]
 
         
 write.table(ssgsea.sort, paste(Outdir,Condition, "_",Treatment,"_vs_",Control,"_ssgsea.txt", sep = ""), 
-            quote = FALSE, sep = "\t", row.names = FALSE)   
+            quote = FALSE, sep = "\t", row.names = TRUE, col.names=NA)   
 
 png(paste(Outdir,Condition, "_",Treatment,"_vs_",Control,"_ssgsea.png", sep = ""),width = 1000, height = 880)
 col_fun = colorRamp2(c(-1,0,1), c("blue","white", "red"))

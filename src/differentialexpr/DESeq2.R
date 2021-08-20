@@ -11,8 +11,6 @@ option_list = list(
               help="list input files", metavar="character"),
   make_option(c("-b", "--batch"), type="character", default=NULL,
               help="control batch effect or not", metavar="character"),
-  make_option(c("-t", "--type"), type="character", default=NULL,
-              help="salmon", metavar="character"),
   make_option(c("-m", "--meta"), type="character", default=NULL,
               help="metasheet info", metavar="character"),
   make_option(c("-x", "--tx2gene"), type="character", default=NULL,
@@ -32,38 +30,33 @@ opt_parser = OptionParser(option_list=option_list)
 opt = parse_args(opt_parser)
 
 batch <- opt$batch 
-Condition <- opt$condition
+Condition <- strsplit(opt$condition, "\\,")[[1]]
 metadata <- opt$meta
 gene <- opt$tx2gene
-Treatment <- opt$treatment
+Treatment <- strsplit(opt$treatment, "\\,")[[1]]
 print(Treatment)
-Control <- opt$control
+Control <- strsplit(opt$control, "\\,")[[1]]
 print(Control)
-Type <- opt$type
 input <- opt$input
 
 print("Reading meta file ...")
 meta <- read.table(file = metadata, sep=',', header = TRUE, stringsAsFactors = FALSE, row.names = 1)
-#print(head(meta))
-#samples <- subset(meta, meta[,Condition] == Treatment | meta[,Condition] == Control)
-samples <- subset(meta, meta[,Condition] != 'NA')
-print(samples)
 
 
 print ("Reading tx2gene file ...")
 tx2gene <- read.table(file = gene,sep = ",",header = TRUE)
 
 
-if (is.null(opt$input) || is.null(opt$tx2gene) || is.null(opt$type)){
+if (is.null(opt$input) || is.null(opt$tx2gene)){
   print_help(opt_parser)
-  stop("At least 3 arguments must be supplied ", call.=FALSE)
+  stop("At least 2 arguments must be supplied ", call.=FALSE)
 }
 
 
 ######################################--------------programme-------------##################################
 ###----If you have transcript quantification files, as produced by Salmon, Sailfish, or kallisto, you would use DESeqDataSetFromTximport.
 
-Transcript <- function(files,samples,tx2gene,Type,batch){
+Transcript <- function(files,samples,tx2gene,Type,batch,condition,tx,con){
 
   filelist <- strsplit(files, "\\,")[[1]]
   print(filelist)
@@ -74,65 +67,88 @@ Transcript <- function(files,samples,tx2gene,Type,batch){
   print(paste("There are ",length(filelist.samples), " samples to be compared", sep = ""))
   print(filelist.samples)
   
-  txi <- tximport(filelist.samples, type=Type, tx2gene=tx2gene)
+  txi <- tximport(filelist.samples, type="salmon", tx2gene=tx2gene)
   txi$length[txi$length == 0] <- 1
   
   print(head(txi$counts))
   exprsn <- txi$counts
-  exprsn_log <- log2(exprsn + 1)
+  #exprsn_log <- log2(exprsn + 1)
 
   
   if(batch != "False"){
-    print (paste("Running DESeq2 with batch effects ",opt$batch," on ",opt$condition,sep=""))  
+    print (paste("Running DESeq2 with batch effects ", batch, " on ", condition, sep=""))  
      
-    colData <- samples[,c(batch ,Condition)]
-    colnames(colData) <- c("Batch","Condition")
+    colnames(samples) <- c("Batch","Condition")
+    print(samples)
        
     ddsTxi <- DESeqDataSetFromTximport(txi,
-                                       colData = colData,
+                                       colData = samples,
                                        design = ~ Batch + Condition)
                                        
-    #print (paste("Generating log transformed TPMS after batch correction of ",batch," on ",Condition,sep=""))
-    
-    #expr.limma = tryCatch(
-    #                 removeBatchEffect(exprsn_log,colData$Batch),
-    #                 error = function(e){
-    #                 print(e)
-    #                 })
-    
-    print ("Generating TPM matrix ...")
-    write.table(exprsn,paste(opt$outpath,opt$condition,'_',opt$treatment,'_vs_',opt$control,'_TPMs.txt',sep = ""),quote = FALSE,sep = "\t")
-
   }else{
-    print(paste("Running DESeq2 on ",opt$condition,sep=""))
+    print(paste("Running DESeq2 on ", condition,sep=""))
     
-    colData <- cbind(rownames(samples),samples[,Condition])
-    colnames(colData) <- c('sample','Condition')
-    print(colData)
+    colnames(samples) <- c('Condition')
+    print(samples)
     
     ddsTxi <- DESeqDataSetFromTximport(txi,
-                                       colData = colData,
+                                       colData = samples,
                                        design = ~ Condition)
                                        
     print ("Generating TPM matrix ...")
-    write.table(exprsn,paste(opt$outpath,opt$condition,'_',opt$treatment,'_vs_',opt$control,'_TPMs.txt',sep = ""),quote = FALSE,sep = "\t")
   }
   dds <- DESeq(ddsTxi)
-  
+  write.table(exprsn,paste(opt$outpath, condition,'_', tx,'_vs_', con,'_estimated_genelevel_count.txt',sep = ""),quote = FALSE,sep = "\t") 
   return (dds)
 }
 
+#multi-comparison
+n = 1
+for (c in Condition) {
+  tx <- Treatment[n]
+  con <- Control[n]
+  if(batch != "False") {
+    samples <- meta[meta[,c] %in% c(tx,con),][,c(batch,c)]
+  }else{
+    samples <- meta[meta[,c] %in% c(tx,con),][c]
+  }
+  
+  tmp_id <- as.character(rownames(samples))
+  n = n + 1
+  if(length(tmp_id) == 0) {
+    next
+  }
+  
+  print ("Star running DESeq2 ...")
+  dds <- Transcript(files = input, samples, tx2gene = tx2gene, batch = batch, condition = c, tx = tx, con = con)
+  print(class(dds))
+  
+  print (paste("Comparing ", tx, " VS ", con, sep = ""))
+  res <- results(dds, contrast = c("Condition", c(tx,con)))
+  
+  
+  res_final <- as.data.frame(res)
+  res_final$Gene_name <- rownames(res_final)
+  res_final <- res_final[c(7, 1:6)]
+  res_final$`-log10(padj)` <- -log10(res_final$padj)
+  write.table(res_final,file = paste(opt$outpath, c, '_', tx, '_vs_', con, '_DESeq2.txt', sep = ""), quote = FALSE, sep = "\t", row.names = F)
+}
 
-print ("Star running DESeq2 ...")
-dds <- Transcript(files = input,samples, tx2gene = tx2gene, Type = Type, batch = batch)
-print(class(dds))
-
-print (paste("Comparing ",opt$treatment , " VS ", opt$control, sep = ""))
-res <- results(dds, contrast = c("Condition",c(opt$treatment,opt$control)))
-
-
-res_final <- as.data.frame(res)
-res_final$Gene_name <- rownames(res_final)
-res_final <- res_final[c(7, 1:6)]
-res_final$`-log10(padj)` <- -log10(res_final$padj)
-write.table(res_final,file = paste(opt$outpath,opt$condition,'_',opt$treatment,'_vs_',opt$control,'_DESeq2.txt',sep = ""), quote = FALSE,sep = "\t")
+#print ("Star running DESeq2 ...")
+#dds <- Transcript(files = input,samples, tx2gene = tx2gene, Type = Type, batch = batch)
+#print(class(dds))
+#
+#print (paste("Comparing ",opt$treatment , " VS ", opt$control, sep = ""))
+#res <- results(dds, contrast = c("Condition",c(opt$treatment,opt$control)))
+#
+#
+#res_final <- as.data.frame(res)
+#res_final$Gene_name <- rownames(res_final)
+#res_final <- res_final[c(7, 1:6)]
+#res_final$`-log10(padj)` <- -log10(res_final$padj)
+#write.table(res_final,file = paste(opt$outpath,opt$condition,'_',opt$treatment,'_vs_',opt$control,'_DESeq2.txt',sep = ""), quote = FALSE,sep = "\t", row.names = F)
+#sub_res <- subset(res_final, abs(log2FoldChange) > 1)
+#sub_res <- sub_res[order(sub_res$`-log10(padj)`, decreasing = TRUE),]
+#sub_res <- head(sub_res, 100)
+#
+#write.table(sub_res,file = paste(opt$outpath,opt$condition,'_',opt$treatment,'_vs_',opt$control,'_DESeq2_sub.txt',sep = ""), quote = FALSE,sep = "\t", row.names = F)
