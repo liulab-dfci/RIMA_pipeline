@@ -35,7 +35,6 @@ def addCondaPaths_Config(config):
     config['stat_root'] = "%s/envs/stat_perl_r" % conda_root
     config['centrifuge_root']= "/%s/envs/centrifuge_env" % conda_root
     config['rseqc_root']= "/%s/envs/rseqc_env" % conda_root
-    config['gatk4_root']= "/%s/envs/gatk4_env" % conda_root
     config['vep_root']= "/%s/envs/vep_env" % conda_root
     config['prada_root']= "/%s/envs/prada_env" % conda_root
 
@@ -124,8 +123,6 @@ def all_targets(wildcards):
         ls.extend(microbiome_individual_targets(wildcards))
     if execution["microbiome_cohort"]:
         ls.extend(microbiome_cohort_targets(wildcards))    
-    if execution["report"]:
-        ls.extend(report_targets(wildcards))
     return ls
 
 
@@ -163,5 +160,3 @@ if execution["microbiome_individual"]:
     include: "./modules/microbiome/microbiome_individual.snakefile"
 if execution["microbiome_cohort"]:
     include: "./modules/microbiome/microbiome_cohort.snakefile"
-if execution["report"]:
-    include: "./modules/report/report.snakefile"
