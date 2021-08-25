@@ -13,7 +13,7 @@ mate: [1,2]               #paired-end fastq format, we recommend naming paired-e
 design: Group             # Condition on which to do comparsion (as set up in metasheet.csv)
 Treatment: R              # Treatment use in DESeq2, corresponding to positive log fold change
 Control: NR               # Control use in DESeq2, corresponding to negative log fold change
-batch: syb_batch          # Options: 'false' or a column name from the metasheet.csv.  
+batch: syn_batch          # Options: 'false' or a column name from the metasheet.csv.  
                           # If set to a column name in the metasheet.csv, the column name will be used for batch effect analysis                                (limma).  
                           # It will also be used as a covariate for differential analysis (DESeq2) to account for batch effect.  
 
@@ -22,8 +22,7 @@ pre_treated: false        # Option: true or false.
                           # If set to true, patients have received some form of therapy prior to the current study.
 
 
-####
-pre-treated : True
+
 ############################################################
 #                     list samples                         #
 ############################################################
@@ -69,15 +68,4 @@ samples:
 ############################################################
 #                    Neoantigen testing                    #
 ############################################################
-VCF:  #vcf files for tumor samples
-  SRR8281228:
-    - /mnt/zhao_trial/test_lin/analysis/vcf/SRR8281228_tnscope.filter.neoantigen.vep.vcf
-  SRR8281231:
-    - /mnt/zhao_trial/test_lin/analysis/vcf/SRR8281231_tnscope.filter.neoantigen.vep.vcf
-  SRR8281222:
-    - /mnt/zhao_trial/test_lin/analysis/vcf/SRR8281222_tnscope.filter.neoantigen.vep.vcf
-  SRR8281224:
-    - /mnt/zhao_trial/test_lin/analysis/vcf/SRR8281224_tnscope.filter.neoantigen.vep.vcf
-  SRR8281225:
-    - /mnt/zhao_trial/test_lin/analysis/vcf/SRR8281225_tnscope.filter.neoantigen.vep.vcf
 
