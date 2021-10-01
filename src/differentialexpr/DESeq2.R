@@ -24,7 +24,9 @@ option_list = list(
   make_option(c("-r", "--treatment"), type="character", default="./",
               help="Treatment", metavar="character"),
   make_option(c("-c", "--control"), type="character", default="./",
-              help="Control", metavar="character")
+              help="Control", metavar="character"),
+  make_option(c("-p", "--pcoding"), type="character", default="./",
+              help="proding coding gene list", metavar="character")
 )
 	      
 
@@ -130,6 +132,7 @@ print(class(dds))
 print (paste("Comparing ",opt$treatment , " VS ", opt$control, sep = ""))
 res <- results(dds, contrast = c("Condition",c(opt$treatment,opt$control)))
 
+clustering_heatmap(dds, res, opt$pcoding, opt$outpath, opt$treatment, opt$control)
 
 res_final <- as.data.frame(res)
 res_final$Gene_name <- rownames(res_final)

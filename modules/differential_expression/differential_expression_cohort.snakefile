@@ -57,6 +57,7 @@ rule deseq2_differential_genes:
         treatment = treatment,
         control = control,
         meta = config["metasheet"],
+        pgenes = "static/deseq2/hg_pcoding.csv",
         path = "set +eu;source activate %s" % config['stat_root']
     message:
         "Running DESeq2 on the samples"
@@ -66,7 +67,7 @@ rule deseq2_differential_genes:
     shell:
     	"{params.path}; Rscript src/differentialexpr/DESeq2.R --input {params.filelist} --type salmon \
         --batch {params.batch} --meta {params.meta} --tx2gene {params.tx_annot} \
-        --condition {params.condition} --treatment {params.treatment} --control {params.control} --outpath {params.out_path}"
+        --condition {params.condition} --pcoding {params.pgenes} --treatment {params.treatment} --control {params.control} --outpath {params.out_path}"
         
         
 
