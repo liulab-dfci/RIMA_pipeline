@@ -43,7 +43,7 @@ https://liulab-dfci.github.io/RIMA/
 You can not run any jobs on the login node, even conda install is not allowed.
 
 
-Download RIMA_pipeline folder to your own working directory. Currently, RIMA_kraken supports hg38 and mm10 data
+Download RIMA_pipeline folder to your own working directory.
 
 ### For human data:
 ```
