@@ -3,6 +3,12 @@
 ## RIMA Workflow 
 ![](https://github.com/Lindky/RIMA_Kraken/blob/master/files/multiqc/Pipeline_Workflow_mqc.png)
 
+## The full tutorial 
+https://liulab-dfci.github.io/RIMA/
+
+
+**Note:** The Kraken users can skip the RIMA installation step and downloading the reference. For the details, please follow this README.
+
 
 ## Available Tools Checklist
 | **Methods** | **Description** | **Available models**|
@@ -30,7 +36,6 @@
 |  | **---RIMA REPORT---** |  |
 | report | RIMA HTML Report Using Multiqc | Human, Mouse |
 
-**Notice**: When you run Mouse data, do not run the tools that aren't available for **Mouse Model**  (e.g. if you set ImmnueDeconv: true in the execution file, the results from ImmnueDeconv would be unreliable when you use Mouse data)
 
 
 ## 1.Install
@@ -40,12 +45,12 @@ You can not run any jobs on the login node, even conda install is not allowed.
 
 Download RIMA_pipeline folder to your own working directory. Currently, RIMA_kraken supports hg38 and mm10 data
 
-## For human data:
+### For human data:
 ```
 git clone https://github.com/liulab-dfci/RIMA_pipeline.git
 ```
 
-## For mouse data: 
+### For mouse data: 
 ```
 ## In the RIMA_pipeline folder, change to the RIMA-mouse branch
 
@@ -53,9 +58,9 @@ cd ./RIMA_pipeline
 git checkout RIMA_Mouse
 ```
 
-## Link the reference folder
+## 2.Link the reference folder
 
-## For human reference (hg38)
+### For human reference (hg38)
 ```
 ## In the RIMA_pipeline folder
 ## This command will create a symbolic link to the human reference on Kraken
@@ -63,7 +68,7 @@ git checkout RIMA_Mouse
 ln -s /data1-common/RIMA_references/ref_files
 ```
 
-## For mouse reference (mm10)
+### For mouse reference (mm10)
 ```
 ## In the RIMA_pipeline folder
 ## This command will create a symbolic link to the human reference on Kraken
@@ -72,7 +77,7 @@ ln -s /data1-common/RIMA_references/mm10_ref ref_files
 ```
 
 
-## 2.Activate the RIMA enviroment
+## 3.Activate the RIMA enviroment
 
 ```
 export CONDA_ROOT=/liulab/linyang/rnaseq_env/miniconda3
@@ -81,9 +86,9 @@ export PATH=/liulab/linyang/rnaseq_env/miniconda3/bin:$PATH
 source activate /liulab/linyang/rnaseq_env/miniconda3/envs/rnaseq
 ```
 
-## 3. Prepare the 2 required execution files (metasheet.txt, config.yaml)
+## 4. Prepare the 2 required execution files (metasheet.txt, config.yaml)
 
-### 3.1 Example of metasheet
+### 4.1 Example of metasheet
 
 Ensure your metasheet contains **Two Required Columns** (SampleName, PatName) in comma-delimited format.
 You can also add more phenotype information that you may want to compare e.g. columns for Responder, Age, Sex etc.
@@ -97,36 +102,37 @@ SRR8281223,P21,NR,59,Male
 ......
 ```
 
-### 3.2 Example of config.yaml
+### 4.2 Example of config.yaml
 
 In the rnaseq_pipeline folder, we have prepared a config.yaml for you. 
 
 First, ensure the data info matches data in the **Data information** section:
 
 ```
----
-############################################################
-#                   Data information                       #
-############################################################
-
-ref: ref.yaml
+#########Fixed and user-defined parameters################
+metasheet: metasheet.csv  # Meta info 
+ref: ref.yaml             # Reference config 
 assembly: hg38
+cancer_type: GBM          #TCGA cancer type abbreviations
+rseqc_ref: house_keeping  #Option: 'house_keeping' or 'false'. 
+                          #By default, a subset of housekeeping genes is used by RSeQC to assess alignment quality.  
+                          #This reduces the amount of time needed to run RSeQC.  
+mate: [1,2]               #paired-end fastq format, we recommend naming paired-end reads with _1.fq.gz and _2.fq.gz
 
-cancer_type: GBM #short name of cancer type
-metasheet: metasheet_latest.txt
-designs: [Responder] #the column from metasheet which is used to do comparsion
-############################################################
-#                       level1                            #
-############################################################
 
-### star 
-#Possible values are [ff-firststrand, ff-secondstrand, ff-unstranded, fr-firststrand, fr-secondstrand, fr-unstranded (default), transfrags]
-library_type: 'fr-firststrand'
-stranded: true
+#########Cohort level analysis parameters################
+design: Group             # Condition on which to do comparsion (as set up in metasheet.csv)
+Treatment: R              # Treatment use in DESeq2, corresponding to positive log fold change
+Control: NR               # Control use in DESeq2, corresponding to negative log fold change
+batch: syn_batch          # Options: 'false' or a column name from the metasheet.csv.  
+                          # If set to a column name in the metasheet.csv, the column name will be used for batch effect analysis (limma)
+                          # It will also be used as a covariate for differential analysis (DESeq2) to account for batch effect.  
 
+pre_treated: false        # Option: true or false. 
+                          # If set to false, patients are treatment naive.  
+                          # If set to true, patients have received some form of therapy prior to the current study.
 
 ```
-To see the details for each parameters: [parameters Interpretation](https://github.com/Lindky/RIMA_Kraken/blob/master/Parameters_description.md)
 
 Parameters within square brackets should be updated to match your analysis goals. In this tutorial, **[Responder]** is the phenotype of interest for comparison as specified in the **metasheet.txt**. All the comparison figures stored under **/images** folder
 
@@ -148,7 +154,7 @@ Finally, set the path of your data in the **list samples** section and set the n
 
 Currently, only **fastq files** are accepted as input (including fastq.gz).
 
-## 3. Choose the tools you want to run
+## 5. Choose the tools you want to run
 
 Use **execution.yaml** to control which tools to run in RIMA. Most downstream analysis require outputs from **DATA PROCESSING** module, so please run the **DATA PROCESSING** module first, then selecting which tools you want to use.
 
@@ -175,7 +181,7 @@ microbiome_cohort: false
 ....
 ```
 
-## 4.Execution
+## 6.Execution
 
 ### Step1: Check the pipeline with a dry run to ensure correct script and data usage.
 
@@ -191,23 +197,14 @@ After the dry-run success, please use sbatch to submit the job or run it on the 
 ```
 #!/bin/bash
 #SBATCH --job-name=RIMA
-#SBATCH --mem=32G       # total memory need
-#SBATCH --time=96:00:00
-#SBATCH -c 16 #number of cores
+#SBATCH --mem=64G       # total memory need
+#SBATCH -c 32 #number of cores
 
-
-snakemake -s rnaseq.snakefile
+snakemake -s rnaseq.snakefile -k
 ```
-**note**: Argument -j that set the cores for parallelly run. (e.g. '-j 4' can run 4 jobs parallelly at the same time) 
-**note**: Argument -k that can skip the error independent run. (This argument can save lots of time for running data at the first time)
+**Note**: Argument -j that set the cores for parallelly run. (e.g. '-j 4' can run 4 jobs parallelly at the same time) 
+**Note**: Argument -k that can skip the error independent run. (This argument can save lots of time for running data at the first time)
 
-## 5.Output files
+## 7.Output files
 
-The raw output files from each tools are stored under `RIMA_kraken/analysis`
-
-The processed output files (esed for visualization) are stored under `RIMA_kraken/files`
-
-The output figures are stored under `RIMA_kraken/images`
-
-**RIMA html report** will be stored under `RIMA_kraken/files`
-
+The output files from each tools are stored under `RIMA_kraken/analysis`
