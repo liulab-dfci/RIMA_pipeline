@@ -202,7 +202,7 @@ After the dry-run success, please use sbatch to submit the job or run it on the 
 
 snakemake -s rnaseq.snakefile -k
 ```
-**Note**: Argument -j that set the cores for parallelly run. (e.g. '-j 4' can run 4 jobs parallelly at the same time) 
+**Note**: Argument -j that set the cores for parallelly run. (e.g. '-j 4' can run 4 jobs parallelly at the same time) \
 **Note**: Argument -k that can skip the error independent run. (This argument can save lots of time for running data at the first time)
 
 ## 7. Output files
