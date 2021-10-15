@@ -3,7 +3,7 @@
 ## RIMA Workflow 
 ![](https://github.com/Lindky/RIMA_Kraken/blob/master/files/multiqc/Pipeline_Workflow_mqc.png)
 
-## The full tutorial 
+### The full tutorial 
 https://liulab-dfci.github.io/RIMA/
 
 
