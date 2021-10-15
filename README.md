@@ -47,11 +47,30 @@ git clone https://github.com/liulab-dfci/RIMA_pipeline.git
 
 ## For mouse data: 
 ```
-## Under the RIMA_pipeline folder, change to the RIMA-mouse branch
+## In the RIMA_pipeline folder, change to the RIMA-mouse branch
 
 cd ./RIMA_pipeline
 git checkout RIMA_Mouse
 ```
+
+## Link the reference folder
+
+## For human reference (hg38)
+```
+## In the RIMA_pipeline folder
+## This command will create a symbolic link to the human reference on Kraken
+
+ln -s /data1-common/RIMA_references/ref_files
+```
+
+## For mouse reference (mm10)
+```
+## In the RIMA_pipeline folder
+## This command will create a symbolic link to the human reference on Kraken
+
+ln -s /data1-common/RIMA_references/mm10_ref ref_files
+```
+
 
 ## 2.Activate the RIMA enviroment
 
