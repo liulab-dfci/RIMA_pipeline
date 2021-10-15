@@ -5,34 +5,6 @@
 # 
 # !VERY IMPORTANT: you can OVERRIDE any of these values in config.yaml!
 
-hg38:
-###annotation path
-  fasta_path: /liulab/RIMA_kraken/reference/GRCh38.d1.vd1.fa 
-  gtf_path: /liulab/RIMA_kraken/reference/gencode.v22.annotation.gtf
-  bed_path: /liulab/RIMA_kraken/reference/refseqGenes.bed
-  driver_bed_path: /liulab/RIMA_kraken/reference/driverGene_refseqGenes.bed
-  housekeeping_bed_path: /liulab/RIMA_kraken/reference/housekeeping_refseqGenes.bed
-###microbe ref
-  microbe_fa_path: /liulab/RIMA_kraken/reference/pathseq_gdc_index/hg38/pathseq_microbe.fa
-  microbe_img_path: /liulab/RIMA_kraken/reference/pathseq_gdc_index/hg38/pathseq_microbe.fa.img
-  taxonomy_path: /liulab/RIMA_kraken/reference/pathseq_gdc_index/hg38/pathseq_microbe.db
-  host_img_path: /liulab/RIMA_kraken/reference/pathseq_gdc_index/hg38/GRCh38.d1.vd1.fa.img
-  host_kmer_path: /liulab/RIMA_kraken/reference/pathseq_gdc_index/hg38/hg38_k31.hss
-###
-  trust4_reper_path: /liulab/RIMA_kraken/TRUST4/hg38_bcrtcr.fa
-  trust4_IMGT_path: /liulab/RIMA_kraken/TRUST4/human_IMGT+C.fa
-###index path
-  star_index: /liulab/RIMA_kraken/reference/star_gdc_index/hg38
-  star_fusion_index: /liulab/RIMA_kraken/reference/fusion_gdc_index/GRCh38_v22_CTAT_lib_GDC_Mar162019/ctat_genome_lib_build_dir
-  salmon_index: /liulab/RIMA_kraken/reference/gencode.v22.ts.fa
-  msisensor_index: /liulab/RIMA_kraken/reference/msisensor_gdc_index/hg38/microsatellite.list
-  centrifuge_index: /liulab/RIMA_kraken/reference/centrifuge_index/p_compressed+h+v
-  vep_plugins: /liulab/RIMA_kraken/reference/VEP_plugins
-  vep_custom_enst: /liulab/RIMA_kraken/reference/isoform_overrides_uniprot
-  vep_germinal_var: /liulab/RIMA_kraken/reference/ExAC_nonTCGA.r0.3.1.sites.vep.vcf.gz
-  vep_data: /liulab/RIMA_kraken/reference/vep_gdc_v84/
-  cfg_init: /liulab/jinwang/pipeline_test/rnaseq_pipeline/static/optitype/config.ini
-
 mm10:
   fasta_path: /liulab/RIMA_mouse/reference/GRCm38.primary_assembly.genome.fa
   gtf_path: /liulab/RIMA_mouse/reference/gencode.vM25.primary_assembly.annotation.gtf
@@ -52,4 +24,8 @@ mm10:
   taxonomy_path: /liulab/RIMA_kraken/reference/pathseq_gdc_index/hg38/pathseq_microbe.db
   host_img_path: /liulab/RIMA_kraken/reference/pathseq_gdc_index/hg38/GRCh38.d1.vd1.fa.img
   host_kmer_path: /liulab/RIMA_kraken/reference/pathseq_gdc_index/hg38/hg38_k31.hss
+
+###tool path
+  trust4_path: /liulab/RIMA_kraken/TRUST4
+
 

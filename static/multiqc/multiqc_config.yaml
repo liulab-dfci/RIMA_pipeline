@@ -1,4 +1,4 @@
-custom_logo: 'static/multiqc/cimac_logo.png'
+custom_logo: '/mnt/disks/RNA_data/10021/static/multiqc/cimac_logo.png'
 custom_logo_title: 'Dana Farber Cancer Institute'
 title: "RIMA: Modules"
 intro_text: "RIMA (RNA-seq IMmune Analysis) is a comprehensive, integrative pipeline to characterize the tumor environment from bulk RNA-seq data at the cohort and individual level. RIMA includes one module for pre-processing and seven downstream modules for differential expression analysis, immune infiltration estimation, immune repertoire inference, variant identification, neoantigen detection, microbiome characterization, immunotherapy response prediction."
@@ -16,6 +16,8 @@ report_header_info:
       - Contact E-mail: 'cidc-rima@ds.dfci.harvard.edu'
       - Application Type: 'RNA-seq'
       - Project Type: 'CIMAC-CIDC network'
+      - Study ID: '10021'
+      - Cancer Type: 'LUAD'
 table_cond_formatting_rules:
     all_columns:
         pass:
@@ -279,40 +281,40 @@ custom_data:
       [1, '#FF0000'],
   ]
         sortRows: True
-      TRUST4-BCR:
-        parent_id: custom_section5
-        parent_name: 'Immune Repertoire'
-        parent_description: 'TRUST4 performs de novo assembly on V, J, C genes including the hypervariable complementarity-determining region 3 (CDR3) and reports consensus of BCR/TCR sequences. TRUST4 then realigns the contigs to IMGT reference gene sequences to report the corresponding information.'
-        section_name: 'TRUST4 BCR_metrics'
-        description: 'BCR metric comparison between different conditions. The four metrics include: the fraction of BCR reads in all mapped reads; number of unique CDR3 sequences; somatic hyper-mutation rate of each sample; and clonality of each sample. Significance level is shown above the violin: (Most Significant: p < 0.001; Significant: p < 0.01; Least Significant: p < 0.05).'
-      TRUST4-TCR:
-        parent_id: custom_section5
-        parent_name: 'Immune Repertoire'
-        parent_description: 'TRUST4 performs de novo assembly on V, J, C genes including the hypervariable complementarity-determining region 3 (CDR3) and reports consensus of BCR/TCR sequences. TRUST4 then realigns the contigs to IMGT reference gene sequences to report the corresponding information.'
-        section_name: 'TRUST4 TCR_metrics'
-        description: 'TCR metric comparison between different conditions. The four metrics include: the fraction of TCR reads in all mapped reads; the number of unique CDR3 sequences; the number of clonotypes per kilo reads; and clonality of each sample. Significance level is shown above the violin:(Most Significant: p < 0.001; Significant: p < 0.01; Least Significant: p < 0.05).'
+      #TRUST4-BCR:
+       # parent_id: custom_section5
+       # parent_name: 'Immune Repertoire'
+       # parent_description: 'TRUST4 performs de novo assembly on V, J, C genes including the hypervariable complementarity-determining region 3 (CDR3) and reports consensus of BCR/TCR sequences. TRUST4 then realigns the contigs to IMGT reference gene sequences to report the corresponding information.'
+       # section_name: 'TRUST4 BCR_metrics'
+       # description: 'BCR metric comparison between different conditions. The four metrics include: the fraction of BCR reads in all mapped reads; number of unique CDR3 sequences; somatic hyper-mutation rate of each sample; and clonality of each sample. Significance level is shown above the violin: (Most Significant: p < 0.001; Significant: p < 0.01; Least Significant: p < 0.05).'
+     # TRUST4-TCR:
+       # parent_id: custom_section5
+       # parent_name: 'Immune Repertoire'
+       # parent_description: 'TRUST4 performs de novo assembly on V, J, C genes including the hypervariable complementarity-determining region 3 (CDR3) and reports consensus of BCR/TCR sequences. TRUST4 then realigns the contigs to IMGT reference gene sequences to report the corresponding information.'
+       # section_name: 'TRUST4 TCR_metrics'
+       # description: 'TCR metric comparison between different conditions. The four metrics include: the fraction of TCR reads in all mapped reads; the number of unique CDR3 sequences; the number of clonotypes per kilo reads; and clonality of each sample. Significance level is shown above the violin:(Most Significant: p < 0.001; Significant: p < 0.01; Least Significant: p < 0.05).'
       #TRUST_BCR_Ig:
         #parent_id: custom_section6
         #parent_name: 'TRUST'
         #parent_description: 'TRUST4 performs de novo assembly on V, J, C genes including the hypervariable complementarity-determining region 3 (CDR3) and reports consensus of BCR/TCR sequences. TRUST4 then realigns the contigs to IMGT reference gene sequences to report the corresponding information'
         #section_name: 'TRUST:BCR_Ig_Frequency'
-      TRUST_Ig:
-        parent_id: custom_section5
-        parent_name: 'Immune Repertoire'
-        parent_description: 'TRUST4 performs de novo assembly on V, J, C genes including the hypervariable complementarity-determining region 3 (CDR3) and reports consensus of BCR/TCR sequences. TRUST4 then realigns the contigs to IMGT reference gene sequences to report the corresponding information.'
-        section_name: 'TRUST4 Ig_Frequency'
-        plot_type: 'bargraph'
-        description: 'The stacked bar plot shows the percentage of BCR CDR3s size within different immunoglobulin (Ig) classes.'
-        pconfig:
-          id: 'TRUST_Ig_plot'
-          title: 'TRUST: Ig'
-          cpswitch: True
-          cpswitch_c_active: False
-          stacking: normal
-          cursor: 'pointer'
-          ylab: 'Frequency of IG'
-          tt_percentages: True
-          tt_decimals: 2
+     # TRUST_Ig:
+       # parent_id: custom_section5
+       # parent_name: 'Immune Repertoire'
+       # parent_description: 'TRUST4 performs de novo assembly on V, J, C genes including the hypervariable complementarity-determining region 3 (CDR3) and reports consensus of BCR/TCR sequences. TRUST4 then realigns the contigs to IMGT reference gene sequences to report the corresponding information.'
+       # section_name: 'TRUST4 Ig_Frequency'
+       # plot_type: 'bargraph'
+       # description: 'The stacked bar plot shows the percentage of BCR CDR3s size within different immunoglobulin (Ig) classes.'
+       # pconfig:
+        #  id: 'TRUST_Ig_plot'
+         # title: 'TRUST: Ig'
+         # cpswitch: True
+         # cpswitch_c_active: False
+         # stacking: normal
+         # cursor: 'pointer'
+         # ylab: 'Frequency of IG'
+         # tt_percentages: True
+         # tt_decimals: 2
       tide_table:
           parent_id: custom_section6
           parent_name: 'Immunotherapy Response'
@@ -391,7 +393,7 @@ custom_data:
           parent_id: custom_section6
           parent_name: 'Immunotherapy Response'
           parent_description: 'Analysis of Signatures of T cell dysfunction and exclusion for prediction of immunotherapy response and detection of somatic microsatellite changes.'
-          description: ' Microsatellite instability is genetic instability in short nucleotide repeats (microsatellites) due to a high mutation rate as a result of abnormal DNA mismatch repair. Length distributions of microsatellites per site in paired tumor and normal are computed and their observed distributions are statistically compared.'
+          description: 'Microsatellite instability is genetic instability in short nucleotide repeats (microsatellites) due to a high mutation rate as a result of abnormal DNA mismatch repair. Length distributions of microsatellites per site in paired tumor and normal are computed and their observed distributions are statistically compared.'
           section_name: 'MSI Comparison'
           description: 'MSI score comparison between different phenotypes, such as responders and non-responders.Significance level is shown above the violin:(Most Significant: p < 0.001; Significant: p < 0.01; Least Significant: p < 0.05).'
       ArcasHLA:
@@ -446,25 +448,25 @@ custom_data:
             tt_percentages: true
             tt_decimals: 2
             cpswitch_counts_label: 'Relative abundance'
-      Microbiome_abundance_ratio:
-        parent_id: custom_section8
-        parent_name: 'Microbiome'
-        parent_description: 'Centrifuge calculates abundance of microbiomes from RNA-seq data, which enables rapid and sensitive labeling of reads and quantification of species based on the referred microbes for each individual sample.'
-        section_name: 'Abundance_ratio'
-        description: 'The same top 15 microbial species, grouped by responder/non-responder, presented as a heatmap.'
-        plot_type: 'heatmap'
-        pconfig:
-            id: 'microbiome_abundance_ratio-plot0'
-            square: False
-            xcats_samples: True
-            datalabels: False
-            borderWidth: 0
-            colstops: [
-        [0, '#f0f0f0'],
-        [0.1, '#99d8c9'],
-        [0.7, '#fdbb84'],
-    ]
-        sortRows: True
+      #Microbiome_abundance_ratio:
+       # parent_id: custom_section8
+       # parent_name: 'Microbiome'
+       # parent_description: 'Centrifuge calculates abundance of microbiomes from RNA-seq data, which enables rapid and sensitive labeling of reads and quantification of species based on the referred microbes for each individual sample.'
+       # section_name: 'Abundance_ratio'
+       # description: 'The same top 15 microbial species, grouped by responder/non-responder, presented as a heatmap.'
+       # plot_type: 'heatmap'
+       # pconfig:
+           # id: 'microbiome_abundance_ratio-plot0'
+           # square: False
+           # xcats_samples: True
+           # datalabels: False
+           # borderWidth: 0
+           # colstops: [
+       # [0, '#f0f0f0'],
+       # [0.1, '#99d8c9'],
+       # [0.7, '#fdbb84'],
+   # ]
+       # sortRows: True
 sp:
       Pipeline_Workflow:
           fn: 'Pipeline_Workflow_mqc.png'
@@ -473,33 +475,33 @@ sp:
       QC_status:
           fn: 'QC_status.txt'
       deseq2_description:
-          fn: '*_sub.txt'
+          fn: 'deseq2_description.txt'
       DESeq2-Volcano-Plot:
           fn: 'DESeq2-Volcano-Plot_mqc.png'
           #      GSEA_Pathways:
           #          fn: 'GSEA_Pathways.txt'
       GSEA_NES:
-          fn: '*_test.txt'
+          fn: '*_report.txt'
       ssgsea:
           fn: 'ssgsea.txt'
       ArcasHLA:
-          fn: 'ArcasHLA.csv'
+          fn: 'hla_table.csv'
       ArcasHLA_heatmap:
-          fn: 'zhao.txt'
+          fn: 'hla_heatmap.txt'
       tide_table:
           fn: 'tide_table.txt'
       TIDE-TCGA:
           fn: 'TIDE-TCGA_mqc.png'
       MSISensor:
-          fn: 'Biomarker-Evaluation*.png'
-      TRUST4-BCR:
-          fn: 'TRUST4-BCR_mqc.png'
-      TRUST4-TCR:
-          fn: 'TRUST4-TCR_mqc.png'
+          fn: 'Biomarker-Evaluation-by-Responder_mqc.png'
+      #TRUST4-BCR:
+         # fn: 'TRUST4-BCR_mqc.png'
+      #TRUST4-TCR:
+         # fn: 'TRUST4-TCR_mqc.png'
       #TRUST_BCR_Ig:
           #fn: 'TRUST_BCR_Ig_mqc.png'
-      TRUST_Ig:
-          fn: 'TRUST_Ig.txt'
+      #TRUST_Ig:
+         # fn: 'TRUST_Ig.txt'
       Xcell:
           fn: 'xcell_immune_multiqc.txt'
       Timer:
@@ -514,17 +516,17 @@ sp:
           fn: 'mcp_counter_immune_multiqc.txt'
       Microbiome_abundance:
           fn: 'Microbiome_abundance.txt'
-      Microbiome_abundance_ratio:
-          fn: 'Microbiome_abundance_ratio.txt'
+      #Microbiome_abundance_ratio:
+         # fn: 'Microbiome_abundance_ratio.txt'
 
 top_modules:
     - 'Meta_information'
     - 'custom_data'
 exclude_modules:
-    - 'salmon'
+    #- 'salmon'
     - 'picard'
     - 'rseqc'
-    - 'star'
+    #- 'star'
 remove_sections:
     - rseqc-junction_saturation
 extra_fn_clean_exts:

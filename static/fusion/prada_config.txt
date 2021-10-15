@@ -1,3 +1,0 @@
---REF--
-tx_seq_file = ./ref_files/salmon_index/gencode.v22.ts.fa
-feature_file = analysis/fusion/pyprada_annotation.txt

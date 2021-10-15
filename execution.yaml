@@ -1,23 +1,20 @@
-##level1
-star: true
-salmon: true
-rseqc: true
-##level2
-batch_removal: false
-deseq2: false
-gsea: false
-ssgsea: false
-##level3
-microbiota: false
-trust4: false
-arcasHLA: false
-pvacseq: false
-##level4
-immunedeconv: false
-mMCP: false
-##level5
-msisensor2: false
-##Report
-report: false
 
+##Note: Preprocess individual and cohort module necessary to get the alignment and quality results.
+##Run the remaining modules only after these two modules.
+preprocess_individual: true
+preprocess_cohort: true
+
+##Optional modules
+##Note: The below modules are specialized modules, each dealing with specific targets.
+##Make sure to run individual and cohort of each module to get all the results.
+
+##Individual runs
+immune_repertoire_individual: false
+microbiome_individual: false
+
+
+##Cohort runs
+differential_expression_cohort: true
+immune_infiltration_cohort: false
+microbiome_cohort: false
 
