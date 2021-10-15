@@ -38,7 +38,7 @@ https://liulab-dfci.github.io/RIMA/
 
 
 
-## 1.Install
+## 1. Install
 
 You can not run any jobs on the login node, even conda install is not allowed.
 
@@ -58,7 +58,7 @@ cd ./RIMA_pipeline
 git checkout RIMA_Mouse
 ```
 
-## 2.Link the reference folder
+## 2. Link the reference folder
 
 ### For human reference (hg38)
 ```
@@ -77,7 +77,7 @@ ln -s /data1-common/RIMA_references/mm10_ref ref_files
 ```
 
 
-## 3.Activate the RIMA enviroment
+## 3. Activate the RIMA enviroment
 
 ```
 export CONDA_ROOT=/liulab/linyang/rnaseq_env/miniconda3
@@ -181,7 +181,7 @@ microbiome_cohort: false
 ....
 ```
 
-## 6.Execution
+## 6. Execution
 
 ### Step1: Check the pipeline with a dry run to ensure correct script and data usage.
 
@@ -205,6 +205,6 @@ snakemake -s rnaseq.snakefile -k
 **Note**: Argument -j that set the cores for parallelly run. (e.g. '-j 4' can run 4 jobs parallelly at the same time) 
 **Note**: Argument -k that can skip the error independent run. (This argument can save lots of time for running data at the first time)
 
-## 7.Output files
+## 7. Output files
 
 The output files from each tools are stored under `RIMA_kraken/analysis`
