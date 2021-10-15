@@ -39,8 +39,18 @@ You can not run any jobs on the login node, even conda install is not allowed.
 
 
 Download RIMA_pipeline folder to your own working directory. Currently, RIMA_kraken supports hg38 and mm10 data
+
+## For human data:
 ```
 git clone https://github.com/liulab-dfci/RIMA_pipeline.git
+```
+
+## For mouse data: 
+```
+## Under the RIMA_pipeline folder, change to the RIMA-mouse branch
+
+cd ./RIMA_pipeline
+git checkout RIMA_Mouse
 ```
 
 ## 2.Activate the RIMA enviroment
@@ -81,7 +91,7 @@ First, ensure the data info matches data in the **Data information** section:
 ############################################################
 
 ref: ref.yaml
-assembly: hg38 #hg38 or mm10
+assembly: hg38
 
 cancer_type: GBM #short name of cancer type
 metasheet: metasheet_latest.txt
@@ -113,15 +123,6 @@ samples:
   SRR8281231:
     - /mnt/zhao_trial/Zhao2019_PD1_Glioblastoma_RNASeq/SRR8281231_1.fastq.gz
     - /mnt/zhao_trial/Zhao2019_PD1_Glioblastoma_RNASeq/SRR8281231_2.fastq.gz
-############################################################
-#                       run settings                       #
-############################################################
-runs:
-  run1:
-    - SRR8281228
-  run2:
-    - SRR8281231
-
 ```
 
 Finally, set the path of your data in the **list samples** section and set the number of runs for each sample (samples' name must be consistent with your metasheet.txt)
@@ -134,17 +135,24 @@ Use **execution.yaml** to control which tools to run in RIMA. Most downstream an
 
 Example of execution.yaml:
 ```
-##DATA PROCESSING
-star: false
-salmon: false
-rseqc: false
+## Note: Preprocess individual and cohort module necessary to get the alignment and quality results.
+## Run the remaining modules only after these two modules.
+preprocess_individual: true
+preprocess_cohort: true
 
-##DIFFERENTIAL EXPRESSION
-batch_removal: false
-deseq2: true
-gsea: false
-ssgsea: false
+## Optional modules
+## Note: The below modules are specialized modules, each dealing with specific targets.
+## Make sure to run individual and cohort of each module to get all the results.
 
+## Individual runs
+immune_repertoire_individual: false
+microbiome_individual: false
+
+
+## Cohort runs
+differential_expression_cohort: false
+immune_infiltration_cohort: false
+microbiome_cohort: false
 ....
 ```
 
@@ -172,6 +180,7 @@ After the dry-run success, please use sbatch to submit the job or run it on the 
 snakemake -s rnaseq.snakefile
 ```
 **note**: Argument -j that set the cores for parallelly run. (e.g. '-j 4' can run 4 jobs parallelly at the same time) 
+**note**: Argument -k that can skip the error independent run. (This argument can save lots of time for running data at the first time)
 
 ## 5.Output files
 
