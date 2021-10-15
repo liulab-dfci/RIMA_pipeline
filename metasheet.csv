@@ -1,0 +1,7 @@
+SampleName,GSE_ID,Sample_Name,Cell_Status,Sequencing_Type
+SRX8245648,GSE149815,pancreas_in_vitro_DMSO_1,in_vitro,Paired
+SRX8245632,GSE149815,pancreas_in_vivo_ars1620_8,in_vivo,Paired
+SRX8245638,GSE149815,pancreas_in_vivo_ctrl_3,in_vivo,Paired
+SRX8245621,GSE98672,lung_in_vivo_ARS1620_9,in_vivo,Paired
+SRX8245619,GSE98672,lung_in_vivo_ARS1620_7,in_vivo,Paired
+SRX2790943,GSE98672,LLC_cells_wild_type___replica_1,in_vitro,Paired

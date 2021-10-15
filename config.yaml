@@ -10,9 +10,9 @@ mate: [1,2]               #paired-end fastq format, we recommend naming paired-e
 
 
 #########Cohort level analysis parameters################
-design: Responder             # Condition on which to do comparsion (as set up in metasheet.csv)
-Treatment: R              # Treatment use in DESeq2, corresponding to positive log fold change
-Control: NR               # Control use in DESeq2, corresponding to negative log fold change
+design: GSE_ID             # Condition on which to do comparsion (as set up in metasheet.csv)
+Treatment: GSE149815              # Treatment use in DESeq2, corresponding to positive log fold change
+Control: GSE98672               # Control use in DESeq2, corresponding to negative log fold change
 batch: syn_batch          # Options: 'false' or a column name from the metasheet.csv.  
                           # If set to a column name in the metasheet.csv, the column name will be used for batch effect analysis                                (limma).  
                           # It will also be used as a covariate for differential analysis (DESeq2) to account for batch effect.  
@@ -20,42 +20,22 @@ batch: syn_batch          # Options: 'false' or a column name from the metasheet
 ############################################################
 #                     list samples                         #
 ############################################################
-
 samples:
-  SRR8281218:
-    - /mnt/RIMA/data/SRR8281218_1.fastq.gz
-    - /mnt/RIMA/data/SRR8281218_2.fastq.gz
-  SRR8281219:
-    - /mnt/RIMA/data/SRR8281219_1.fastq.gz
-    - /mnt/RIMA/data/SRR8281219_2.fastq.gz
-  SRR8281226:
-    - /mnt/RIMA/data/SRR8281226_1.fastq.gz
-    - /mnt/RIMA/data/SRR8281226_2.fastq.gz
-  SRR8281236:
-    - /mnt/RIMA/data/SRR8281236_1.fastq.gz
-    - /mnt/RIMA/data/SRR8281236_2.fastq.gz
-  SRR8281230:
-    - /mnt/RIMA/data/SRR8281230_1.fastq.gz
-    - /mnt/RIMA/data/SRR8281230_2.fastq.gz
-  SRR8281233:
-    - /mnt/RIMA/data/SRR8281233_1.fastq.gz
-    - /mnt/RIMA/data/SRR8281233_2.fastq.gz
-  SRR8281244:
-    - /mnt/RIMA/data/SRR8281244_1.fastq.gz
-    - /mnt/RIMA/data/SRR8281244_2.fastq.gz
-  SRR8281245:
-    - /mnt/RIMA/data/SRR8281245_1.fastq.gz
-    - /mnt/RIMA/data/SRR8281245_2.fastq.gz
-  SRR8281243:
-    - /mnt/RIMA/data/SRR8281243_1.fastq.gz
-    - /mnt/RIMA/data/SRR8281243_2.fastq.gz
-  SRR8281251:
-    - /mnt/RIMA/data/SRR8281251_1.fastq.gz
-    - /mnt/RIMA/data/SRR8281251_2.fastq.gz
-  SRR8281238:
-    - /mnt/RIMA/data/SRR8281238_1.fastq.gz
-    - /mnt/RIMA/data/SRR8281238_2.fastq.gz
-  SRR8281250:
-    - /mnt/RIMA/data/SRR8281250_1.fastq.gz
-    - /mnt/RIMA/data/SRR8281250_2.fastq.gz
-
+  SRX8245648:
+    - /liulab/nofal/syng_raw_data_new/GSE149815/SRX8245648/SRR11684859/SRR11684859_2.fastq.gz
+    - /liulab/nofal/syng_raw_data_new/GSE149815/SRX8245648/SRR11684859/SRR11684859_1.fastq.gz
+  SRX8245632:
+    - /liulab/nofal/syng_raw_data_new/GSE149815/SRX8245632/SRR11684843/SRR11684843_2.fastq.gz
+    - /liulab/nofal/syng_raw_data_new/GSE149815/SRX8245632/SRR11684843/SRR11684843_1.fastq.gz
+  SRX8245638:
+    - /liulab/nofal/syng_raw_data_new/GSE149815/SRX8245638/SRR11684849/SRR11684849_1.fastq.gz
+    - /liulab/nofal/syng_raw_data_new/GSE149815/SRX8245638/SRR11684849/SRR11684849_2.fastq.gz
+  SRX8245621:
+    - /liulab/nofal/syng_raw_data_new/GSE149815/SRX8245621/SRR11684832/SRR11684832_2.fastq.gz
+    - /liulab/nofal/syng_raw_data_new/GSE149815/SRX8245621/SRR11684832/SRR11684832_1.fastq.gz
+  SRX8245619:
+    - /liulab/nofal/syng_raw_data_new/GSE149815/SRX8245619/SRR11684830/SRR11684830_1.fastq.gz
+    - /liulab/nofal/syng_raw_data_new/GSE149815/SRX8245619/SRR11684830/SRR11684830_2.fastq.gz
+  SRX2790943:
+    - /liulab/nofal/syng_raw_data_new/GSE98672/SRX2790943/SRR5517574/SRR5517574_2.fastq.gz
+    - /liulab/nofal/syng_raw_data_new/GSE98672/SRX2790943/SRR5517574/SRR5517574_1.fastq.gz
