@@ -6,26 +6,20 @@
 # !VERY IMPORTANT: you can OVERRIDE any of these values in config.yaml!
 
 mm10:
-  fasta_path: /liulab/RIMA_mouse/reference/GRCm38.primary_assembly.genome.fa
-  gtf_path: /liulab/RIMA_mouse/reference/gencode.vM25.primary_assembly.annotation.gtf
-  bed_path: /liulab/RIMA_mouse/reference/mm10_RefSeq.bed
-  housekeeping_bed_path: /liulab/RIMA_mouse/reference/housekeepingMM.bed
+  fasta_path: ./ref_files/GRCm38.primary_assembly.genome.fa
+  gtf_path: ./ref_files/gencode.vM25.primary_assembly.annotation.gtf
+  bed_path: ./ref_files/mm10_RefSeq.bed
+  housekeeping_bed_path: ./ref_files/housekeepingMM.bed
 
-  trust4_reper_path: /liulab/RIMA_kraken/TRUST4/mouse/GRCm38_bcrtcr.fa
-  trust4_IMGT_path: /liulab/RIMA_kraken/TRUST4/mouse/mouse_IMGT+C.fa
+  trust4_reper_path: ./ref_files/TRUST4/mouse/GRCm38_bcrtcr.fa
+  trust4_IMGT_path: ./ref_files/TRUST4/mouse/mouse_IMGT+C.fa
 
 ##index path
-  star_index: /liulab/RIMA_mouse/reference/star_index/mm10
-  salmon_index: /liulab/RIMA_mouse/reference/salmon_index/salmon.tx.fa
-  centrifuge_index: /liulab/RIMA_mouse/reference/p_compressed+m+v/p_compressed+m+v
-
-  microbe_fa_path: /liulab/RIMA_kraken/reference/pathseq_gdc_index/hg38/pathseq_microbe.fa
-  microbe_img_path: /liulab/RIMA_kraken/reference/pathseq_gdc_index/hg38/pathseq_microbe.fa.img
-  taxonomy_path: /liulab/RIMA_kraken/reference/pathseq_gdc_index/hg38/pathseq_microbe.db
-  host_img_path: /liulab/RIMA_kraken/reference/pathseq_gdc_index/hg38/GRCh38.d1.vd1.fa.img
-  host_kmer_path: /liulab/RIMA_kraken/reference/pathseq_gdc_index/hg38/hg38_k31.hss
+  star_index: ./ref_files/star_index
+  salmon_index: ./ref_files/salmon_index/salmon.tx.fa
+  centrifuge_index: ./ref_files/centrifuge_index/p_compressed+m+v
 
 ###tool path
-  trust4_path: /liulab/RIMA_kraken/TRUST4
+  trust4_path: ./ref_files/TRUST4
 
 
