@@ -71,7 +71,7 @@ ln -s /data1-common/RIMA_references/ref_files
 ### For mouse reference (mm10)
 ```
 ## In the RIMA_pipeline folder
-## This command will create a symbolic link to the human reference on Kraken
+## This command will create a symbolic link to the mouse reference on Kraken
 
 ln -s /data1-common/RIMA_references/mm10_ref ref_files
 ```
