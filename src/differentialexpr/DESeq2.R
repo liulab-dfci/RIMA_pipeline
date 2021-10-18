@@ -131,7 +131,8 @@ print(class(dds))
 
 print (paste("Comparing ",opt$treatment , " VS ", opt$control, sep = ""))
 res <- results(dds, contrast = c("Condition",c(opt$treatment,opt$control)))
-
+			     
+source("src/differentialexpr/clusteringheatmap.R")
 clustering_heatmap(dds, res, opt$pcoding, opt$outpath, opt$treatment, opt$control)
 
 res_final <- as.data.frame(res)
