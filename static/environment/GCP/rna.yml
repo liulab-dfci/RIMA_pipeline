@@ -37,3 +37,4 @@ dependencies:
     - scikit-learn==0.24.0
     - tensorflow==2.4.0
     - tidepy==1.3.6
+    - numpy==1.21.2
