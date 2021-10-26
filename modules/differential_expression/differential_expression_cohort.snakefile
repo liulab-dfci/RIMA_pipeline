@@ -14,7 +14,7 @@ control = config["Control"]
 
 def diffexpr_targets(wildcards):
     ls=[]
-    ls.append("analysis/deseq2//%s_%s_vs_%s_volcano_plot.png" % (design,treatment,control))
+    ls.append("analysis/deseq2/%s_%s_vs_%s_volcano_plot.png" % (design,treatment,control))
     ls.append("analysis/deseq2/%s_%s_vs_%s_DESeq2.txt" % (design,treatment,control))
     ls.append("analysis/deseq2/%s_%s_vs_%s_TPMs.txt" % (design,treatment,control))
     ls.append("analysis/gsea/%s_%s_vs_%s_BP_terms.txt" % (design,treatment,control))
