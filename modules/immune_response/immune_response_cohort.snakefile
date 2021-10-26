@@ -7,7 +7,7 @@ options = [config["Treatment"],config["Control"]]
 design = config["design"]
 treatment = config["Treatment"]
 control = config["Control"] 
-pretreat = config["pre-treated"]
+pretreat = config["pre_treated"]
 cancer = config["cancer_type"]
 
 if cancer in ['NSCLC','Melanoma']:
