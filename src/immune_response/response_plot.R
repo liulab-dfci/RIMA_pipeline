@@ -48,7 +48,7 @@ CompareGroups <- function(dat,col,metric){
  y_pos <- max(dat[,col])*1.2
  gp <- ggplot(dat, aes_string(x = factor(dat$clinic, levels=c(Treatment,Control)), y = col, fill = 'clinic'))+
     geom_boxplot(lwd=0.3,size=0.3,outlier.size=-1,width=0.3,alpha=0.3,position = position_dodge2(preserve = "single"))+
-    geom_jitter(shape=16, position=position_dodge(0.5)) +
+    geom_jitter(shape=16, position=position_dodge(0.5), size = 0.6, alpha = 0.6) +
     theme_bw() +
     ylab(metric)+
     ggtitle(paste('wilcoxon p-value = ',p.value,sep=''))+

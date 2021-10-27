@@ -112,14 +112,19 @@ format <- function(gseaRes){
 
   res <- NULL
   if(dim(subset(enrich.res, NES > 0))[1] >= 10){
-    res <- rbind(res,enrich.res[1:10,])
+    tmp <- enrich.res[enrich.res$NES > 0,]
+    tmp <- tmp[order(tmp$pvalue),]
+
+    res <- rbind(res,tmp[1:10,])
   }
   if(dim(subset(enrich.res, NES > 0))[1] < 10){
     res <- rbind(res,subset(enrich.res, NES > 0))
   }
   if(dim(subset(enrich.res, NES < 0))[1] >= 10){
-    total <- dim(enrich.res)[1]
-    res <- rbind(res,enrich.res[(total-9):total,])
+    tmp <- enrich.res[enrich.res$NES < 0,]
+    tmp <- tmp[order(tmp$pvalue),]
+    
+    res <- rbind(res,tmp[1:10,])
   }
   if(dim(subset(enrich.res, NES < 0))[1] < 10){
     res <- rbind(res,subset(enrich.res, NES < 0))
