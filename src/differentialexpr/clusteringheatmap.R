@@ -53,7 +53,7 @@ clustering_heatmap <- function(dds, res, pgenes, outpath, treatment, control) {
   a <- t(scale(t(df)))
   
   pdf(paste0(outpath,'heatmap_',treatment,'_vs_',control,'.pdf'), width = 5, height = 20)
-  pheatmap(a, cluster_cols = FALSE, cluster_rows = FALSE, annotation = coldata["Condition"])
+  pheatmap(a, cluster_cols = FALSE, cluster_rows = TRUE, annotation = coldata["Condition"])
   dev.off()
 }
 #deseq_result <- res

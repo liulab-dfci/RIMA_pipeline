@@ -11,9 +11,9 @@ option_list = list(
               help="signature reference", metavar="character"),
   make_option(c("-o", "--output"), type="character", default=NULL,
               help="output directory", metavar="character"),
-  make_option(c("-treat", "--treatment"), type="character", default=NULL,
+  make_option(c("-t", "--treatment"), type="character", default=NULL,
               help="meta info", metavar="character"),
-  make_option(c("-ctrl", "--control"), type="character", default=NULL,
+  make_option(c("-n", "--control"), type="character", default=NULL,
               help="meta info", metavar="character"),
   make_option(c("-c", "--condition"), type="character", default=NULL,
               help="meta info", metavar="character")
