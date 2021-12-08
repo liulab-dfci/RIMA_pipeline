@@ -67,7 +67,7 @@ if (is.null(opt$input) || is.null(opt$tx2gene) || is.null(opt$type)){
 
 Transcript <- function(files,samples,tx2gene,Type,batch){
 
-  filelist <- strsplit(input, "\\,")[[1]]
+  filelist <- strsplit(files, "\\,")[[1]]
   print(filelist)
   print(rownames(meta))
   filelist.samples <- sapply(rownames(meta), function(x) grep(paste0("\\b",x,"\\b"), filelist, value = TRUE))
