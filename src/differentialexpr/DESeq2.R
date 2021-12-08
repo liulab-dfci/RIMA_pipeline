@@ -67,15 +67,15 @@ if (is.null(opt$input) || is.null(opt$tx2gene) || is.null(opt$type)){
 
 Transcript <- function(files,samples,tx2gene,Type,batch){
 
-  filelist <- strsplit(files, "\\,")[[1]]
+  filelist <- strsplit(input, "\\,")[[1]]
   print(filelist)
-  print(rownames(samples))
-  filelist.samples <- sapply(rownames(samples), function(x) grep(x, filelist, value = TRUE))
-  
+  print(rownames(meta))
+  filelist.samples <- sapply(rownames(meta), function(x) grep(paste0("\\b",x,"\\b"), filelist, value = TRUE))
+
   filelist.samples <- filelist.samples[lapply(filelist.samples,length)>0]
-  print(paste("There are ",length(filelist.samples), " samples to be compared", sep = ""))
+  print(paste("There are ",length(filelist.samples), "samples to be compared ...", sep = ""))
   print(filelist.samples)
-  
+
   txi <- tximport(filelist.samples, type=Type, tx2gene=tx2gene)
   txi$length[txi$length == 0] <- 1
   
