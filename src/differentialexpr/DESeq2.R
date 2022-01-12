@@ -49,7 +49,7 @@ meta <- read.table(file = metadata, sep=',', header = TRUE, stringsAsFactors = F
 #print(head(meta))
 #samples <- subset(meta, meta[,Condition] == Treatment | meta[,Condition] == Control)
 samples <- subset(meta, meta[,Condition] != 'NA')
-print(samples)
+#print(samples)
 
 
 print ("Reading tx2gene file ...")
@@ -61,7 +61,6 @@ if (is.null(opt$input) || is.null(opt$tx2gene) || is.null(opt$type)){
   stop("At least 3 arguments must be supplied ", call.=FALSE)
 }
 
-
 ######################################--------------programme-------------##################################
 ###----If you have transcript quantification files, as produced by Salmon, Sailfish, or kallisto, you would use DESeqDataSetFromTximport.
 
@@ -69,11 +68,17 @@ Transcript <- function(files,samples,tx2gene,Type,batch){
 
   filelist <- strsplit(files, "\\,")[[1]]
   print(filelist)
-  print(rownames(meta))
+  #print(rownames(meta))
   filelist.samples <- sapply(rownames(meta), function(x) grep(paste0("\\b",x,"\\b"), filelist, value = TRUE))
-
+  
+  #exactly match may output a list, need to convert list to character
   filelist.samples <- filelist.samples[lapply(filelist.samples,length)>0]
   print(paste("There are ",length(filelist.samples), "samples to be compared ...", sep = ""))
+
+  tmp_chr <- as.character(filelist.samples)
+  names(tmp_chr) <- names(filelist.samples)
+
+  filelist.samples <- tmp_chr
   print(filelist.samples)
 
   txi <- tximport(filelist.samples, type=Type, tx2gene=tx2gene)
@@ -128,6 +133,8 @@ Transcript <- function(files,samples,tx2gene,Type,batch){
 print ("Star running DESeq2 ...")
 dds <- Transcript(files = input,samples, tx2gene = tx2gene, Type = Type, batch = batch)
 print(class(dds))
+
+save.image("git_version.RData")
 
 print (paste("Comparing ",opt$treatment , " VS ", opt$control, sep = ""))
 res <- results(dds, contrast = c("Condition",c(opt$treatment,opt$control)))
