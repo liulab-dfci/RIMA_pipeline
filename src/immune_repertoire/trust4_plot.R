@@ -175,7 +175,7 @@ infil_tcr <- read.csv(file = infil_tcr_input,header = TRUE,sep= '\t')
 if (length(unique(infil_tcr$clinic)) < 2 ) {
   gr <- NULL
 } else {
-  gr <- CompareGroups(infil_tcr,"Infil","Fraction of BCR reads")
+  gr <- CompareGroups(infil_tcr,"Infil","Fraction of TCR reads")
 }
 
 
