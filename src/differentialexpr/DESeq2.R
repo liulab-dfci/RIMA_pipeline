@@ -69,7 +69,7 @@ Transcript <- function(files,samples,tx2gene,Type,batch){
   filelist <- strsplit(files, "\\,")[[1]]
   print(filelist)
   #print(rownames(meta))
-  filelist.samples <- sapply(rownames(meta), function(x) grep(paste0("\\b",x,"\\b"), filelist, value = TRUE))
+  filelist.samples <- sapply(rownames(samples), function(x) grep(paste0("\\b",x,"\\b"), filelist, value = TRUE))
   
   #exactly match may output a list, need to convert list to character
   filelist.samples <- filelist.samples[lapply(filelist.samples,length)>0]
