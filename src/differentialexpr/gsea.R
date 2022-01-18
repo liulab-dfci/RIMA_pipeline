@@ -50,7 +50,9 @@ nPerm <- as.numeric(opt$npermutation)
 ####read in data and convert to entrez ID
 data <- read.table(opt$deseq2_mat, sep = "\t", header = TRUE, row.names = 1)
 data <- na.omit(data)
-geneList <- sign(data$log2FoldChange) * (-log10(data$pvalue))
+
+#geneList <- sign(data$log2FoldChange) * (-log10(data$pvalue))
+geneList <- data$stat
 GeneIDSymbol <- toTable(org.Hs.egSYMBOL)
 names(geneList) <- GeneIDSymbol[match(data[,1],GeneIDSymbol$symbol),'gene_id']
 geneList <- sort(geneList, decreasing = TRUE)
@@ -134,10 +136,42 @@ format <- function(gseaRes){
   return(res.new)
 }
 
+#new gesa plot
+bubble_plot <- function(data, treatment, control, cutoff) {
+
+  final_up <- data[data$NES > 0,]
+  final_down <- data[data$NES < 0,]
+
+  final_up <- final_up[order(final_up$pvalue, decreasing = FALSE),]
+  final_down <- final_down[order(final_down$pvalue, decreasing = FALSE),]
+
+  final <- rbind(head(final_up, 15), head(final_down, 15))
+  final <- final[order(final$NES, decreasing = TRUE),]
+  final$Description <- factor(final$Description, levels = rev(unique(final$Description)))
+
+  final$condition <- ifelse(final$NES > 0, paste0("Enriched in ", treatment), paste0("Enriched in ", control))
+  final$condition <- factor(final$condition, levels = c(paste0("Enriched in ", control), paste0("Enriched in ", treatment)))
+  p <- ggplot(final, aes(x= NES, y= factor(Description), label = qvalues, color=qvalues,size=setSize)) + geom_point() +
+      facet_grid(~condition, scales = "free_x") + theme_bw()
+
+  p <- p + scale_color_gradientn(colours = c("red4", "red", "mediumpurple2", "blue"),
+                                values = c(0, cutoff - 0.0000000000000001,cutoff, 1),
+                                guide = guide_colourbar(nbin = 1000),
+                                limits = c(0,1)) +
+                                theme(axis.title.y = element_blank(),
+                                      axis.text = element_text(size = 18),
+                                      strip.text = element_text(size = 16),
+                                      axis.title.x = element_text(size = 18))
+  return(p)
+}
+
+
 writeoutput <- function(result,onto){
 write.table(format(result), paste(Outdir,Condition, "_",Treatment,"_vs_",Control,"_",onto,"_terms.txt", sep = ""), quote = FALSE, sep = "\t", row.names = FALSE)
-png(paste(Outdir,Condition, "_",Treatment,"_vs_",Control,"_",onto,"_terms.png", sep = ""),width = 1000, height = 880)
-print(dotplot(result, x = 'NES', showCategory = 10, title = paste("Enriched GO",onto) , split=".sign"))
+write.table(result@result, paste(Outdir,Condition, "_",Treatment,"_vs_",Control,"_",onto,"_allterms.txt", sep = ""), quote = FALSE, sep = "\t", row.names = FALSE)
+p <- bubble_plot(result@result, Treatment, Control, cutoff = 0.05)
+png(paste(Outdir,Condition, "_",Treatment,"_vs_",Control,"_",onto,"_terms.png", sep = ""),width = 2000, height = 1000)
+print(p)
 dev.off()
 }
 
