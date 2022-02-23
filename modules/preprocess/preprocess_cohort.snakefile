@@ -162,8 +162,8 @@ rule batch_removal:
         
 rule pca_sample_clustering:
     input:
-        before_batch = "analysis/batchremoval/{design}_{covariates}_tpm.genesymbol.batchremoved.csv",
-        after_batch = "analysis/batchremoval/{design}_{covariates}_tpm.genesymbol.csv"
+        after_batch = "analysis/batchremoval/{design}_{covariates}_tpm.genesymbol.batchremoved.csv",
+        before_batch = "analysis/batchremoval/{design}_{covariates}_tpm.genesymbol.csv"
     output:
         before_pca = "analysis/batchremoval/{design}_{covariates}_pca_plot_before.png",
         after_pca = "analysis/batchremoval/{design}_{covariates}_pca_plot_after.png",
