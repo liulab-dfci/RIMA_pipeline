@@ -29,7 +29,6 @@ option_list = list(
               help="minimal gsea size", metavar="character"),
   make_option(c("-l", "--hallmark"), type="character", default=NULL,
               help="hallmark gmt file", metavar="character")
-            
 ); 
 
 ###parameters
@@ -103,7 +102,6 @@ GSEAHALLMARK <- function(geneList,minGSSize,pcut,hallmark){
 }
 
 
-
 format <- function(gseaRes){  
   enrich.res <- gseaRes@result %>%
     mutate(group = ifelse(NES > 0,paste("Enrich in",Treatment) ,paste("Enrich in",Control))) %>%
@@ -112,19 +110,14 @@ format <- function(gseaRes){
 
   res <- NULL
   if(dim(subset(enrich.res, NES > 0))[1] >= 10){
-    tmp <- enrich.res[enrich.res$NES > 0,]
-    tmp <- tmp[order(tmp$pvalue),]
-
-    res <- rbind(res,tmp[1:10,])
+    res <- rbind(res,enrich.res[1:10,])
   }
   if(dim(subset(enrich.res, NES > 0))[1] < 10){
     res <- rbind(res,subset(enrich.res, NES > 0))
   }
   if(dim(subset(enrich.res, NES < 0))[1] >= 10){
-    tmp <- enrich.res[enrich.res$NES < 0,]
-    tmp <- tmp[order(tmp$pvalue),]
-    
-    res <- rbind(res,tmp[1:10,])
+    total <- dim(enrich.res)[1]
+    res <- rbind(res,enrich.res[(total-9):total,])
   }
   if(dim(subset(enrich.res, NES < 0))[1] < 10){
     res <- rbind(res,subset(enrich.res, NES < 0))
@@ -134,13 +127,43 @@ format <- function(gseaRes){
   return(res.new)
 }
 
-writeoutput <- function(result,onto){
-write.table(format(result), paste(Outdir,Condition, "_",Treatment,"_vs_",Control,"_",onto,"_terms.txt", sep = ""), quote = FALSE, sep = "\t", row.names = FALSE)
-png(paste(Outdir,Condition, "_",Treatment,"_vs_",Control,"_",onto,"_terms.png", sep = ""),width = 1000, height = 880)
-print(dotplot(result, x = 'NES', showCategory = 10, title = paste("Enriched GO",onto) , split=".sign"))
-dev.off()
+#new gesa plot
+bubble_plot <- function(data, treatment, control, limit) {
+
+  final_up <- data[data$NES > 0,]
+  final_down <- data[data$NES < 0,]
+
+  final_up <- final_up[order(final_up$pvalue, decreasing = FALSE),]
+  final_down <- final_down[order(final_down$pvalue, decreasing = FALSE),]
+
+  final <- rbind(head(final_up, 15), head(final_down, 15))
+  final <- final[order(final$NES, decreasing = TRUE),]
+  final$qvalues <- ifelse(final$qvalues <= 0.15, final$qvalues, limit)
+  final$Description <- factor(final$Description, levels = rev(unique(final$Description)))
+
+  final$condition <- ifelse(final$NES > 0, paste0("Enriched in ", treatment), paste0("Enriched in ", control))
+  final$condition <- factor(final$condition, levels = c(paste0("Enriched in ", control), paste0("Enriched in ", treatment)))
+  p <- ggplot(final, aes(x= NES, y= factor(Description), label = qvalues, color=qvalues,size=setSize)) + geom_point() +
+      facet_grid(~condition, scales = "free_x") + theme_bw()
+
+  p <- p + scale_color_gradient(low = "red", high = "blue", limits = c(0,limit)) + 
+		                theme(axis.title.y = element_blank(),
+                                      axis.text = element_text(size = 18),
+                                      strip.text = element_text(size = 16),
+                                      axis.title.x = element_text(size = 18))
+				
+  return(p)
 }
 
+
+writeoutput <- function(result,onto){
+write.table(format(result), paste(Outdir,Condition, "_",Treatment,"_vs_",Control,"_",onto,"_terms.txt", sep = ""), quote = FALSE, sep = "\t", row.names = FALSE)
+write.table(result@result, paste(Outdir,Condition, "_",Treatment,"_vs_",Control,"_",onto,"_allterms.txt", sep = ""), quote = FALSE, sep = "\t", row.names = FALSE)
+p <- bubble_plot(result@result, Treatment, Control, limit = 0.15)
+png(paste(Outdir,Condition, "_",Treatment,"_vs_",Control,"_",onto,"_terms.png", sep = ""),width = 3000, height = 1000)
+print(p)
+dev.off()
+}
 
 
 ###For GO
