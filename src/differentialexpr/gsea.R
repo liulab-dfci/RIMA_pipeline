@@ -28,7 +28,9 @@ option_list = list(
   make_option(c("-s", "--minsize"), type="character", default=NULL,
               help="minimal gsea size", metavar="character"),
   make_option(c("-l", "--hallmark"), type="character", default=NULL,
-              help="hallmark gmt file", metavar="character")
+              help="hallmark gmt file", metavar="character"),
+  make_option(c("-i", "--c7immune"), type="character", default=NULL,
+              help="c7immune gmt file", metavar="character")
             
 ); 
 
@@ -37,6 +39,7 @@ opt_parser = OptionParser(option_list=option_list);
 opt = parse_args(opt_parser);
 Outdir <- opt$outdir
 h_file <- opt$hallmark
+c7_file <- opt$c7immune
 Condition <- opt$condition
 Treatment <- opt$treatment
 Control <- opt$control
@@ -50,9 +53,7 @@ nPerm <- as.numeric(opt$npermutation)
 ####read in data and convert to entrez ID
 data <- read.table(opt$deseq2_mat, sep = "\t", header = TRUE, row.names = 1)
 data <- na.omit(data)
-
-#geneList <- sign(data$log2FoldChange) * (-log10(data$pvalue))
-geneList <- data$stat
+geneList <- sign(data$log2FoldChange) * (-log10(data$pvalue))
 GeneIDSymbol <- toTable(org.Hs.egSYMBOL)
 names(geneList) <- GeneIDSymbol[match(data[,1],GeneIDSymbol$symbol),'gene_id']
 geneList <- sort(geneList, decreasing = TRUE)
@@ -105,7 +106,6 @@ GSEAHALLMARK <- function(geneList,minGSSize,pcut,hallmark){
 }
 
 
-
 format <- function(gseaRes){  
   enrich.res <- gseaRes@result %>%
     mutate(group = ifelse(NES > 0,paste("Enrich in",Treatment) ,paste("Enrich in",Control))) %>%
@@ -114,19 +114,14 @@ format <- function(gseaRes){
 
   res <- NULL
   if(dim(subset(enrich.res, NES > 0))[1] >= 10){
-    tmp <- enrich.res[enrich.res$NES > 0,]
-    tmp <- tmp[order(tmp$pvalue),]
-
-    res <- rbind(res,tmp[1:10,])
+    res <- rbind(res,enrich.res[1:10,])
   }
   if(dim(subset(enrich.res, NES > 0))[1] < 10){
     res <- rbind(res,subset(enrich.res, NES > 0))
   }
   if(dim(subset(enrich.res, NES < 0))[1] >= 10){
-    tmp <- enrich.res[enrich.res$NES < 0,]
-    tmp <- tmp[order(tmp$pvalue),]
-    
-    res <- rbind(res,tmp[1:10,])
+    total <- dim(enrich.res)[1]
+    res <- rbind(res,enrich.res[(total-9):total,])
   }
   if(dim(subset(enrich.res, NES < 0))[1] < 10){
     res <- rbind(res,subset(enrich.res, NES < 0))
@@ -137,7 +132,7 @@ format <- function(gseaRes){
 }
 
 #new gesa plot
-bubble_plot <- function(data, treatment, control, cutoff) {
+bubble_plot <- function(data, treatment, control, limit) {
 
   final_up <- data[data$NES > 0,]
   final_down <- data[data$NES < 0,]
@@ -147,6 +142,7 @@ bubble_plot <- function(data, treatment, control, cutoff) {
 
   final <- rbind(head(final_up, 15), head(final_down, 15))
   final <- final[order(final$NES, decreasing = TRUE),]
+  final$qvalues <- ifelse(final$qvalues <= 0.15, final$qvalues, limit)
   final$Description <- factor(final$Description, levels = rev(unique(final$Description)))
 
   final$condition <- ifelse(final$NES > 0, paste0("Enriched in ", treatment), paste0("Enriched in ", control))
@@ -154,14 +150,19 @@ bubble_plot <- function(data, treatment, control, cutoff) {
   p <- ggplot(final, aes(x= NES, y= factor(Description), label = qvalues, color=qvalues,size=setSize)) + geom_point() +
       facet_grid(~condition, scales = "free_x") + theme_bw()
 
-  p <- p + scale_color_gradientn(colours = c("red4", "red", "mediumpurple2", "blue"),
-                                values = c(0, cutoff - 0.0000000000000001,cutoff, 1),
-                                guide = guide_colourbar(nbin = 1000),
-                                limits = c(0,1)) +
-                                theme(axis.title.y = element_blank(),
+  p <- p + scale_color_gradient(low = "red", high = "blue", limits = c(0,limit)) + 
+		                theme(axis.title.y = element_blank(),
                                       axis.text = element_text(size = 18),
                                       strip.text = element_text(size = 16),
                                       axis.title.x = element_text(size = 18))
+				
+#  p <- p + scale_color_gradientn(colours = c("red4", "red", "mediumpurple2", "blue"),
+#                                values = c(0, cutoff - 0.0000000000000001,cutoff, 1),
+#                                guide = guide_colourbar(nbin = 1000),
+#                                limits = c(0,1)) + theme(axis.title.y = element_blank(),
+#                                                                      axis.text = element_text(size = 18),
+#                                                                      strip.text = element_text(size = 16),
+#								      axis.title.x = element_text(size = 18))
   return(p)
 }
 
@@ -169,13 +170,14 @@ bubble_plot <- function(data, treatment, control, cutoff) {
 writeoutput <- function(result,onto){
 write.table(format(result), paste(Outdir,Condition, "_",Treatment,"_vs_",Control,"_",onto,"_terms.txt", sep = ""), quote = FALSE, sep = "\t", row.names = FALSE)
 write.table(result@result, paste(Outdir,Condition, "_",Treatment,"_vs_",Control,"_",onto,"_allterms.txt", sep = ""), quote = FALSE, sep = "\t", row.names = FALSE)
-p <- bubble_plot(result@result, Treatment, Control, cutoff = 0.05)
-png(paste(Outdir,Condition, "_",Treatment,"_vs_",Control,"_",onto,"_terms.png", sep = ""),width = 2000, height = 1000)
+p <- bubble_plot(result@result, Treatment, Control, limit = 0.15)
+png(paste(Outdir,Condition, "_",Treatment,"_vs_",Control,"_",onto,"_terms.png", sep = ""),width = 3000, height = 1000)
+#print(dotplot(result, x = 'NES', showCategory = 10, title = paste("Enriched GO",onto) , split=".sign"))
 print(p)
 dev.off()
 }
 
-
+#save.image("gsea.Rdata")
 
 ###For GO
 go.mf <- GSEAGO(geneList,"MF",minGSSize,nPerm,pcut)
@@ -189,12 +191,19 @@ kegg <- GSEAKEGG(geneList,minGSSize,nPerm,pcut)
 hallmark_gene <- read.gmt(h_file)
 hallmark <- GSEAHALLMARK(geneList,minGSSize,pcut,hallmark_gene)
 
+###For C7 geneset 
+C7geneset <- read.gmt(c7_file)
+c7gsea <- GSEAHALLMARK(geneList,minGSSize,pcut,C7geneset)
+
+save.image("gsea.Rdata")
+
 ###write enriched term table
 writeoutput(go.mf,"MF")
 writeoutput(go.bp,"BP")
 writeoutput(go.cc,"CC")
 writeoutput(kegg,"KEGG")
 writeoutput(hallmark,"HALLMARK")
+writeoutput(c7gsea,"C7immune")
 
 
 
