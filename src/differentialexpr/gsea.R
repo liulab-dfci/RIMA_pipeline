@@ -28,10 +28,7 @@ option_list = list(
   make_option(c("-s", "--minsize"), type="character", default=NULL,
               help="minimal gsea size", metavar="character"),
   make_option(c("-l", "--hallmark"), type="character", default=NULL,
-              help="hallmark gmt file", metavar="character"),
-  make_option(c("-i", "--c7immune"), type="character", default=NULL,
-              help="c7immune gmt file", metavar="character")
-            
+              help="hallmark gmt file", metavar="character")
 ); 
 
 ###parameters
@@ -39,7 +36,6 @@ opt_parser = OptionParser(option_list=option_list);
 opt = parse_args(opt_parser);
 Outdir <- opt$outdir
 h_file <- opt$hallmark
-c7_file <- opt$c7immune
 Condition <- opt$condition
 Treatment <- opt$treatment
 Control <- opt$control
@@ -156,13 +152,6 @@ bubble_plot <- function(data, treatment, control, limit) {
                                       strip.text = element_text(size = 16),
                                       axis.title.x = element_text(size = 18))
 				
-#  p <- p + scale_color_gradientn(colours = c("red4", "red", "mediumpurple2", "blue"),
-#                                values = c(0, cutoff - 0.0000000000000001,cutoff, 1),
-#                                guide = guide_colourbar(nbin = 1000),
-#                                limits = c(0,1)) + theme(axis.title.y = element_blank(),
-#                                                                      axis.text = element_text(size = 18),
-#                                                                      strip.text = element_text(size = 16),
-#								      axis.title.x = element_text(size = 18))
   return(p)
 }
 
@@ -172,12 +161,10 @@ write.table(format(result), paste(Outdir,Condition, "_",Treatment,"_vs_",Control
 write.table(result@result, paste(Outdir,Condition, "_",Treatment,"_vs_",Control,"_",onto,"_allterms.txt", sep = ""), quote = FALSE, sep = "\t", row.names = FALSE)
 p <- bubble_plot(result@result, Treatment, Control, limit = 0.15)
 png(paste(Outdir,Condition, "_",Treatment,"_vs_",Control,"_",onto,"_terms.png", sep = ""),width = 3000, height = 1000)
-#print(dotplot(result, x = 'NES', showCategory = 10, title = paste("Enriched GO",onto) , split=".sign"))
 print(p)
 dev.off()
 }
 
-#save.image("gsea.Rdata")
 
 ###For GO
 go.mf <- GSEAGO(geneList,"MF",minGSSize,nPerm,pcut)
@@ -191,19 +178,12 @@ kegg <- GSEAKEGG(geneList,minGSSize,nPerm,pcut)
 hallmark_gene <- read.gmt(h_file)
 hallmark <- GSEAHALLMARK(geneList,minGSSize,pcut,hallmark_gene)
 
-###For C7 geneset 
-C7geneset <- read.gmt(c7_file)
-c7gsea <- GSEAHALLMARK(geneList,minGSSize,pcut,C7geneset)
-
-save.image("gsea.Rdata")
-
 ###write enriched term table
 writeoutput(go.mf,"MF")
 writeoutput(go.bp,"BP")
 writeoutput(go.cc,"CC")
 writeoutput(kegg,"KEGG")
 writeoutput(hallmark,"HALLMARK")
-writeoutput(c7gsea,"C7immune")
 
 
 
