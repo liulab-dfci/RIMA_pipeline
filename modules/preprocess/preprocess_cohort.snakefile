@@ -122,7 +122,7 @@ rule salmon_matrix:
       "benchmarks/salmon/salmon_gene_matrix.benchmark"
     params:
       args = lambda wildcards, input: merge_sal_inputs({input.salmon_tpm_files}),
-      tx2gene = 'static/deseq2/tx2gene.csv',
+      tx2gene = 'ref_files/tximport/tx2gene.csv',
       outpath = 'analysis/salmon/',
       path = "set +eu;source activate %s" % config['stat_root']
       
@@ -162,8 +162,8 @@ rule batch_removal:
         
 rule pca_sample_clustering:
     input:
-        before_batch = "analysis/batchremoval/{design}_{covariates}_tpm.genesymbol.batchremoved.csv",
-        after_batch = "analysis/batchremoval/{design}_{covariates}_tpm.genesymbol.csv"
+        after_batch = "analysis/batchremoval/{design}_{covariates}_tpm.genesymbol.batchremoved.csv",
+        before_batch = "analysis/batchremoval/{design}_{covariates}_tpm.genesymbol.csv"
     output:
         before_pca = "analysis/batchremoval/{design}_{covariates}_pca_plot_before.png",
         after_pca = "analysis/batchremoval/{design}_{covariates}_pca_plot_after.png",
