@@ -19,8 +19,6 @@ def mutation_cohort_targets(wildcards):
     ls.append("analysis/fusion/%s_pyprada_output.txt" % design),
     ls.append("analysis/fusion/%s_pyprada_unique_genelist.txt" % design),
     ls.append("analysis/fusion/%s_fusion_gene_table.txt" % design),
-    #ls.append("analysis/fusion/%s_fusion_gene_plot.png" % design),
-    #ls.append("analysis/fusion/%s_prada_homology.png" % design)
     return ls
 
 rule mutation_cohort:
@@ -90,6 +88,7 @@ rule run_prada:
     shell:
       "{params.path}"
       "&& {params.prada_path}/prada-homology -i {input} -o {output} -tmpdir {params.tmpout} -conf {params.config}"
+      "&& rm -r {params.tmpout}"
 
 
 rule fusion_plot:
