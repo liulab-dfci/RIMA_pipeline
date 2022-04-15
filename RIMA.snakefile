@@ -33,10 +33,10 @@ def addCondaPaths_Config(config):
     config['conda_root'] = conda_root
     config['rnaseq_root'] = "%s/envs/rnaseq_new" % conda_root
     config['stat_root'] = "%s/envs/stat_perl_r" % conda_root
-    config['centrifuge_root']= "/%s/envs/centrifuge_env" % conda_root
-    config['rseqc_root']= "/%s/envs/rseqc_env" % conda_root
-    config['vep_root']= "/%s/envs/vep_env" % conda_root
-    config['prada_root']= "/%s/envs/prada_env" % conda_root
+    config['centrifuge_root']= "%s/envs/centrifuge_env" % conda_root
+    config['rseqc_root']= "%s/envs/rseqc_env" % conda_root
+    config['vep_root']= "%s/envs/vep_env" % conda_root
+    config['prada_root']= "%s/envs/prada_env" % conda_root
 
 
 def addExecPaths(config):
