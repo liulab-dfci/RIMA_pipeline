@@ -8,22 +8,19 @@
 hg38:
 ###annotation path
   fasta_path: ./ref_files/GRCh38.d1.vd1.fa 
-  gtf_path: ./ref_files/gencode.v22.annotation.gtf
-  bed_path: ./ref_files/refseqGenes.bed
-  driver_bed_path: ./ref_files/driverGene_refseqGenes.bed
-  housekeeping_bed_path: ./ref_files/housekeeping_refseqGenes.bed
+  gtf_path: ./ref_files/gencode.annotation.gtf
+  bed_path: ./ref_files/RSeQC_bed/refseqGenes.bed
+  housekeeping_bed_path: ./ref_files/RSeQC_bed/housekeeping_refseqGenes.bed
   trust4_reper_path: ./ref_files/TRUST4/hg38_bcrtcr.fa
   trust4_IMGT_path: ./ref_files/TRUST4/human_IMGT+C.fa
-  gmt_path: ./static/ssgsea/c2.cp.kegg.v6.1.symbols.gmt
 
 ###index path
-  star_index: ./ref_files/v22
-  star_fusion_index: ./ref_files/fusion_gdc_index/GRCh38_v22_CTAT_lib_GDC_Mar162019/ctat_genome_lib_build_dir
-  salmon_index:  ./ref_files/salmon_index/gencode.v22.ts.fa
-  msisensor_index: ./ref_files/msisensor_gdc_index/hg38/microsatellite.list
+  star_index: ./ref_files/star_index
+  star_fusion_index: ./ref_files/fusion_index/ctat_genome_lib_build_dir
+  salmon_index:  ./ref_files/salmon_index/transcripts.fa
+  msisensor_index: ./ref_files/msisensor_index/hg38/microsatellite.list
   centrifuge_index: ./ref_files/centrifuge_index/p_compressed+h+v
-  neoantigen_iedb_mhcI: ./ref_files/
-  annotation_pyprada: ./ref_files/pyPRADA/gencode.v22.canonical.gene.exons.tab.txt
+  annotation_pyprada: ./ref_files/pyPRADA/gencode.canonical.gene.exons.tab.txt
 
 ###tool path
   msisensor2_path: ./ref_files/msisensor2
