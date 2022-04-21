@@ -122,7 +122,7 @@ rule salmon_matrix:
       "benchmarks/salmon/salmon_gene_matrix.benchmark"
     params:
       args = lambda wildcards, input: merge_sal_inputs({input.salmon_tpm_files}),
-      tx2gene = 'static/deseq2/tx2gene.csv',
+      tx2gene = 'ref_files/tximport/tx2gene.csv',
       outpath = 'analysis/salmon/',
       path = "set +eu;source activate %s" % config['stat_root']
       

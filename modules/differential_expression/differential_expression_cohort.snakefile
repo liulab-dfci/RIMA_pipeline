@@ -52,7 +52,7 @@ rule deseq2_differential_genes:
     	filelist = lambda wildcards, input: ','.join(str(i) for i in list({input.files})[0]),
         batch = config["batch"],
         out_path = "analysis/deseq2/",
-        tx_annot = "static/deseq2/tx2gene.csv",
+        tx_annot = "ref_files/tximport/tx2gene.csv",
         condition = design,
         treatment = treatment,
         control = control,
