@@ -26,7 +26,7 @@ outdir <- opt$outdir
 treat <- opt$treated
 design <- opt$design
 
-exprsn <- read.table(file = input, sep=',', header = TRUE, stringsAsFactors = FALSE, row.names = 1)
+exprsn <- read.table(file = input, sep=',', header = TRUE, stringsAsFactors = FALSE, row.names = 1, check.names = FALSE)
 tide_input <- exprsn - rowMeans(exprsn)
 GeneIDSymbol <- toTable(org.Hs.egSYMBOL)
 entrizid <- GeneIDSymbol[match(rownames(tide_input),GeneIDSymbol$symbol),'gene_id']
