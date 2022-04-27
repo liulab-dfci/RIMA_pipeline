@@ -40,7 +40,7 @@ meta <- read.csv(file = meta, sep=",",  header = TRUE, row.names=1)
 samples <- subset(meta,meta[,Condition] == opt$treatment | meta[,Condition] == opt$control)
 print(paste("There are ", length(rownames(samples)), " samples to  merge ...",sep=''))
 
-filelist.samples <- sapply(rownames(samples), function(x) grep(x, files, value = TRUE))
+filelist.samples <- sapply(rownames(samples), function(x) grep(paste0("\\b",x,"\\b"), files, value = TRUE))
 ###merge samples
 merge_process <- function(filelist){
   output <- list()
