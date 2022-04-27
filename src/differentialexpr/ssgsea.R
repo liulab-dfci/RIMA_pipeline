@@ -58,7 +58,13 @@ geneSets <- getGmt(gmt_file)
 hallmark <- getGmt(opt$hallmark)
 expr.dat <- read.table(exprsn, sep = "\t", header = TRUE, row.names = 1, check.names = FALSE)
 
-meta <- read.table(file = metadata, sep=',', header = TRUE, stringsAsFactors = FALSE, check.names = FALSE)
+meta <- read.table(file = metadata, sep=',', header = TRUE, stringsAsFactors = FALSE, row.names = 1, check.names = FALSE)
+
+#add tmp column if the metasheet only has two columns
+if(ncol(meta) == 1) {
+meta$tmp <- 1
+}
+
 samples <- subset(meta,meta[,Condition] == Treatment | meta[,Condition] == Control)
 samples <- samples[order(samples[[Condition]], decreasing = TRUE),]
 
