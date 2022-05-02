@@ -25,7 +25,7 @@ meta <- read.table(file = meta, sep=',', header = TRUE, stringsAsFactors = FALSE
 samples <- subset(meta, meta[,Condition] != 'NA')
 print(paste("There are ", length(rownames(samples)), " samples to  merge ...",sep=''))
 
-filelist.samples<- sapply(rownames(samples), function(x) grep(x, files, value = TRUE))
+filelist.samples<- sapply(rownames(samples), function(x) grep(paste0("\\b",x,"\\b"), files, value = TRUE))
 print (filelist.samples)
 
 merge_process <- function(filelist){

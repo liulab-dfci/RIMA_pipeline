@@ -28,7 +28,7 @@ def diffexpr_targets(wildcards):
     ls.append("analysis/gsea/%s_%s_vs_%s_KEGG_terms.png" % (design,treatment,control))
     ls.append("analysis/gsea/%s_%s_vs_%s_HALLMARK_terms.png" % (design,treatment,control))
     ls.append("analysis/deseq2/%s_%s_vs_%s_ssgsea.txt" % (design,treatment,control))
-    ls.append("analysis/deseq2/%s_%s_vs_%s_ssgsea.png" % (design,treatment,control))
+#    ls.append("analysis/deseq2/%s_%s_vs_%s_ssgsea.png" % (design,treatment,control))
 
     return ls
 
@@ -140,11 +140,12 @@ rule ssgsea:
         "analysis/deseq2/{design}_{treatment}_vs_{control}_TPMs.txt"
     output:
         score = "analysis/deseq2/{design}_{treatment}_vs_{control}_ssgsea.txt",
-        ssgsea_plot = "analysis/deseq2/{design}_{treatment}_vs_{control}_ssgsea.png"
+ #       ssgsea_plot = "analysis/deseq2/{design}_{treatment}_vs_{control}_ssgsea.png"
     log:
         "logs/ssgsea/{design}_{treatment}_vs_{control}_ssgsea.log"
     params:
         gmt = 'static/ssgsea/c2.cp.kegg.v6.1.symbols.gmt',
+        hallmark = "static/ssgsea/h.all.v7.5.1.symbols.gmt.txt",
         condition = design,
         treatment = treatment,
         control = control,
@@ -160,7 +161,7 @@ rule ssgsea:
     shell:
         "{params.path}; Rscript src/differentialexpr/ssgsea.R -e {input} -f {params.gmt} \
         --treatment {params.treatment} --control {params.control} --condition {params.condition}\
-        -m {params.meta} -n {params.top_n} -o {params.outpath}"
+        -m {params.meta} -n {params.top_n} -o {params.outpath} --hallmark {params.hallmark}"
 
 
 

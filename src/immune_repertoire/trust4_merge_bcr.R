@@ -43,8 +43,8 @@ meta <- read.csv(file = meta, sep=",",  header = TRUE, row.names=1)
 samples <- subset(meta,meta[,Condition] == opt$treatment | meta[,Condition] == opt$control)
 print(paste("There are ", length(rownames(samples)), "samples to  merge ...",sep=''))
 
-filelist.samples.light <- sapply(rownames(samples), function(x) grep(x, files_light, value = TRUE))
-filelist.samples.heavy <- sapply(rownames(samples), function(x) grep(x, files_heavy, value = TRUE))
+filelist.samples.light <- sapply(rownames(samples), function(x) grep(paste0("\\b",x,"\\b"), files_light, value = TRUE))
+filelist.samples.heavy <- sapply(rownames(samples), function(x) grep(paste0("\\b",x,"\\b"), files_heavy, value = TRUE))
 
 ###merge samples
 merge_process <- function(filelist){
