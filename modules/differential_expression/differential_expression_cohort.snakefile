@@ -27,9 +27,8 @@ def diffexpr_targets(wildcards):
     ls.append("analysis/gsea/%s_%s_vs_%s_CC_terms.png" % (design,treatment,control))
     ls.append("analysis/gsea/%s_%s_vs_%s_KEGG_terms.png" % (design,treatment,control))
     ls.append("analysis/gsea/%s_%s_vs_%s_HALLMARK_terms.png" % (design,treatment,control))
-    ls.append("analysis/deseq2/%s_%s_vs_%s_ssgsea.txt" % (design,treatment,control))
-#    ls.append("analysis/deseq2/%s_%s_vs_%s_ssgsea.png" % (design,treatment,control))
-
+    ls.append("analysis/ssgsea/%s_%s_vs_%s_kegg_ssgsea.txt" % (design,treatment,control))
+    ls.append("analysis/ssgsea/%s_%s_vs_%s_hallmark_ssgsea.txt" % (design,treatment,control))
     return ls
 
 def getsampleIDs(meta):
@@ -139,8 +138,8 @@ rule ssgsea:
     input:
         "analysis/deseq2/{design}_{treatment}_vs_{control}_TPMs.txt"
     output:
-        score = "analysis/deseq2/{design}_{treatment}_vs_{control}_ssgsea.txt",
- #       ssgsea_plot = "analysis/deseq2/{design}_{treatment}_vs_{control}_ssgsea.png"
+        kegg_score = "analysis/ssgsea/{design}_{treatment}_vs_{control}_kegg_ssgsea.txt",
+        hallmark_score = "analysis/ssgsea/{design}_{treatment}_vs_{control}_hallmark_ssgsea.txt"
     log:
         "logs/ssgsea/{design}_{treatment}_vs_{control}_ssgsea.log"
     params:
