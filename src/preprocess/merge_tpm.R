@@ -41,8 +41,7 @@ print(paste("There are ",length(filelist.samples), " samples to be merge ...", s
 print(filelist.samples)
 
 txi <- tximport(filelist.samples, type=Type, tx2gene=tx2gene)
-#txi$length[txi$length == 0] <- 1
   
-print(head(txi$counts))
-exprsn <- txi$counts
+print(head(txi$abundance))
+exprsn <- txi$abundance
 write.table(exprsn,paste(opt$outpath,'tpm.genesymbol.csv',sep=""),quote = FALSE,sep = ",")
