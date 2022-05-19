@@ -6,7 +6,6 @@ suppressMessages(library(GSVA))
 suppressMessages(library(ggplot2))
 suppressMessages(library(dplyr))
 suppressMessages(library(tidyr))
-#suppressMessages(library(textshape))
 suppressMessages(library(reshape2))
 suppressMessages(library(optparse))
 
@@ -103,9 +102,6 @@ ssgsea_plot <- function(samples, Condition, Treatment, Control, ssgsea) {
   ssgsea.sort <- ssgsea[ta$terms,]
   ssgsea.sort <- ssgsea.sort[as.character(samples$SampleName)]
   
-  #caculate the zscore
-  #zscore_mat <- t(scale(t(ssgsea.sort)))
-
   ssgsea.sort <- as.matrix(ssgsea.sort)
   samples <- samples[,c("SampleName",Condition)]
   rownames(samples) <- samples[[1]]

@@ -42,8 +42,6 @@ Control <- opt$control
 pcut <- as.numeric(opt$pcut)
 minGSSize <- as.numeric(opt$minsize)
 nPerm <- as.numeric(opt$npermutation)
-#tsize <- 4   ###term size in plot
-#msize <- 5   ###significance label size in plot
 
 
 ####read in data and convert to entrez ID
@@ -184,32 +182,3 @@ writeoutput(go.bp,"BP")
 writeoutput(go.cc,"CC")
 writeoutput(kegg,"KEGG")
 writeoutput(hallmark,"HALLMARK")
-
-
-
-
-
-#############multiqc file
-#go.mf.multiqc <- subset(go.mf,  select = c(Description,NES,p.adjust))
-#colnames(go.mf.multiqc) <- c("Description","MF","Pvalue")
-#go.mf.multiqc  <- go.mf.multiqc[order(-go.mf.multiqc$Pvalue),]
-#go.mf.multiqc <- subset(go.mf.multiqc[1:10,],select=c(Description,MF))
-#write.table(go.mf.multiqc,paste(opt$outdir,"_GO_MF_report.txt", sep = ""), quote = FALSE, sep = "\t", row.names = FALSE)
-
-#go.bp.multiqc <- subset(go.bp,  select = c(Description,NES,p.adjust))
-#colnames(go.bp.multiqc) <- c("Description", "BP","Pvalue")
-#go.bp.multiqc  <- go.bp.multiqc[order(-go.bp.multiqc$Pvalue),]
-#go.bp.multiqc <- subset(go.bp.multiqc[1:10,],select=c(Description,BP))
-#write.table(go.bp.multiqc,paste(opt$outdir,"_GO_BP_report.txt", sep = ""), quote = FALSE, sep = "\t", row.names = FALSE)
-
-#go.cc.multiqc <- subset(go.cc,  select = c(Description,NES,p.adjust))
-#colnames(go.cc.multiqc) <- c("Description", "CC", "Pvalue")
-#go.cc.multiqc <- go.cc.multiqc[order(-go.cc.multiqc$Pvalue),]
-#go.cc.multiqc <- subset(go.cc.multiqc[1:10,],select=c(Description,CC))
-#write.table(go.cc.multiqc,paste(opt$outdir,"_GO_CC_report.txt", sep = ""), quote = FALSE, sep = "\t", row.names = FALSE)
-
-#go.kegg.multiqc <- subset( kegg,  select = c(Description,NES,p.adjust))
-#colnames(go.kegg.multiqc) <- c("Description", "KEGG","Pvalue")
-#go.kegg.multiqc <- go.kegg.multiqc[order(-go.kegg.multiqc$Pvalue),]
-#go.kegg.multiqc <- subset(go.kegg.multiqc[1:10,],select=c(Description,KEGG))
-#write.table(go.kegg.multiqc,paste(opt$outdir,"_GO_KEGG_report.txt", sep = ""), quote = FALSE, sep = "\t", row.names = FALSE)

@@ -46,10 +46,7 @@ input <- opt$input
 
 print("Reading meta file ...")
 meta <- read.table(file = metadata, sep=',', header = TRUE, stringsAsFactors = FALSE, row.names = 1)
-#print(head(meta))
-#samples <- subset(meta, meta[,Condition] == Treatment | meta[,Condition] == Control)
 samples <- subset(meta, meta[,Condition] != 'NA')
-#print(samples)
 
 
 print ("Reading tx2gene file ...")
@@ -68,7 +65,6 @@ Transcript <- function(files,samples,tx2gene,Type,batch){
 
   filelist <- strsplit(files, "\\,")[[1]]
   print(filelist)
-  #print(rownames(meta))
   filelist.samples <- sapply(rownames(meta), function(x) grep(paste0("\\b",x,"\\b"), filelist, value = TRUE))
   
   #exactly match may output a list, need to convert list to character
@@ -86,7 +82,8 @@ Transcript <- function(files,samples,tx2gene,Type,batch){
   
   print(head(txi$counts))
   exprsn <- txi$counts
-  exprsn_log <- log2(exprsn + 1)
+  
+  tpm_matrix <- txi$abundance
 
   
   if(batch != "False"){
@@ -99,16 +96,9 @@ Transcript <- function(files,samples,tx2gene,Type,batch){
                                        colData = colData,
                                        design = ~ Batch + Condition)
                                        
-    #print (paste("Generating log transformed TPMS after batch correction of ",batch," on ",Condition,sep=""))
-    
-    #expr.limma = tryCatch(
-    #                 removeBatchEffect(exprsn_log,colData$Batch),
-    #                 error = function(e){
-    #                 print(e)
-    #                 })
-    
     print ("Generating TPM matrix ...")
-    write.table(exprsn,paste(opt$outpath,opt$condition,'_',opt$treatment,'_vs_',opt$control,'_TPMs.txt',sep = ""),quote = FALSE,sep = "\t")
+    write.table(tpm_matrix,paste(opt$outpath,opt$condition,'_',opt$treatment,'_vs_',opt$control,'_TPMs.txt',sep = ""),quote = FALSE,sep = "\t")
+    write.table(exprsn,paste(opt$outpath,opt$condition,'_',opt$treatment,'_vs_',opt$control,'_Estimated_genecount.txt',sep = ""),quote = FALSE,sep = "\t")
 
   }else{
     print(paste("Running DESeq2 on ",opt$condition,sep=""))
@@ -142,6 +132,9 @@ clustering_heatmap(dds, res, opt$pcoding, opt$outpath, opt$treatment, opt$contro
 
 res_final <- as.data.frame(res)
 res_final$Gene_name <- rownames(res_final)
+
+#re-order the result
 res_final <- res_final[c(7, 1:6)]
+
 res_final$`-log10(padj)` <- -log10(res_final$padj)
 write.table(res_final,file = paste(opt$outpath,opt$condition,'_',opt$treatment,'_vs_',opt$control,'_DESeq2.txt',sep = ""), quote = FALSE,sep = "\t")
