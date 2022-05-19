@@ -24,7 +24,6 @@ def immune_infiltration_targets(wildcards):
     ls.append("analysis/immune_infiltration/%s_%s_CD8_T_cell_corr.png" % (design,batch))
     ls.append("analysis/immune_infiltration/%s_%s_Macrophage_corr.png" % (design,batch))
     ls.append("analysis/immune_infiltration/%s_%s_Treg_corr.png" % (design,batch))
-    #ls.append("analysis/immune_infiltration/%s_%s_ImmuneDeconv_heatmap.png" % (design,batch))
     return ls
 
 rule immune_infiltration__all:
@@ -77,7 +76,6 @@ rule ImmuneDeconv_plot:
         "analysis/immune_infiltration/{design}_{batch}_CD8_T_cell_corr.png",
         "analysis/immune_infiltration/{design}_{batch}_Macrophage_corr.png",
         "analysis/immune_infiltration/{design}_{batch}_Treg_corr.png",
-        #"analysis/immune_infiltration/{design}_{batch}_ImmuneDeconv_heatmap.png",
     log:
         "logs/immune_infiltration/{design}_{batch}_deconv_plot.log"
     message:

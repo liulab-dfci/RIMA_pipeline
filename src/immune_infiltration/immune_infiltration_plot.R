@@ -144,7 +144,6 @@ for (cell in comps){
   colnames(cell.deconv.new) <- names(cell.deconv)
   methods.corr <- cor(cell.deconv.new, method = "spearman")
   png(paste(outdir,cell,"_corr.png",sep = ""), res = 350, width = 2000, height = 2200)
-  # corrplot(methods.corr, type = "upper", order = "hclust", tl.col = "black", tl.srt = 45, col = col2(200),mar=c(0,0,2,0), title = cell, tl.cex = 1.2)
   print(corrplot.mixed(methods.corr, tl.pos = "lt", upper = "circle", lower = "number", diag = "u",tl.col = "black",lower.col = col2(200), upper.col = col2(200),tl.srt = 45,mar=c(0,3,1,1), title = cell))
   dev.off()
 }
