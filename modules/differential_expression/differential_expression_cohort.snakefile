@@ -150,7 +150,7 @@ rule ssgsea:
         control = control,
         meta = config['metasheet'],
         top_n = 20,
-        outpath = "analysis/deseq2/",
+        outpath = "analysis/ssgsea/",
         path = "set +eu;source activate %s" % config['stat_root']
     message:
         "Running single sample gene set enrichment analysis"

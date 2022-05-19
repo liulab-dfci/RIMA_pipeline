@@ -46,10 +46,7 @@ input <- opt$input
 
 print("Reading meta file ...")
 meta <- read.table(file = metadata, sep=',', header = TRUE, stringsAsFactors = FALSE, row.names = 1)
-#print(head(meta))
-#samples <- subset(meta, meta[,Condition] == Treatment | meta[,Condition] == Control)
 samples <- subset(meta, meta[,Condition] != 'NA')
-#print(samples)
 
 
 print ("Reading tx2gene file ...")
@@ -86,7 +83,8 @@ Transcript <- function(files,samples,tx2gene,Type,batch){
   
   print(head(txi$counts))
   exprsn <- txi$counts
-  exprsn_log <- log2(exprsn + 1)
+  
+  tmp_matrix <- txi$abundance
 
   
   if(batch != "False"){
@@ -99,16 +97,9 @@ Transcript <- function(files,samples,tx2gene,Type,batch){
                                        colData = colData,
                                        design = ~ Batch + Condition)
                                        
-    #print (paste("Generating log transformed TPMS after batch correction of ",batch," on ",Condition,sep=""))
-    
-    #expr.limma = tryCatch(
-    #                 removeBatchEffect(exprsn_log,colData$Batch),
-    #                 error = function(e){
-    #                 print(e)
-    #                 })
-    
     print ("Generating TPM matrix ...")
-    write.table(exprsn,paste(opt$outpath,opt$condition,'_',opt$treatment,'_vs_',opt$control,'_TPMs.txt',sep = ""),quote = FALSE,sep = "\t")
+    write.table(tmp_matrix,paste(opt$outpath,opt$condition,'_',opt$treatment,'_vs_',opt$control,'_TPMs.txt',sep = ""),quote = FALSE,sep = "\t")
+    write.table(exprsn,paste(opt$outpath,opt$condition,'_',opt$treatment,'_vs_',opt$control,'_genecount.txt',sep = ""),quote = FALSE,sep = "\t")
 
   }else{
     print(paste("Running DESeq2 on ",opt$condition,sep=""))
