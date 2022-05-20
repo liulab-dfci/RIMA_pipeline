@@ -1,14 +1,16 @@
 #!/usr/bin/env python
 
+design = config["design"]
+batch = config["batch"]
+
 #####################Neoantigen cohort module#####################################
 
 def neoantigen_cohort_targets(wildcards):
     """Generates the targets for this module"""
     ls = []
     ls.append("analysis/neoantigen/merge/genotypes.tsv")
-    #ls.append("analysis/neoantigen/merge/genotypes.p-group.tsv")
-    #ls.append("files/multiqc/neoantigen/hla_typing_frequency_plot.png")
-    #ls.append("files/multiqc/neoantigen/hla_heatmap.txt")
+    ls.append("analysis/neoantigen/merge/genotypes.p-group.tsv")
+    ls.append("analysis/neoantigen/%s_%s_hla_frequency_plot.png" % (design,batch))
     return ls
 
 rule neoantigen_all:
@@ -27,7 +29,6 @@ rule arcasHLA_merge:
     shell:
         """{params.arcasHLA_path}/arcasHLA merge -i {params.outpath} -o {params.outpath}"""
 
-'''
 rule arcasHLA_convert:
     input:
         res = "analysis/neoantigen/merge/genotypes.tsv",
@@ -41,17 +42,14 @@ rule arcasHLA_convert:
 rule arcasHLA_plot:
     input:
         res = "analysis/neoantigen/merge/genotypes.p-group.tsv",
-        expr = "analysis/batchremoval/tpm_convertID.batch"
+        expr = "analysis/batchremoval/tpm.genesymbol.batchremoved.csv"
     output:
-        png = "files/multiqc/neoantigen/hla_typing_frequency_plot.png",
-        arcasHLA_table = "files/multiqc/neoantigen/hla_heatmap.txt"
+        png = "analysis/neoantigen/{design}_{batch}_hla_frequency_plot.png"
     params:
         meta = config["metasheet"],
-        group = lambda wildcards: ','.join(str(i) for i in config["hla_annot_group"]),
-        multiqc = "files/multiqc/neoantigen/",
-        outpath = "files/multiqc/neoantigen/",
+        design = config["design"],
+        outpath = "analysis/neoantigen/{design}_{batch}_",
         path="set +eu;source activate %s" % config['stat_root'],
     conda: "../../envs/stat_perl_r.yml"
     shell:
-        "{params.path}; Rscript src/neoantigen/hla_plot.R --hla {input.res} --meta {params.meta} --expression {input.expr} --group {params.group} --outdir {params.outpath} --multiqc {params.multiqc}"
-'''
+        "{params.path}; Rscript src/neoantigen/hla_plot.R --hla {input.res} --meta {params.meta} --expression {input.expr} --design {params.design} --outdir {params.outpath}"
