@@ -6,7 +6,6 @@ suppressMessages(library(GSVA))
 suppressMessages(library(ggplot2))
 suppressMessages(library(dplyr))
 suppressMessages(library(tidyr))
-#suppressMessages(library(textshape))
 suppressMessages(library(reshape2))
 suppressMessages(library(optparse))
 
@@ -58,7 +57,7 @@ geneSets <- getGmt(gmt_file)
 hallmark <- getGmt(opt$hallmark)
 expr.dat <- read.table(exprsn, sep = "\t", header = TRUE, row.names = 1, check.names = FALSE)
 
-meta <- read.table(file = metadata, sep=',', header = TRUE, stringsAsFactors = FALSE, row.names = 1, check.names = FALSE)
+meta <- read.table(file = metadata, sep=',', header = TRUE, stringsAsFactors = FALSE, check.names = FALSE)
 
 #add tmp column if the metasheet only has two columns
 if(ncol(meta) == 1) {
@@ -103,9 +102,6 @@ ssgsea_plot <- function(samples, Condition, Treatment, Control, ssgsea) {
   ssgsea.sort <- ssgsea[ta$terms,]
   ssgsea.sort <- ssgsea.sort[as.character(samples$SampleName)]
   
-  #caculate the zscore
-  #zscore_mat <- t(scale(t(ssgsea.sort)))
-
   ssgsea.sort <- as.matrix(ssgsea.sort)
   samples <- samples[,c("SampleName",Condition)]
   rownames(samples) <- samples[[1]]
@@ -137,7 +133,7 @@ ssgsea_kegg <- ssgsea_plot(samples, Condition, Treatment, Control, ssgsea_kegg)
 ssgsea_hallmark <- ssgsea_plot(samples, Condition, Treatment, Control, ssgsea_hallmark)
 
         
-write.table(ssgsea_kegg[[2]], paste(Outdir,Condition, "_",Treatment,"_vs_",Control,"_ssgsea.txt", sep = ""), 
+write.table(ssgsea_kegg[[2]], paste(Outdir,Condition, "_",Treatment,"_vs_",Control,"_kegg_ssgsea.txt", sep = ""), 
             quote = FALSE, sep = "\t", row.names = TRUE, col.names = NA)  
 
 write.table(ssgsea_hallmark[[2]], paste(Outdir,Condition, "_",Treatment,"_vs_",Control,"_hallmark_ssgsea.txt", sep = ""),

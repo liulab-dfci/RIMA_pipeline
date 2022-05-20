@@ -4,7 +4,6 @@ fusion_bar <- function(ta) {
   type <- c("Both", "Oncogene", "Tumor_Suppressor", "Cancer_Driver", "Others")
   color_ta <- data.frame(terms = type, color = c("#e333cc","#e34a33", "#a6bddb", "#fc9272", "#bdbdbd"))
   
-  #ta <- ta[ta$Sample %in% meta[!is.na(meta$Screen_R_vs_NR),][[1]],]
   
   #preprocess the data
   processed_ta <- NULL
@@ -24,7 +23,6 @@ fusion_bar <- function(ta) {
     } else {
       tmp_ta_sig <- tmp_ta_sig %>% group_by(Gene) %>% mutate(ID=1:n())
     }
-    #tmp_ta_sig <- tmp_ta_sig %>% group_by(Gene) %>% mutate(ID=1:n())
     
     tmp_ta <- rbind(tmp_ta_others, tmp_ta_sig)
     
@@ -126,8 +124,7 @@ fusion_bar <- function(ta) {
   
   p <- ggplot(final_ta, aes(x = Gene, y = Expression, fill = Type, group=factor(ID))) +
     geom_bar(stat = "identity",position=position_dodge(), color = "#636363") +
-    facet_grid(Phenotype ~ ., scales = "free_y", space = "free_y") + #, scales = "free_y", space = "free_y") +
-    #facet_wrap(~Phenotype, ncol = 1, strip.position="right", scales = "free_y") + coord_flip() + theme_bw() +
+    facet_grid(Phenotype ~ ., scales = "free_y", space = "free_y") +
     geom_text(data = final_label, aes(label=Pos), position = position_dodge(.9), hjust = -0.1, size = 2) +
     coord_flip() + theme_bw() +
     scale_fill_manual(breaks = iterms, values = color) +

@@ -84,8 +84,6 @@ CTL <- get(load("static/tide/Results/TCGA_CTL_score.Rdata"))
 # read in TIDE results
 TIDE.res <- get(load("static/tide/Results/TCGA_TIDE_res.Rdata"))
 # prepare dysfunction and exclusion score
-# tcga.path <- dir(path = "~/Documents/pipeline_test/RIMA_V1/rnaseq_pipeline/static/tide/Results/Tumor_Dysf_Excl_scores", pattern = "OS_base$", full.names = TRUE)
-# compare.path <- grep(paste("TCGA.",cc,".*OS_base", sep = ""),tcga.path,value = TRUE)
 if (cc %in% names(TIDE.res)){
   pats <- intersect(rownames(TIDE.res[[cc]]), names(CTL[[cc]]))
   tcga.tide <- cbind(TIDE.res[[cc]][pats, ], CTL = CTL[[cc]][pats])

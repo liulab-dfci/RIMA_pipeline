@@ -33,7 +33,6 @@ print OFH join(",",@labels) . ')' . "\n";
 print OFH "\n";
 print OFH 'png("' . $$options{png} . '", width = 8, height = 8, unit="in",res=300)' . "\n";
 print OFH 'rc <- cm.colors(ncol(data_matrix))' . "\n";
-#print OFH 'heatmap(data_matrix, scale=c("none"),keep.dendro=F, labRow = rowLabel ,Colv = NA,Rowv = NA,labCol=NA,col=cm.colors(256),margins = c(6, 8),ColSideColors = rc,cexRow=1,cexCol=1,xlab="Gene body percentile (5\'->3\')", add.expr=x_axis_expr <- axis(side=1,at=c(1,10,20,30,40,50,60,70,80,90,100),labels=c("1","10","20","30","40","50","60","70","80","90","100")))' . "\n";
 print OFH 'junk <- dev.off()' . "\n";
 print OFH "\n";
 print OFH 'png("' . $$options{curves_png} . '", width = 8, height = 8, unit="in",res=300)' . "\n";
