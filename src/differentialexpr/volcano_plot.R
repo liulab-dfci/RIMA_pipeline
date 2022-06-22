@@ -56,7 +56,8 @@ if(nrow(up) >= 10 && nrow(down) >= 10){
 
 
 ###volcano plot
-png(opt$output, res = 300, width = 1900, height = 1000)
+#png(opt$output, res = 300, width = 1900, height = 1000)
+pdf(opt$output, width = 6, height = 4)
 
 ggplot(dif.data, aes(x = log2FoldChange, y = logP)) +
   geom_point(aes(color = factor(color)), size = 1.55, alpha = 0.8, na.rm = TRUE) + # add gene points
