@@ -23,7 +23,7 @@ def preprocess_cohort_targets(wildcards):
     ls = []
     ls.append("analysis/star/STAR_Align_Report.csv" )
     ls.append("analysis/rseqc/gene_body_cvg/geneBodyCoverage.r")
-    ls.append("analysis/rseqc/gene_body_cvg/geneBodyCoverage.curves.png")
+    ls.append("analysis/rseqc/gene_body_cvg/geneBodyCoverage.curves.pdf")
     ls.append("analysis/rseqc/tin_score/tin_score_summary.txt")
     ls.append("analysis/rseqc/read_distrib/read_distrib.matrix.tab")
     
@@ -31,8 +31,8 @@ def preprocess_cohort_targets(wildcards):
     ls.append("analysis/batchremoval/%s_%s_tpm.genesymbol.csv" % (design,covariates))
     ls.append("analysis/batchremoval/%s_%s_tpm.genesymbol.batchremoved.csv" % (design,covariates))
     
-    ls.append("analysis/batchremoval/%s_%s_pca_plot_before.png" % (design,covariates))
-    ls.append("analysis/batchremoval/%s_%s_pca_plot_after.png" % (design,covariates))
+    ls.append("analysis/batchremoval/%s_%s_pca_plot_before.pdf" % (design,covariates))
+    ls.append("analysis/batchremoval/%s_%s_pca_plot_after.pdf" % (design,covariates))
     return ls 
 
 rule preprocess_cohort_all:
@@ -97,7 +97,7 @@ rule plot_gene_body_cvg:
       samples_list=expand("analysis/rseqc/gene_body_cvg/{sample}/{sample}.geneBodyCoverage.r", sample=config["samples"] )
     output:
       rscript="analysis/rseqc/gene_body_cvg/geneBodyCoverage.r",
-      png_curves="analysis/rseqc/gene_body_cvg/geneBodyCoverage.curves.png"
+      png_curves="analysis/rseqc/gene_body_cvg/geneBodyCoverage.curves.pdf"
     message: "Plotting gene body coverage"
     benchmark:
       "benchmarks/rseqc/gene_body_cvg/plot_gene_body_cvg.benchmark"
@@ -165,8 +165,8 @@ rule pca_sample_clustering:
         after_batch = "analysis/batchremoval/{design}_{covariates}_tpm.genesymbol.batchremoved.csv",
         before_batch = "analysis/batchremoval/{design}_{covariates}_tpm.genesymbol.csv"
     output:
-        before_pca = "analysis/batchremoval/{design}_{covariates}_pca_plot_before.png",
-        after_pca = "analysis/batchremoval/{design}_{covariates}_pca_plot_after.png",
+        before_pca = "analysis/batchremoval/{design}_{covariates}_pca_plot_before.pdf",
+        after_pca = "analysis/batchremoval/{design}_{covariates}_pca_plot_after.pdf",
     message:
         "Running PCA for sample clustering"
     benchmark:

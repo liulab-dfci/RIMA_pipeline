@@ -53,8 +53,8 @@ CTL.entrez <- c("925","926","3001","3002","5551")  #CD8A:925;CD8B:926;GZMA:3001;
 expr.norm.ctl <- colMeans(expr.norm[CTL.entrez,])
 
 ####barplot of showing tide score
-Pwidth <- nrow(tide.mat)*40+500
-png(file=paste(outdir,"tide_score_mqc.png",sep = ""), res = 300, width = Pwidth, height = 1400)
+Pwidth <- nrow(tide.mat)*40+500/72
+pdf(file=paste(outdir,"tide_score_mqc.png",sep = ""),width = Pwidth, height = 1400/72)
 ggplot(tide.mat,aes(x = reorder(sample, -TIDE), y = TIDE, fill = group))+
   geom_bar(stat = "identity", position="identity",alpha = 0.8)+
   theme_minimal()+
@@ -131,7 +131,7 @@ if (cc %in% names(TIDE.res)){
             #heatmap_legend_param = list(direction = "horizontal" ), #title_position = "lefttop-rot"
 	    heatmap_legend_param = list( legend_direction="horizontal", legend_width=unit(3,"mm")),
             row_names_gp = gpar(fontsize = 6))
-  png(file=paste(outdir,design,"_TIDE-TCGA_mqc.png",sep = ""), res = 300, width = 2000, height = 700)
+  pdf(file=paste(outdir,design,"_TIDE-TCGA_mqc.png",sep = ""), width = 2000/72, height = 700/72)
   draw(ht_list,annotation_legend_side = "bottom", heatmap_legend_side = "bottom",merge_legends = TRUE)
   dev.off()
 } else{

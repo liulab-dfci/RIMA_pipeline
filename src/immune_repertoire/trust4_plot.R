@@ -125,7 +125,7 @@ if (length(unique(cdr3.bcr.heavy$clinic)) < 2) {
   names(Ig.color) <- Igs.order
   st.Ig$C <- factor(st.Ig$C, levels = Igs.order)
 
-  png(file = paste(outdir,Condition,"_",Treatment,"_vs_",Control,"_TRUST4_BCR_Ig_frequency.png",sep = ""),res = 300, width = 1000, height = 800, pointsize = 4)
+  pdf(file = paste(outdir,Condition,"_",Treatment,"_vs_",Control,"_TRUST4_BCR_Ig_frequency.pdf",sep = ""),width = 8, height = 6, pointsize = 4)
   ggplot(st.Ig,aes(x = clinic, y = Num.Ig, fill = C))+
     geom_bar(stat = "identity",position="fill",alpha = 0.8)+
     theme_bw()+
@@ -162,7 +162,7 @@ if (length(unique(clonality.bcr$clinic)) < 2) {
 }
 
 ###combine BCR Metrics Plots
-png(file = paste(outdir,Condition,"_",Treatment,"_vs_",Control,"_TRUST4-BCR_mqc.png",sep = ""),res = 300, width = 2200, height = 550)
+pdf(file = paste(outdir,Condition,"_",Treatment,"_vs_",Control,"_TRUST4-BCR_mqc.pdf",sep = ""),width = 16, height = 5)
 ggarrange(gr, gc, gs, gn, ncol = 4, nrow = 1, common.legend = TRUE, legend = "bottom")
 dev.off()
 
@@ -203,7 +203,7 @@ if (length(unique(clonality.tcr$clinic)) < 2) {
 }
 
 ###combine TCR Metrics Plots
-png(file = paste(outdir,Condition,"_",Treatment,"_vs_",Control,"_TRUST4-TCR_mqc.png",sep = ""),res = 300, width = 2200, height = 550)
+pdf(file = paste(outdir,Condition,"_",Treatment,"_vs_",Control,"_TRUST4-TCR_mqc.pdf",sep = ""),width = 16, height = 5)
 par(oma=c(1,1,1,1))
 ggarrange(gr, gc, gk, gn,ncol = 4, nrow = 1, common.legend = TRUE, legend = "bottom")
 dev.off()

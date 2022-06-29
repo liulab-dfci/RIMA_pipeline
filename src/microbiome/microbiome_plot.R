@@ -151,7 +151,7 @@ species <- as.character(unique(final_rat$species))
 
 
 print(final_rat)
-png(paste(outdir, "microbes_abundance.png", sep = ""), res = 300, width = 1600, height = 1300, pointsize = 12)
+pdf(paste(outdir, "microbes_abundance.png", sep = ""), res = 300, width = 8, height = 6, pointsize = 12)
 ggplot(final_rat, aes(x= ratio, y = sample, fill = species)) + geom_col() + theme_bw() + 
   scale_fill_manual(breaks = species, values = color) +
   theme(

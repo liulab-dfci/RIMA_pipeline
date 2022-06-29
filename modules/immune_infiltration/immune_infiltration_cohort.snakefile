@@ -16,14 +16,14 @@ def immune_infiltration_targets(wildcards):
     ls.append("analysis/immune_infiltration/%s_%s_cibersort_abs.txt" % (design,batch))
     ls.append("analysis/immune_infiltration/%s_%s_timer.txt" % (design,batch))
     ls.append("analysis/immune_infiltration/%s_%s_epic.txt" % (design,batch))
-    ls.append("analysis/immune_infiltration/%s_%s_B_cell_corr.png" % (design,batch))
-    ls.append("analysis/immune_infiltration/%s_%s_DC_corr.png" % (design,batch))
-    ls.append("analysis/immune_infiltration/%s_%s_NK_corr.png" % (design,batch))
-    ls.append("analysis/immune_infiltration/%s_%s_CD4_T_cell_corr.png" % (design,batch))
-    ls.append("analysis/immune_infiltration/%s_%s_Neutrophil_corr.png" % (design,batch))
-    ls.append("analysis/immune_infiltration/%s_%s_CD8_T_cell_corr.png" % (design,batch))
-    ls.append("analysis/immune_infiltration/%s_%s_Macrophage_corr.png" % (design,batch))
-    ls.append("analysis/immune_infiltration/%s_%s_Treg_corr.png" % (design,batch))
+    ls.append("analysis/immune_infiltration/%s_%s_B_cell_corr.pdf" % (design,batch))
+    ls.append("analysis/immune_infiltration/%s_%s_DC_corr.pdf" % (design,batch))
+    ls.append("analysis/immune_infiltration/%s_%s_NK_corr.pdf" % (design,batch))
+    ls.append("analysis/immune_infiltration/%s_%s_CD4_T_cell_corr.pdf" % (design,batch))
+    ls.append("analysis/immune_infiltration/%s_%s_Neutrophil_corr.pdf" % (design,batch))
+    ls.append("analysis/immune_infiltration/%s_%s_CD8_T_cell_corr.pdf" % (design,batch))
+    ls.append("analysis/immune_infiltration/%s_%s_Macrophage_corr.pdf" % (design,batch))
+    ls.append("analysis/immune_infiltration/%s_%s_Treg_corr.pdf" % (design,batch))
     return ls
 
 rule immune_infiltration__all:
@@ -68,14 +68,14 @@ rule ImmuneDeconv_plot:
         "analysis/immune_infiltration/{design}_{batch}_timer.txt",
         "analysis/immune_infiltration/{design}_{batch}_epic.txt"
     output:
-        "analysis/immune_infiltration/{design}_{batch}_B_cell_corr.png",
-        "analysis/immune_infiltration/{design}_{batch}_DC_corr.png",
-        "analysis/immune_infiltration/{design}_{batch}_NK_corr.png",
-        "analysis/immune_infiltration/{design}_{batch}_CD4_T_cell_corr.png",
-        "analysis/immune_infiltration/{design}_{batch}_Neutrophil_corr.png",
-        "analysis/immune_infiltration/{design}_{batch}_CD8_T_cell_corr.png",
-        "analysis/immune_infiltration/{design}_{batch}_Macrophage_corr.png",
-        "analysis/immune_infiltration/{design}_{batch}_Treg_corr.png",
+        "analysis/immune_infiltration/{design}_{batch}_B_cell_corr.pdf",
+        "analysis/immune_infiltration/{design}_{batch}_DC_corr.pdf",
+        "analysis/immune_infiltration/{design}_{batch}_NK_corr.pdf",
+        "analysis/immune_infiltration/{design}_{batch}_CD4_T_cell_corr.pdf",
+        "analysis/immune_infiltration/{design}_{batch}_Neutrophil_corr.pdf",
+        "analysis/immune_infiltration/{design}_{batch}_CD8_T_cell_corr.pdf",
+        "analysis/immune_infiltration/{design}_{batch}_Macrophage_corr.pdf",
+        "analysis/immune_infiltration/{design}_{batch}_Treg_corr.pdf",
     log:
         "logs/immune_infiltration/{design}_{batch}_deconv_plot.log"
     message:

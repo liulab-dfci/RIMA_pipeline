@@ -19,8 +19,8 @@ def mutation_cohort_targets(wildcards):
     ls.append("analysis/fusion/%s_pyprada_output.txt" % design),
     ls.append("analysis/fusion/%s_pyprada_unique_genelist.txt" % design),
     ls.append("analysis/fusion/%s_fusion_gene_table.txt" % design),
-    ls.append("analysis/fusion/%s_fusion_gene_plot.png" % design),
-    ls.append("analysis/fusion/%s_prada_homology.png" % design)
+    ls.append("analysis/fusion/%s_fusion_gene_plot.pdf" % design),
+    ls.append("analysis/fusion/%s_prada_homology.pdf" % design)
     return ls
 
 rule mutation_cohort:
@@ -100,8 +100,8 @@ rule fusion_plot:
       tpm_batch = "analysis/batchremoval/tpm.genesymbol.batchremoved.csv"
     output:
       fusion_table = "analysis/fusion/{design}_fusion_gene_table.txt",
-      fusion_plot = "analysis/fusion/{design}_fusion_gene_plot.png",
-      prada_plot = "analysis/fusion/{design}_prada_homology.png"
+      fusion_plot = "analysis/fusion/{design}_fusion_gene_plot.pdf",
+      prada_plot = "analysis/fusion/{design}_prada_homology.pdf"
     log:
       "logs/fusion/{design}_fusion_plot.log"
     message:

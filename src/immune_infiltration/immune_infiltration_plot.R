@@ -143,7 +143,7 @@ for (cell in comps){
   cell.deconv.new <- do.call("cbind", cell.deconv)
   colnames(cell.deconv.new) <- names(cell.deconv)
   methods.corr <- cor(cell.deconv.new, method = "spearman")
-  png(paste(outdir,cell,"_corr.png",sep = ""), res = 350, width = 2000, height = 2200)
+  pdf(paste(outdir,cell,"_corr.pdf",sep = ""),  width = 6, height = 6)
   print(corrplot.mixed(methods.corr, tl.pos = "lt", upper = "circle", lower = "number", diag = "u",tl.col = "black",lower.col = col2(200), upper.col = col2(200),tl.srt = 45,mar=c(0,3,1,1), title = cell))
   dev.off()
 }

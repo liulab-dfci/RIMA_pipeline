@@ -10,7 +10,7 @@ def neoantigen_cohort_targets(wildcards):
     ls = []
     ls.append("analysis/neoantigen/merge/genotypes.tsv")
     ls.append("analysis/neoantigen/merge/genotypes.p-group.tsv")
-    ls.append("analysis/neoantigen/%s_%s_hla_frequency_plot.png" % (design,batch))
+    ls.append("analysis/neoantigen/%s_%s_hla_frequency_plot.pdf" % (design,batch))
     return ls
 
 rule neoantigen_all:
@@ -44,7 +44,7 @@ rule arcasHLA_plot:
         res = "analysis/neoantigen/merge/genotypes.p-group.tsv",
         expr = "analysis/batchremoval/tpm.genesymbol.batchremoved.csv"
     output:
-        png = "analysis/neoantigen/{design}_{batch}_hla_frequency_plot.png"
+        png = "analysis/neoantigen/{design}_{batch}_hla_frequency_plot.pdf"
     params:
         meta = config["metasheet"],
         design = config["design"],
