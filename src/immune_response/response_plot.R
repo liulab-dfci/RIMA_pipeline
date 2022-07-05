@@ -73,7 +73,7 @@ g_TAM <- CompareGroups(dat,"TAM.M2","TAM.M2")
 g_CAF <- CompareGroups(dat,"CAF","CAF")
 g_IFNG <- CompareGroups(dat,"IFNG","IFNG")
 
-png(file = paste(outdir,Condition,"_comparison.png",sep = ""),res = 300, width = 2200, height = 1150)
+pdf(file = paste(outdir,Condition,"_comparison.png",sep = ""), width = 2200/72, height = 1150/72)
 ggarrange(g_msi, g_tide, g_Dys, g_Exl,g_mdsc,g_TAM,g_CAF,g_IFNG,ncol = 4, nrow = 2, common.legend = TRUE, legend = "bottom")
 dev.off()
 

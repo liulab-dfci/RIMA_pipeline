@@ -137,7 +137,7 @@ highlight_genes <- pradafusion %>%
 
 
 print("drawing the prada homology plot...")
-png(paste(outdir, pheno, "_prada_homology.png", sep = ""), width = 1600, height = 1400, res = 300)
+pdf(paste(outdir, pheno, "_prada_homology.pdf", sep = ""), width = 4, height = 6)
 pradafusion %>% 
   ggplot(aes(x=BitScore,y=Evalue,size=Align_Len)) + 
   geom_point(alpha=0.3) +
@@ -164,7 +164,7 @@ write.table(merge.fusion.df, paste(outdir,pheno,"_fusion_gene_table.txt", sep = 
 
 ### extract expression of oncogene,tsg and protein kinase genes
 print("drawing the fusion gene plot...")
-png(paste(outdir, pheno,"_fusion_gene_plot.png", sep = ""), width = 1600, height = 1400, res = 300)
+pdf(paste(outdir, pheno,"_fusion_gene_plot.pdf", sep = ""), width = 4, height = 6)
 #pdf(paste(outdir, pheno,"_fusion_gene_plot.pdf", sep = ""), width = 8, height = 7)
 ggplot(merge.fusion.df, aes(x=Phenotype, y=log10(Expression+1))) + 
   geom_violin(trim=TRUE) +
@@ -197,8 +197,8 @@ dev.off()
 print("drawing the fusion gene barplot...")
 source("src/mutation/fusion_bar.R")
 ta <- merge.fusion.df
-
+scale_factor <- 2
 p <- fusion_bar(ta)
-png(paste(outdir, pheno,"_fusion_boxplot.png", sep = ""), width = 2000, height = 1800, res = 300)
+pdf(paste(outdir, pheno,"_fusion_boxplot.pdf", sep = ""), width = 6, height = nrow(meta)/scale_factor)
 print(p)
 dev.off()

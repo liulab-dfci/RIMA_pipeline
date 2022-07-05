@@ -22,8 +22,8 @@ def immune_repertoire_cohort_targets(wildcards):
     ls.append("analysis/trust4/%s_%s_vs_%s_TRUST4_TCR_clonality.txt" % (design,treatment,control))
     ls.append("analysis/trust4/%s_%s_vs_%s_TRUST4_TCR_Infil.txt" % (design,treatment,control))
     
-    ls.append("analysis/trust4/%s_%s_vs_%s_TRUST4-BCR_mqc.png" % (design,treatment,control))
-    ls.append("analysis/trust4/%s_%s_vs_%s_TRUST4-TCR_mqc.png" % (design,treatment,control))
+    ls.append("analysis/trust4/%s_%s_vs_%s_TRUST4-BCR_mqc.pdf" % (design,treatment,control))
+    ls.append("analysis/trust4/%s_%s_vs_%s_TRUST4-TCR_mqc.pdf" % (design,treatment,control))
     ls.append("analysis/trust4/%s_%s_vs_%s_TRUST4_Ig.txt" % (design,treatment,control))
     
     
@@ -219,8 +219,8 @@ rule trust4_cohort_plot:
       tcr_infil = "analysis/trust4/{design}_{treatment}_vs_{control}_TRUST4_TCR_Infil.txt",
       tcr_clone = "analysis/trust4/{design}_{treatment}_vs_{control}_TRUST4_TCR_clonality.txt",
    output:
-      "analysis/trust4/{design}_{treatment}_vs_{control}_TRUST4-BCR_mqc.png",
-      "analysis/trust4/{design}_{treatment}_vs_{control}_TRUST4-TCR_mqc.png",
+      "analysis/trust4/{design}_{treatment}_vs_{control}_TRUST4-BCR_mqc.pdf",
+      "analysis/trust4/{design}_{treatment}_vs_{control}_TRUST4-TCR_mqc.pdf",
       "analysis/trust4/{design}_{treatment}_vs_{control}_TRUST4_Ig.txt"
    log:
       "logs/trust4/{design}_{treatment}_vs_{control}_trust4_plot.log"

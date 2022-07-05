@@ -34,6 +34,7 @@ expr <- expr[overlapped_sam]
 source("src/neoantigen/hla_oncoplot.R")
 hla_plot <- hla_oncoplot(hla, expr, meta, opt$design)
 
-png(file = paste(opt$outdir,"hla_frequency_plot.png",sep = ""),res = 300, width = 3200 + 60*nrow(hla), height = 3000)
+#png(file = paste(opt$outdir,"hla_frequency_plot.png",sep = ""),res = 300, width = 3200 + 60*nrow(hla), height = 3000)
+pdf(file = paste(opt$outdir,"hla_frequency_plot.png",sep = ""), width=3200 + 60*nrow(hla)/72, height=3000/72
 print(hla_plot)
 dev.off()
