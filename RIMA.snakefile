@@ -37,7 +37,7 @@ def addCondaPaths_Config(config):
     config['rseqc_root']= "%s/envs/rseqc_env" % conda_root
     config['vep_root']= "%s/envs/vep_env" % conda_root
     config['prada_root']= "%s/envs/prada_env" % conda_root
-
+    config['arcasHLA_root'] = "%s/envs/arcasHLA_env" % conda_root
 
 def addExecPaths(config):
     conda_root = subprocess.check_output('conda info --root',shell=True).decode('utf-8').strip()

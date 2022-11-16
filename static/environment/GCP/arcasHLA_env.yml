@@ -1,0 +1,25 @@
+name: arcasHLA_env
+channels:
+  - bioconda
+  - imperial-college-research-computing
+#- conda-forge
+  - conda-forge
+  - anaconda
+  - defaults
+dependencies:
+  - bedtools=2.27.1=hd03093a_6
+  - kallisto=0.46.0=hb6a4e580
+  - python=3.6.10=h0371630_0
+  - samtools=1.9=h10a08f8_12
+  - numpy=1.19.1=pV36hbc911f0g
+  - pandas=1.1.1=py36he6710b0_0
+   #- pip=20.2.2=V36_0
+  - pip=22.1.2=py39h06a4308_0  
+  - pigz=2.4=h8499404_0
+  - scipy=1.5.0=py36h0b6359f0
+  - git-lfs
+  - coreutils
+
+  
+      
+
