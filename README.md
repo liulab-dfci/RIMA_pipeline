@@ -7,6 +7,8 @@ if you want to run cibersort in immune infitration module, you should download t
 Make sure you should download **CIBERSORT.R** into RIMA_pipeline/src/immune_infiltration/ folder;\
 **LM22.txt** shoube be in RIMA_pipeline/static/cibersort folder.
 
+Gene Set Enrichment Analysis (GSEA) function is currently unavaible due to conda environment issue.
+
 ## Support 
 Create a [GitHub issue](https://github.com/liulab-dfci/RIMA_pipeline/issues).
 
