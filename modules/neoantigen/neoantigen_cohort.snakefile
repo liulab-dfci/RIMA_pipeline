@@ -26,8 +26,10 @@ rule arcasHLA_merge:
     params:
         arcasHLA_path=config["arcasHLA_path"],
         outpath = "analysis/neoantigen/merge",
+        path="set +eu;source activate %s" % config['aracasHLA_root'],
+    conda: "../envs/rseqc_env.yml"
     shell:
-        """{params.arcasHLA_path}/arcasHLA merge -i {params.outpath} -o {params.outpath}"""
+        """{params.path}; {params.arcasHLA_path}/arcasHLA merge -i {params.outpath} -o {params.outpath}"""
 
 rule arcasHLA_convert:
     input:
@@ -36,8 +38,10 @@ rule arcasHLA_convert:
         pgroup = "analysis/neoantigen/merge/genotypes.p-group.tsv",
     params:
         arcasHLA_path=config["arcasHLA_path"],
+         path="set +eu;source activate %s" % config['aracasHLA_root'],
+    conda: "../envs/rseqc_env.yml"
     shell:
-        """{params.arcasHLA_path}/arcasHLA convert -r p-group {input.res} -o {output.pgroup}"""
+        """{params.path}; {params.arcasHLA_path}/arcasHLA convert -r p-group {input.res} -o {output.pgroup}"""
         
 rule arcasHLA_plot:
     input:
