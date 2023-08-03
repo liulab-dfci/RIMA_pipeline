@@ -38,6 +38,5 @@ dependencies:
     - mhcnuggets==2.3.3
     - mhctools==1.8.1
     - progressbar33==2.4
-    - pvactools==1.5.13
     - scikit-learn==0.24.0
     - tidepy==1.3.6
