@@ -83,7 +83,7 @@ Transcript <- function(files,samples,tx2gene,Type,batch){
   
   print(head(txi$counts))
   exprsn <- txi$counts
-  
+  target_sample_id <- colnames(txi$counts)  
   tmp_matrix <- txi$abundance
 
   
@@ -92,7 +92,8 @@ Transcript <- function(files,samples,tx2gene,Type,batch){
      
     colData <- samples[,c(batch ,Condition)]
     colnames(colData) <- c("Batch","Condition")
-       
+    colData <- colData[target_sample_id,] 
+  
     ddsTxi <- DESeqDataSetFromTximport(txi,
                                        colData = colData,
                                        design = ~ Batch + Condition)
@@ -106,6 +107,8 @@ Transcript <- function(files,samples,tx2gene,Type,batch){
     
     colData <- cbind(rownames(samples),samples[,Condition])
     colnames(colData) <- c('sample','Condition')
+    rownames(colData) <- rownames(samples)
+    colData <- colData[target_sample_id,]
     print(colData)
     
     ddsTxi <- DESeqDataSetFromTximport(txi,
