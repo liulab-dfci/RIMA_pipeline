@@ -11,9 +11,9 @@ option_list = list(
               help="signature reference", metavar="character"),
   make_option(c("-o", "--output"), type="character", default=NULL,
               help="output directory", metavar="character"),
-  make_option(c("-treat", "--treatment"), type="character", default=NULL,
+  make_option(c("-t", "--treatment"), type="character", default=NULL,
               help="meta info", metavar="character"),
-  make_option(c("-ctrl", "--control"), type="character", default=NULL,
+  make_option(c("-n", "--control"), type="character", default=NULL,
               help="meta info", metavar="character"),
   make_option(c("-c", "--condition"), type="character", default=NULL,
               help="meta info", metavar="character")
@@ -56,7 +56,8 @@ if(nrow(up) >= 10 && nrow(down) >= 10){
 
 
 ###volcano plot
-png(opt$output, res = 300, width = 1900, height = 1000)
+#png(opt$output, res = 300, width = 1900, height = 1000)
+pdf(opt$output, width = 6, height = 4)
 
 ggplot(dif.data, aes(x = log2FoldChange, y = logP)) +
   geom_point(aes(color = factor(color)), size = 1.55, alpha = 0.8, na.rm = TRUE) + # add gene points

@@ -13,8 +13,8 @@ control = config["Control"]
 
 data_type = config["assembly"]
 
-def DiffInput(data_type):
-        return expand("analysis/salmon/{sample}/{sample}.quant.sf",sample=config["samples"])
+#def DiffInput(data_type):
+#        return expand("analysis/salmon/{sample}/{sample}.quant.sf",sample=config["samples"])
 
 def DiffReference(data_type):
     if data_type == "mm10":
@@ -39,15 +39,12 @@ def diffexpr_targets(wildcards):
     ls.append("analysis/gsea/%s_%s_vs_%s_BP_terms.txt" % (design,treatment,control))
     ls.append("analysis/gsea/%s_%s_vs_%s_MF_terms.txt" % (design,treatment,control))
     ls.append("analysis/gsea/%s_%s_vs_%s_CC_terms.txt" % (design,treatment,control))
-    ls.append("analysis/gsea/%s_%s_vs_%s_KEGG_terms.txt" % (design,treatment,control))
-    #ls.append("analysis/gsea/%s_%s_vs_%s_HALLMARK_terms.txt" % (design,treatment,control))
+#    ls.append("analysis/gsea/%s_%s_vs_%s_KEGG_terms.txt" % (design,treatment,control))
     ls.append("analysis/gsea/%s_%s_vs_%s_BP_terms.png" % (design,treatment,control))
     ls.append("analysis/gsea/%s_%s_vs_%s_MF_terms.png" % (design,treatment,control))
     ls.append("analysis/gsea/%s_%s_vs_%s_CC_terms.png" % (design,treatment,control))
-    ls.append("analysis/gsea/%s_%s_vs_%s_KEGG_terms.png" % (design,treatment,control))
-    #ls.append("analysis/gsea/%s_%s_vs_%s_HALLMARK_terms.png" % (design,treatment,control))
-    ls.append("analysis/deseq2/%s_%s_vs_%s_ssgsea.txt" % (design,treatment,control))
-    ls.append("analysis/deseq2/%s_%s_vs_%s_ssgsea.png" % (design,treatment,control))
+#    ls.append("analysis/gsea/%s_%s_vs_%s_KEGG_terms.png" % (design,treatment,control))
+#    ls.append("analysis/ssgsea/%s_%s_vs_%s_kegg_ssgsea.txt" % (design,treatment,control))
 
     return ls
 
@@ -122,13 +119,11 @@ rule gsea_plot:
         go_bp = "analysis/gsea/{design}_{treatment}_vs_{control}_BP_terms.txt",
         go_mf = "analysis/gsea/{design}_{treatment}_vs_{control}_MF_terms.txt",
         go_cc = "analysis/gsea/{design}_{treatment}_vs_{control}_CC_terms.txt",
-        kegg = "analysis/gsea/{design}_{treatment}_vs_{control}_KEGG_terms.txt",
-    #    hallmark = "analysis/gsea/{design}_{treatment}_vs_{control}_HALLMARK_terms.txt",
+       # kegg = "analysis/gsea/{design}_{treatment}_vs_{control}_KEGG_terms.txt",
         go_bp_plot = "analysis/gsea/{design}_{treatment}_vs_{control}_BP_terms.png",
         go_mf_plot = "analysis/gsea/{design}_{treatment}_vs_{control}_MF_terms.png",
-        go_cc_plot = "analysis/gsea/{design}_{treatment}_vs_{control}_CC_terms.png",
-        kegg_plot = "analysis/gsea/{design}_{treatment}_vs_{control}_KEGG_terms.png",
-    #    hallmark_plot = "analysis/gsea/{design}_{treatment}_vs_{control}_HALLMARK_terms.png"
+        go_cc_plot = "analysis/gsea/{design}_{treatment}_vs_{control}_CC_terms.png"
+ #       kegg_plot = "analysis/gsea/{design}_{treatment}_vs_{control}_KEGG_terms.png",
     log:
         "logs/gsea/{design}_{treatment}_vs_{control}.gsea.log"
     params:
@@ -139,8 +134,6 @@ rule gsea_plot:
         treatment = treatment,
         control = control,
         condition = design,
-        gsea_species = config['assembly'],
-        hallmark = "static/deseq2/h.all.v7.4.entrez.gmt.txt",
         path = "set +eu;source activate %s" % config['stat_root']
     message:
         "Running GSEA on the samples"
@@ -149,38 +142,37 @@ rule gsea_plot:
     conda: "../envs/stat_perl_r.yml"
     shell:
         "{params.path}; Rscript src/differentialexpr/gsea.R --deseq2_mat {input} \
-        --pcut {params.gsea_pcut} --minsize {params.gsea_minsize} --npermutation {params.gsea_permutation} --species {params.gsea_species}\
+        --pcut {params.gsea_pcut} --minsize {params.gsea_minsize} --npermutation {params.gsea_permutation} \
         --outdir {params.out_path} --treatment {params.treatment} --control {params.control} \
-        --condition {params.condition} --hallmark {params.hallmark}"
+        --condition {params.condition}"
 
 
 
-rule ssgsea:
-    input:
-        "analysis/deseq2/{design}_{treatment}_vs_{control}_TPMs.txt"
-    output:
-        score = "analysis/deseq2/{design}_{treatment}_vs_{control}_ssgsea.txt",
-        ssgsea_plot = "analysis/deseq2/{design}_{treatment}_vs_{control}_ssgsea.png"
-    log:
-        "logs/ssgsea/{design}_{treatment}_vs_{control}_ssgsea.log"
-    params:
-        gmt = ssgseaRef(data_type),
-        condition = design,
-        treatment = treatment,
-        control = control,
-        meta = config['metasheet'],
-        top_n = 20,
-        outpath = "analysis/deseq2/",
-        path = "set +eu;source activate %s" % config['stat_root']
-    message:
-        "Running single sample gene set enrichment analysis"
-    benchmark:
-        "benchmarks/ssgsea/{design}_{treatment}_vs_{control}_ssgsea.benchmark"
-    conda: "../envs/stat_perl_r.yml"
-    shell:
-        "{params.path}; Rscript src/differentialexpr/ssgsea.R -e {input} -f {params.gmt} \
-        --treatment {params.treatment} --control {params.control} --condition {params.condition}\
-        -m {params.meta} -n {params.top_n} -o {params.outpath}"
+#rule ssgsea:
+#    input:
+#        "analysis/deseq2/{design}_{treatment}_vs_{control}_TPMs.txt"
+#    output:
+#        score = "analysis/ssgsea/{design}_{treatment}_vs_{control}_kegg_ssgsea.txt"
+#    log:
+#        "logs/ssgsea/{design}_{treatment}_vs_{control}_ssgsea.log"
+#    params:
+#        gmt = ssgseaRef(data_type),
+#        condition = design,
+#        treatment = treatment,
+#        control = control,
+#        meta = config['metasheet'],
+#        top_n = 20,
+#        outpath = "analysis/ssgsea/",
+#        path = "set +eu;source activate %s" % config['stat_root']
+#    message:
+#        "Running single sample gene set enrichment analysis"
+#    benchmark:
+#        "benchmarks/ssgsea/{design}_{treatment}_vs_{control}_ssgsea.benchmark"
+#    conda: "../envs/stat_perl_r.yml"
+#    shell:
+#        "{params.path}; Rscript src/differentialexpr/ssgsea.R -e {input} -f {params.gmt} \
+#        --treatment {params.treatment} --control {params.control} --condition {params.condition}\
+#        -m {params.meta} -n {params.top_n} -o {params.outpath}"
 
 
 

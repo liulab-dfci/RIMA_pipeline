@@ -37,16 +37,16 @@ def preprocess_individual_targets(wildcards):
         ls.append("analysis/star/%s/%s.sorted.bam.stat.txt" % (sample, sample))
         ls.append("analysis/star/%s/%s.sorted.bam.bai" % (sample, sample))
         ls.append("analysis/salmon/%s/%s.quant.sf" % (sample, sample))
-        ls.append("analysis/star/%s/%s.stat_tmp.txt" % (sample, sample))
-        ls.append("analysis/star/%s/%s_downsampling.bam" % (sample, sample))
-        ls.append("analysis/star/%s/%s_downsampling.bam.bai" % (sample, sample))
-        ls.append("analysis/star/%s/%s_downsampling_housekeeping.bam" % (sample, sample))
-        ls.append("analysis/star/%s/%s_downsampling_housekeeping.bam.bai" % (sample, sample))
-        ls.append("analysis/rseqc/read_distrib/%s/%s.txt" % (sample, sample))
-        ls.append("analysis/rseqc/gene_body_cvg/%s/%s.geneBodyCoverage.r" % (sample, sample))
-        ls.append("analysis/rseqc/junction_saturation/%s/%s.junctionSaturation_plot.pdf" % (sample, sample))
-        ls.append("analysis/rseqc/tin_score/%s/%s.summary.txt" % (sample, sample))
-        ls.append("analysis/rseqc/tin_score/%s/%s.tin_score.txt" % (sample, sample))
+#        ls.append("analysis/star/%s/%s.stat_tmp.txt" % (sample, sample))
+#        ls.append("analysis/star/%s/%s_downsampling.bam" % (sample, sample))
+#        ls.append("analysis/star/%s/%s_downsampling.bam.bai" % (sample, sample))
+#        ls.append("analysis/star/%s/%s_downsampling_housekeeping.bam" % (sample, sample))
+#        ls.append("analysis/star/%s/%s_downsampling_housekeeping.bam.bai" % (sample, sample))
+#        ls.append("analysis/rseqc/read_distrib/%s/%s.txt" % (sample, sample))
+#        ls.append("analysis/rseqc/gene_body_cvg/%s/%s.geneBodyCoverage.r" % (sample, sample))
+#        ls.append("analysis/rseqc/junction_saturation/%s/%s.junctionSaturation_plot.pdf" % (sample, sample))
+#        ls.append("analysis/rseqc/tin_score/%s/%s.summary.txt" % (sample, sample))
+#        ls.append("analysis/rseqc/tin_score/%s/%s.tin_score.txt" % (sample, sample))
     return ls
 
 def getFastq(wildcards):
@@ -158,152 +158,152 @@ rule align_bam_stat:
 
 #---------------------RSeQC rules--------------------------#
 
-rule Size_downsampling:
-    input:
-        "analysis/star/{sample}/{sample}.sorted.bam.stat.txt"
-    output:
-        "analysis/star/{sample}/{sample}.stat_tmp.txt"
-    shell:
-        """chmod +x src/preprocess/ds_check_size.sh && """
-        """src/preprocess/ds_check_size.sh {input} {output} """
+#rule Size_downsampling:
+#    input:
+#        "analysis/star/{sample}/{sample}.sorted.bam.stat.txt"
+#    output:
+#        "analysis/star/{sample}/{sample}.stat_tmp.txt"
+#    shell:
+#        """chmod +x src/preprocess/ds_check_size.sh && """
+#        """src/preprocess/ds_check_size.sh {input} {output} """
 
-rule bam_downsampling:
-    input:
-        bam = "analysis/star/{sample}/{sample}.sorted.bam",
-        stat = "analysis/star/{sample}/{sample}.sorted.bam.stat.txt",
-        stat_tmp = "analysis/star/{sample}/{sample}.stat_tmp.txt"
-    output:
-        Downsampling_bam = "analysis/star/{sample}/{sample}_downsampling.bam",
-        Downsampling_bai = "analysis/star/{sample}/{sample}_downsampling.bam.bai"
-    message:
-        "Running Downsampling on {wildcards.sample}"
-    log:
-        "logs/star/{sample}.downsampling.log"
-    benchmark:
-        "benchmarks/star/{sample}.downsampling.benchmark"
-    params:
-        prefix = "analysis/star/{sample}",
-        path="set +eu;source activate %s" % config['rseqc_root'],
-    conda: "../envs/rseqc_env.yml"
-    shell:
-        """size=$(python -c "print(open('{input.stat_tmp}','r').readlines()[0].replace('\\n',''))") && """
-        """chmod +x src/preprocess/downsampling.sh && """
-        """src/preprocess/downsampling.sh {input.bam} $size && """
-        """mv {input.bam}*downsampling.bam {output.Downsampling_bam} && """
-        """samtools index {output.Downsampling_bam} > {output.Downsampling_bai}"""
+#rule bam_downsampling:
+#    input:
+#        bam = "analysis/star/{sample}/{sample}.sorted.bam",
+#        stat = "analysis/star/{sample}/{sample}.sorted.bam.stat.txt",
+#        stat_tmp = "analysis/star/{sample}/{sample}.stat_tmp.txt"
+#    output:
+#        Downsampling_bam = "analysis/star/{sample}/{sample}_downsampling.bam",
+#        Downsampling_bai = "analysis/star/{sample}/{sample}_downsampling.bam.bai"
+#    message:
+#        "Running Downsampling on {wildcards.sample}"
+#    log:
+#        "logs/star/{sample}.downsampling.log"
+#    benchmark:
+#        "benchmarks/star/{sample}.downsampling.benchmark"
+#    params:
+#        prefix = "analysis/star/{sample}",
+#        path="set +eu;source activate %s" % config['rseqc_root'],
+#    conda: "../envs/rseqc_env.yml"
+#    shell:
+#        """size=$(python -c "print(open('{input.stat_tmp}','r').readlines()[0].replace('\\n',''))") && """
+#        """chmod +x src/preprocess/downsampling.sh && """
+#        """src/preprocess/downsampling.sh {input.bam} $size && """
+#        """mv {input.bam}*downsampling.bam {output.Downsampling_bam} && """
+#        """samtools index {output.Downsampling_bam} > {output.Downsampling_bai}"""
 
-rule Downsampling_HouseKeeping:
-    input:
-        bam = "analysis/star/{sample}/{sample}_downsampling.bam",
-        stat_tmp = "analysis/star/{sample}/{sample}.stat_tmp.txt"
-    output:
-        downsampling_hp_bam = "analysis/star/{sample}/{sample}_downsampling_housekeeping.bam",
-        Downsampling_hp_bai = "analysis/star/{sample}/{sample}_downsampling_housekeeping.bam.bai"
-    message:
-        "Running Downsampling on house keeping genes"
-    params:
-        housekeeping_bed = config["housekeeping_bed_path"]
-    log:
-        "logs/rseqc/{sample}.downsampling_housekeeping.log"
-    benchmark:
-        "benchmarks/rseqc/{sample}.downsampling_housekeeping.benchmark"
-    shell:
-        "bedtools intersect -a {input.bam} -b {params.housekeeping_bed} > {output.downsampling_hp_bam} && "
-        "samtools index {output.downsampling_hp_bam} > {output.Downsampling_hp_bai}"
+#rule Downsampling_HouseKeeping:
+#    input:
+#        bam = "analysis/star/{sample}/{sample}_downsampling.bam",
+#        stat_tmp = "analysis/star/{sample}/{sample}.stat_tmp.txt"
+#    output:
+#        downsampling_hp_bam = "analysis/star/{sample}/{sample}_downsampling_housekeeping.bam",
+#        Downsampling_hp_bai = "analysis/star/{sample}/{sample}_downsampling_housekeeping.bam.bai"
+#    message:
+#        "Running Downsampling on house keeping genes"
+#    params:
+#        housekeeping_bed = config["housekeeping_bed_path"]
+#    log:
+#        "logs/rseqc/{sample}.downsampling_housekeeping.log"
+#    benchmark:
+#        "benchmarks/rseqc/{sample}.downsampling_housekeeping.benchmark"
+#    shell:
+#        "bedtools intersect -a {input.bam} -b {params.housekeeping_bed} > {output.downsampling_hp_bam} && "
+#        "samtools index {output.downsampling_hp_bam} > {output.Downsampling_hp_bai}"
 
      
-rule tin_score:
-    input:
-        bam = getHousekeepingBam(config["rseqc_ref"]),
-        bai = getHousekeepingBai(config["rseqc_ref"])
-    output:
-        summary = "analysis/rseqc/tin_score/{sample}/{sample}.summary.txt",
-        score = "analysis/rseqc/tin_score/{sample}/{sample}.tin_score.txt"
-    message:
-        "Running RseQC TIN score on {wildcards.sample}"
-    log:
-        "logs/rseqc/tin_score/{sample}.tin_score.log"
-    benchmark:
-        "benchmarks/rseqc/tin_score/{sample}.tin_score.benchmark"
-    params:
-        bed_ref = rseqc_ref,
-        prefix = "./{sample}",
-        min_coverage = "10" ,
-        sample_size = "100" ,
-        path="set +eu;source activate %s" % config['rseqc_root'],
-    conda: "../envs/rseqc_env.yml"
-    shell:
-        "{params.path}; tin.py"
-        " --input={input.bam}"
-        " --refgene={params.bed_ref}"
-        " --minCov={params.min_coverage}"
-        " --sample-size={params.sample_size} "
-        "&& mv {params.prefix}*summary.txt {output.summary} "
-        "&& mv {params.prefix}*tin.xls {output.score}"
+#rule tin_score:
+#    input:
+#        bam = getHousekeepingBam(config["rseqc_ref"]),
+#        bai = getHousekeepingBai(config["rseqc_ref"])
+#    output:
+#        summary = "analysis/rseqc/tin_score/{sample}/{sample}.summary.txt",
+#        score = "analysis/rseqc/tin_score/{sample}/{sample}.tin_score.txt"
+#    message:
+#        "Running RseQC TIN score on {wildcards.sample}"
+#    log:
+#        "logs/rseqc/tin_score/{sample}.tin_score.log"
+#    benchmark:
+#        "benchmarks/rseqc/tin_score/{sample}.tin_score.benchmark"
+#    params:
+#        bed_ref = rseqc_ref,
+#        prefix = "./{sample}",
+#        min_coverage = "10" ,
+#        sample_size = "100" ,
+#        path="set +eu;source activate %s" % config['rseqc_root'],
+#    conda: "../envs/rseqc_env.yml"
+#    shell:
+#        "{params.path}; tin.py"
+#        " --input={input.bam}"
+#        " --refgene={params.bed_ref}"
+#        " --minCov={params.min_coverage}"
+#        " --sample-size={params.sample_size} "
+#        "&& mv {params.prefix}*summary.txt {output.summary} "
+#        "&& mv {params.prefix}*tin.xls {output.score}"
 
 
-rule read_distrib_qc:
-    input:
-        bam = getHousekeepingBam(config["rseqc_ref"]),
-        bai = getHousekeepingBai(config["rseqc_ref"])
-    output:
-        "analysis/rseqc/read_distrib/{sample}/{sample}.txt"
-    message:
-        "Running RseQC read distribution on {wildcards.sample}"
-    log:
-        "logs/rseqc/read_distrib/{sample}.read_distrib_qc_matrix.log"
-    benchmark:
-        "benchmarks/rseqc/read_distrib/{sample}.read_distrib_qc_matrix.benchmark"
-    params:
-        bed_ref = rseqc_ref,
-        path="set +eu;source activate %s" % config['rseqc_root'],
-    conda: "../envs/rseqc_env.yml"
-    shell:
-        "{params.path}; read_distribution.py"
-        " --input-file={input.bam}"
-        " --refgene={params.bed_ref} 1>{output}"
+#rule read_distrib_qc:
+#    input:
+#        bam = getHousekeepingBam(config["rseqc_ref"]),
+#        bai = getHousekeepingBai(config["rseqc_ref"])
+#    output:
+#        "analysis/rseqc/read_distrib/{sample}/{sample}.txt"
+#    message:
+#        "Running RseQC read distribution on {wildcards.sample}"
+#    log:
+#        "logs/rseqc/read_distrib/{sample}.read_distrib_qc_matrix.log"
+#    benchmark:
+#        "benchmarks/rseqc/read_distrib/{sample}.read_distrib_qc_matrix.benchmark"
+#    params:
+#        bed_ref = rseqc_ref,
+#        path="set +eu;source activate %s" % config['rseqc_root'],
+#    conda: "../envs/rseqc_env.yml"
+#    shell:
+#        "{params.path}; read_distribution.py"
+#        " --input-file={input.bam}"
+#        " --refgene={params.bed_ref} 1>{output}"
 
 
-rule gene_body_cvg_qc:
-    input:
-        bam = getHousekeepingBam(config["rseqc_ref"]),
-        bai = getHousekeepingBai(config["rseqc_ref"])
-    output:
-        "analysis/rseqc/gene_body_cvg/{sample}/{sample}.geneBodyCoverage.r"
-    threads: _preprocess_threads
-    message:
-        "Creating gene body coverage curves"
-    log:
-        "logs/rseqc/gene_body_cvg/{sample}.gene_body_cvg_qc.log"
-    benchmark:
-        "benchmarks/rseqc/gene_body_cvg/{sample}.gene_body_cvg_qc.benchmark"
-    params:
-        bed_ref = rseqc_ref,
-        prefix = "analysis/rseqc/gene_body_cvg/{sample}/{sample}",
-        path="set +eu;source activate %s" % config['rseqc_root'],
-    conda: "../envs/rseqc_env.yml"
-    shell:
-        "{params.path}; geneBody_coverage.py -i {input.bam} -r {params.bed_ref}"
-        " -f png -o {params.prefix}"
+#rule gene_body_cvg_qc:
+#    input:
+#        bam = getHousekeepingBam(config["rseqc_ref"]),
+#        bai = getHousekeepingBai(config["rseqc_ref"])
+#    output:
+#        "analysis/rseqc/gene_body_cvg/{sample}/{sample}.geneBodyCoverage.r"
+#    threads: _preprocess_threads
+#    message:
+#        "Creating gene body coverage curves"
+#    log:
+#        "logs/rseqc/gene_body_cvg/{sample}.gene_body_cvg_qc.log"
+#    benchmark:
+#        "benchmarks/rseqc/gene_body_cvg/{sample}.gene_body_cvg_qc.benchmark"
+#    params:
+#        bed_ref = rseqc_ref,
+#        prefix = "analysis/rseqc/gene_body_cvg/{sample}/{sample}",
+#        path="set +eu;source activate %s" % config['rseqc_root'],
+#    conda: "../envs/rseqc_env.yml"
+#    shell:
+#        "{params.path}; geneBody_coverage.py -i {input.bam} -r {params.bed_ref}"
+#        " -f png -o {params.prefix}"
 
-rule junction_saturation:
-    input:
-        bam = getHousekeepingBam(config["rseqc_ref"]),
-        bai = getHousekeepingBai(config["rseqc_ref"])
-    output:
-        "analysis/rseqc/junction_saturation/{sample}/{sample}.junctionSaturation_plot.pdf"
-    message:
-        "Determining junction saturation for {wildcards.sample}"
-    benchmark:
-        "benchmarks/rseqc/junction_saturation/{sample}.junction_saturation.benchmark"
-    log:
-        "logs/rseqc/junction_saturation/{sample}.junction_saturation.log"
-    params:
-        prefix = "analysis/rseqc/junction_saturation/{sample}/{sample}",
-        path="set +eu;source activate %s" % config['rseqc_root'],
-    conda: "../envs/rseqc_env.yml"
-    shell:
-        "{params.path}; junction_saturation.py -i {input.bam} -r {config[bed_path]} -o {params.prefix}"
+#rule junction_saturation:
+#    input:
+#        bam = getHousekeepingBam(config["rseqc_ref"]),
+#        bai = getHousekeepingBai(config["rseqc_ref"])
+#    output:
+#        "analysis/rseqc/junction_saturation/{sample}/{sample}.junctionSaturation_plot.pdf"
+#    message:
+#        "Determining junction saturation for {wildcards.sample}"
+#    benchmark:
+#        "benchmarks/rseqc/junction_saturation/{sample}.junction_saturation.benchmark"
+#    log:
+#        "logs/rseqc/junction_saturation/{sample}.junction_saturation.log"
+#    params:
+#        prefix = "analysis/rseqc/junction_saturation/{sample}/{sample}",
+#        path="set +eu;source activate %s" % config['rseqc_root'],
+#    conda: "../envs/rseqc_env.yml"
+#    shell:
+#        "{params.path}; junction_saturation.py -i {input.bam} -r {config[bed_path]} -o {params.prefix}"
 
 
 #----------------------Salmon rules----------------------#

@@ -1,10 +1,6 @@
 suppressMessages(library(sva))
 suppressMessages(library(limma))
 suppressMessages(library(optparse))
-suppressMessages(library(ggplot2))
-suppressMessages(library(ggfortify))
-suppressMessages(library(RColorBrewer))
-suppressMessages(library(ggpubr))
 
 
 # make option list and parse command line
@@ -22,23 +18,6 @@ option_list <- list(
   make_option(c("-a","--output_after",type="character",
               help="Output files [Required]"))
 )
-
-pca_plot <- function(exprTable, annot,title,Batch) {
-  batch_n <- length(unique(as.character(annot[colnames(exprTable),"Batch"])))
-  print(paste("there are ", batch_n, " batches in your data"))
-  df <- cbind.data.frame(t(exprTable),batch = as.character(annot[colnames(exprTable),"Batch"]))
-  pca_plot <- autoplot(prcomp(t(exprTable)), data = df, col = Batch, size = 1, frame = TRUE, frame.type = 'norm')+
-    labs(title=title)+
-    scale_color_manual(values = brewer.pal(name = "Set1", n = 9)[1:batch_n])+
-    theme_bw()+
-    theme(plot.title = element_text(hjust=0.5,vjust = 0.5, margin = margin(l=100,r=50,t=10,b=10),face = "bold", colour = "black"),
-          axis.text.x=element_blank(),
-          axis.text.y=element_text(size=12,face = "bold",hjust=1),
-          axis.title.x = element_text(size = 12, face = "bold"),
-          axis.title.y = element_text(size = 12, face = "bold"))
-  return(pca_plot)
-}
-
 
 opt_parser <- OptionParser(option_list=option_list);
 opts <- parse_args(opt_parser);
@@ -106,14 +85,5 @@ if(opts$covariates == "False"){
       })
       expr.limma = rbind(expr.limma,exprZero)
       writeDF(ssgsvaFormat(expr.limma),opts$output_after)
-      
-      #png(file = paste(opts$out_before,'.png',sep=''), res = 300, height = 1200, width = 1500)
-      #pca_plot(expr.dat, annot = samples, title = "PCA plot Before Batch Removal",Batch=Batch)
-      #dev.off()
-     
-      #png(file = paste(opt$out_after,'.png',sep=''), res = 300, height = 1200, width = 1500)
-      #pca_plot(expr.limma, annot = samples, title = "PCA plot Before Batch Removal",Batch=Batch)
-      #dev.off()
-
     }
 

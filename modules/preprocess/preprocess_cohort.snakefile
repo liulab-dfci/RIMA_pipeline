@@ -8,7 +8,7 @@ import pandas as pd
 
 design = config["design"]
 covariates = config["batch"]
-data_type = config["assembly"]
+
 
 def merge_sep_inputs(inputs):
     inputs_format = ' -f '.join(str(i) for i in list(inputs)[0])
@@ -18,27 +18,21 @@ def merge_sal_inputs(inputs):
     inputs_format = ','.join(str(i) for i in list(inputs)[0])
     return inputs_format
 
-def tx2gene_inputs(data_type):
-    if data_type == "mm10":
-        reference = "static/deseq2/tx2gene_mouse.csv"
-    if data_type == "hg38":
-        reference = "static/deseq2/tx2gene.csv"
-    return reference
 
 def preprocess_cohort_targets(wildcards):
     ls = []
     ls.append("analysis/star/STAR_Align_Report.csv" )
-    ls.append("analysis/rseqc/gene_body_cvg/geneBodyCoverage.r")
-    ls.append("analysis/rseqc/gene_body_cvg/geneBodyCoverage.curves.png")
-    ls.append("analysis/rseqc/tin_score/tin_score_summary.txt")
-    ls.append("analysis/rseqc/read_distrib/read_distrib.matrix.tab")
+    #ls.append("analysis/rseqc/gene_body_cvg/geneBodyCoverage.r")
+    #ls.append("analysis/rseqc/gene_body_cvg/geneBodyCoverage.curves.pdf")
+    #ls.append("analysis/rseqc/tin_score/tin_score_summary.txt")
+    #ls.append("analysis/rseqc/read_distrib/read_distrib.matrix.tab")
     
     ls.append("analysis/salmon/tpm.genesymbol.csv")
     ls.append("analysis/batchremoval/%s_%s_tpm.genesymbol.csv" % (design,covariates))
     ls.append("analysis/batchremoval/%s_%s_tpm.genesymbol.batchremoved.csv" % (design,covariates))
     
-    ls.append("analysis/batchremoval/%s_%s_pca_plot_before.png" % (design,covariates))
-    ls.append("analysis/batchremoval/%s_%s_pca_plot_after.png" % (design,covariates))
+    ls.append("analysis/batchremoval/%s_%s_pca_plot_before.pdf" % (design,covariates))
+    ls.append("analysis/batchremoval/%s_%s_pca_plot_after.pdf" % (design,covariates))
     return ls 
 
 rule preprocess_cohort_all:
@@ -63,57 +57,57 @@ rule STAR_matrix:
       """{params.path}; perl src/preprocess/STAR_reports.pl -f {params.log_files} 1>{output.csv} """
 
 #--------------------------RSeQC cohort----------------#
-rule tin_summary:
-    input:
-      expand("analysis/rseqc/tin_score/{sample}/{sample}.summary.txt", sample=config['samples'])
-    output:
-      score = "analysis/rseqc/tin_score/tin_score_summary.txt",
-    message:
-      "plotting TIN score summary"
-    log:
-      "logs/rseqc/tin_score/tin_score_summary.log"
-    benchmark:
-      "benchmarks/rseqc/tin_score/tin_score_summary.benchmark"
-    params:
-      path="set +eu;source activate %s" % config['stat_root'],
-    conda: "../envs/stat_perl_r.yml"
-    shell:
-      """cat {input} | sed '1 !{{/Bam_file/d;}}' >{output.score}"""
+#rule tin_summary:
+#    input:
+#      expand("analysis/rseqc/tin_score/{sample}/{sample}.summary.txt", sample=config['samples'])
+#    output:
+#      score = "analysis/rseqc/tin_score/tin_score_summary.txt",
+#    message:
+#      "plotting TIN score summary"
+#    log:
+#      "logs/rseqc/tin_score/tin_score_summary.log"
+#    benchmark:
+#      "benchmarks/rseqc/tin_score/tin_score_summary.benchmark"
+#    params:
+#      path="set +eu;source activate %s" % config['stat_root'],
+#    conda: "../envs/stat_perl_r.yml"
+#    shell:
+#      """cat {input} | sed '1 !{{/Bam_file/d;}}' >{output.score}"""
 
-rule read_distrib_qc_matrix:
-    input:
-      read_distrib_files=expand( "analysis/rseqc/read_distrib/{sample}/{sample}.txt", sample = config['samples'])
-    output:
-      matrix="analysis/rseqc/read_distrib/read_distrib.matrix.tab",
-    message:
-      "Creating RseQC read distribution matrix"
-    log:
-      "logs/rseqc/read_distrib/read_distrib_qc_matrix.log"
-    benchmark:
-      "benchmarks/rseqc/read_distrib/read_distrib_qc_matrix.benchmark"
-    conda: "../envs/stat_perl_r.yml"
-    params:
-      file_list_with_flag = lambda wildcards, input: merge_sep_inputs({input.read_distrib_files}),
-      path="set +eu;source activate %s" % config['stat_root'],
-    shell:
-      "perl src/preprocess/read_distrib_matrix.pl -f {params.file_list_with_flag} 1>{output.matrix} "
+#rule read_distrib_qc_matrix:
+#    input:
+#      read_distrib_files=expand( "analysis/rseqc/read_distrib/{sample}/{sample}.txt", sample = config['samples'])
+#    output:
+#      matrix="analysis/rseqc/read_distrib/read_distrib.matrix.tab",
+#    message:
+#      "Creating RseQC read distribution matrix"
+#    log:
+#      "logs/rseqc/read_distrib/read_distrib_qc_matrix.log"
+#    benchmark:
+#      "benchmarks/rseqc/read_distrib/read_distrib_qc_matrix.benchmark"
+#    conda: "../envs/stat_perl_r.yml"
+#    params:
+#      file_list_with_flag = lambda wildcards, input: merge_sep_inputs({input.read_distrib_files}),
+#      path="set +eu;source activate %s" % config['stat_root'],
+#    shell:
+#      "perl src/preprocess/read_distrib_matrix.pl -f {params.file_list_with_flag} 1>{output.matrix} "
 
-rule plot_gene_body_cvg:
-    input:
-      samples_list=expand("analysis/rseqc/gene_body_cvg/{sample}/{sample}.geneBodyCoverage.r", sample=config["samples"] )
-    output:
-      rscript="analysis/rseqc/gene_body_cvg/geneBodyCoverage.r",
-      png_curves="analysis/rseqc/gene_body_cvg/geneBodyCoverage.curves.png"
-    message: "Plotting gene body coverage"
-    benchmark:
-      "benchmarks/rseqc/gene_body_cvg/plot_gene_body_cvg.benchmark"
-    params:
-      path="set +eu;source activate %s" % config['stat_root'],
-    conda: "../envs/stat_perl_r.yml"
-    shell:
-      "{params.path};perl src/preprocess/plot_gene_body_cvg.pl --rfile {output.rscript} --curves_png {output.png_curves}"
+#rule plot_gene_body_cvg:
+#    input:
+#      samples_list=expand("analysis/rseqc/gene_body_cvg/{sample}/{sample}.geneBodyCoverage.r", sample=config["samples"] )
+ #   output:
+ #     rscript="analysis/rseqc/gene_body_cvg/geneBodyCoverage.r",
+ #     png_curves="analysis/rseqc/gene_body_cvg/geneBodyCoverage.curves.pdf"
+ #   message: "Plotting gene body coverage"
+ #   benchmark:
+ #     "benchmarks/rseqc/gene_body_cvg/plot_gene_body_cvg.benchmark"
+ #   params:
+ #     path="set +eu;source activate %s" % config['stat_root'],
+ #   conda: "../envs/stat_perl_r.yml"
+ #   shell:
+  #    "{params.path};perl src/preprocess/plot_gene_body_cvg.pl --rfile {output.rscript} --curves_png {output.png_curves}"
       
-      " {input.samples_list} && {params.path}; Rscript {output.rscript}"
+   #   " {input.samples_list} && {params.path}; Rscript {output.rscript}"
       
 
 
@@ -128,7 +122,7 @@ rule salmon_matrix:
       "benchmarks/salmon/salmon_gene_matrix.benchmark"
     params:
       args = lambda wildcards, input: merge_sal_inputs({input.salmon_tpm_files}),
-      tx2gene = tx2gene_inputs(data_type),
+      tx2gene = 'static/deseq2/tx2gene_mouse.csv',
       outpath = 'analysis/salmon/',
       path = "set +eu;source activate %s" % config['stat_root']
       
@@ -168,11 +162,11 @@ rule batch_removal:
         
 rule pca_sample_clustering:
     input:
-        before_batch = "analysis/batchremoval/{design}_{covariates}_tpm.genesymbol.batchremoved.csv",
-        after_batch = "analysis/batchremoval/{design}_{covariates}_tpm.genesymbol.csv"
+        after_batch = "analysis/batchremoval/{design}_{covariates}_tpm.genesymbol.batchremoved.csv",
+        before_batch = "analysis/batchremoval/{design}_{covariates}_tpm.genesymbol.csv"
     output:
-        before_pca = "analysis/batchremoval/{design}_{covariates}_pca_plot_before.png",
-        after_pca = "analysis/batchremoval/{design}_{covariates}_pca_plot_after.png",
+        before_pca = "analysis/batchremoval/{design}_{covariates}_pca_plot_before.pdf",
+        after_pca = "analysis/batchremoval/{design}_{covariates}_pca_plot_after.pdf",
     message:
         "Running PCA for sample clustering"
     benchmark:

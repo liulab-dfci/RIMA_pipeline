@@ -35,14 +35,13 @@ tx2gene <- read.table(file = gene,sep = ",",header = TRUE)
 filelist <- strsplit(input, "\\,")[[1]]
 print(filelist)
 print(rownames(meta))
-filelist.samples <- sapply(rownames(meta), function(x) grep(x, filelist, value = TRUE))
+filelist.samples <- sapply(rownames(meta), function(x) grep(paste0("\\b",x,"\\b"), filelist, value = TRUE))
 filelist.samples <- filelist.samples[lapply(filelist.samples,length)>0]
 print(paste("There are ",length(filelist.samples), " samples to be merge ...", sep = ""))
 print(filelist.samples)
 
 txi <- tximport(filelist.samples, type=Type, tx2gene=tx2gene)
-#txi$length[txi$length == 0] <- 1
   
-print(head(txi$counts))
-exprsn <- txi$counts
+print(head(txi$abundance))
+exprsn <- txi$abundance
 write.table(exprsn,paste(opt$outpath,'tpm.genesymbol.csv',sep=""),quote = FALSE,sep = ",")

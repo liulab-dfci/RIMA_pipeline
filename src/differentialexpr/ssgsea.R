@@ -3,13 +3,10 @@
 #dependencies
 suppressMessages(library(GSEABase))
 suppressMessages(library(GSVA))
-suppressMessages(library(RColorBrewer))
-suppressMessages(library(circlize))
-suppressMessages(library(ComplexHeatmap))
+suppressMessages(library(ggplot2))
 suppressMessages(library(dplyr))
 suppressMessages(library(tidyr))
-suppressMessages(library(gplots))
-suppressMessages(library(textshape))
+suppressMessages(library(reshape2))
 suppressMessages(library(optparse))
 
 option_list = list(
@@ -33,7 +30,7 @@ option_list = list(
               
   make_option(c("-n", "--top"), type="character", default=NULL,
               help="top n terms for displaying", metavar="character"),
-              
+
   make_option(c("-o", "--outdir"), type="character", default=NULL,
               help="output directory", metavar="character")
 );
@@ -56,60 +53,76 @@ top_n <- opt$top
 geneSets <- getGmt(gmt_file)
 expr.dat <- read.table(exprsn, sep = "\t", header = TRUE, row.names = 1, check.names = FALSE)
 
-meta <- read.table(file = metadata, sep=',', header = TRUE, stringsAsFactors = FALSE, row.names = 1, check.names = FALSE)
+meta <- read.table(file = metadata, sep=',', header = TRUE, stringsAsFactors = FALSE, check.names = FALSE)
+
+#add tmp column if the metasheet only has two columns
+if(ncol(meta) == 1) {
+meta$tmp <- 1
+}
+
 samples <- subset(meta,meta[,Condition] == Treatment | meta[,Condition] == Control)
 samples <- samples[order(samples[[Condition]], decreasing = TRUE),]
 
 #####read in data
-ssgsea <- gsva(as.matrix(expr.dat), geneSets,
+print("Running the ssgsea using kegg pathways")
+ssgsea_kegg <- gsva(as.matrix(expr.dat), geneSets,
                method="ssgsea",
                ssgsea.norm=TRUE,
                verbose=TRUE)
             
+print("done")
+###look at the most different terms
+ssgsea_plot <- function(samples, Condition, Treatment, Control, ssgsea) {
+	
+  ssgsea <- as.data.frame(ssgsea)
+  head(ssgsea)
+  tx = samples[samples[,Condition] == Treatment,][1]
+  ssgsea_tx <- ssgsea[as.character(tx[[1]])]
 
-               
-###min-max normalization(make scale from -1 to 1)
-ssgsea.nor <- t(apply(ssgsea,1,function(x) (2*(x-min(x))/(max(x)-min(x)))-1))
+  cn <- samples[samples[,Condition] == Control,][1]
+  ssgsea_cn <- ssgsea[as.character(cn[[1]])]
 
+  ta <- NULL
+  for (t in rownames(ssgsea_tx)) {
+    wilcox <- wilcox.test(as.numeric(ssgsea_tx[t,]), as.numeric(ssgsea_cn[t,]), alternative = "two.sided")
+    tmp_ta <- data.frame(terms = t, pvalue = wilcox$p.value)
+    ta <- rbind(ta, tmp_ta)
+  }
 
-###get the difference between Clinic traits for each term
+  ta <- ta[order(ta$pvalue, decreasing = FALSE),]
+  ssgsea.sort <- ssgsea[ta$terms,]
+  ssgsea.sort <- ssgsea.sort[as.character(samples$SampleName)]
   
-annot.col <- data.frame(Clinic = samples[,Condition],row.names = rownames(samples))
-gr.samples <- lapply(unique(annot.col$Clinic), function(x) return(rownames(annot.col)[which(annot.col$Clinic == x)]))
-  
+  ssgsea.sort <- as.matrix(ssgsea.sort)
+  samples <- samples[,c("SampleName",Condition)]
+  rownames(samples) <- samples[[1]]
+  colnames(samples)[2] <- "Condition"
 
+  melted_cormat <- melt(ssgsea.sort[1:30,], na.rm = TRUE)
 
+  melted_cormat <- merge(melted_cormat, samples, by.x = 2, by.y = 1)
+  melted_cormat$Var1 <- factor(melted_cormat$Var1, levels = rev(unique(as.character(ta$terms[1:30]))))
 
-###calculate between-group variation for filtering terms with top variance
-SelTerm <- lapply(c(1:dim(ssgsea.nor)[1]), function(t) {
-    grandmean <- mean(ssgsea.nor[t,])
-    bgV <- lapply(c(1:length(gr.samples)), function(g){
-      bg <- ((ssgsea.nor[t,gr.samples[[g]]] - grandmean)^2)*length(gr.samples[[g]])
-      return (bg)
-    })
-    bgsum <- sum(unlist(bgV))
-    return (bgsum)
-  })
-  
-  
-names(SelTerm) <- rownames(ssgsea.nor)
-gr.diff.sort <- sort(unlist(SelTerm), decreasing = TRUE)
-ssgsea.sort <- ssgsea[names(gr.diff.sort),]
+  p <- ggplot(data = melted_cormat, aes(Var2, as.factor(Var1), fill = value))+
+    geom_tile(color = "white")+
+    scale_fill_gradient2(low = "blue", high = "red", mid = "white",
+                         midpoint = 0, limit = c(min(melted_cormat$value),max(melted_cormat$value)), space = "Lab",
+                         name="ssgsea score") +
+    theme_minimal()+
+    theme(axis.text.x = element_text(angle = 90, vjust = 1,
+                                     hjust = 1),
+          axis.text = element_text(size = 14),
+          legend.text = element_text(size = 14),
+          strip.text = element_text(size = 14)) + facet_grid(.~Condition, scales = "free_x", space='free') +
+    labs(x = "", y = "")
 
+  return(list(p,ssgsea.sort))
+}
 
+ssgsea_kegg <- ssgsea_plot(samples, Condition, Treatment, Control, ssgsea_kegg)
         
-write.table(ssgsea.sort, paste(Outdir,Condition, "_",Treatment,"_vs_",Control,"_ssgsea.txt", sep = ""), 
-            quote = FALSE, sep = "\t", row.names = FALSE)   
-
-png(paste(Outdir,Condition, "_",Treatment,"_vs_",Control,"_ssgsea.png", sep = ""),width = 1000, height = 880)
-col_fun = colorRamp2(c(-1,0,1), c("blue","white", "red"))
-print(
-Heatmap(ssgsea.sort[1:top_n,] ,cluster_rows = TRUE,cluster_columns = FALSE,show_row_dend = FALSE,
-        row_names_gp = gpar(fontsize = 9),column_names_gp = gpar(fontsize = 9),
-        col = col_fun, name='ssgsea')
-        )
-dev.off()
-    
+write.table(ssgsea_kegg[[2]], paste(Outdir,Condition, "_",Treatment,"_vs_",Control,"_kegg_ssgsea.txt", sep = ""), 
+            quote = FALSE, sep = "\t", row.names = TRUE, col.names = NA)  
 
 
 
