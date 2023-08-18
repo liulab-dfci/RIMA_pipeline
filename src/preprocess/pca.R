@@ -52,7 +52,8 @@ pca_plot <- function(exprTable, annot,title, Batch) {
           axis.text.x=element_blank(),
           axis.text.y=element_text(size=12,face = "bold",hjust=1),
           axis.title.x = element_text(size = 12, face = "bold"),
-          axis.title.y = element_text(size = 12, face = "bold"))
+          axis.title.y = element_text(size = 12, face = "bold")) +
+    guides(color = guide_legend(override.aes = aes(fill = NA)))
   return(pca_plot)
 }
 
