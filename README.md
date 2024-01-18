@@ -16,4 +16,5 @@ Or contact main developers:\
 Yang Liu: yangliu@ds.dfci.harvard.edu\
 Lin Yang: lyang2021nuli@gmail.com 
 
-
+## Citing RIMA  
+If you use RIMA pipeline in your work, please cite [Yang et al.2023](https://www.nature.com/articles/s41596-023-00841-8)
