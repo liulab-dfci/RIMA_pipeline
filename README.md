@@ -13,7 +13,7 @@ RIMA has required an overhaul in a lot of the code and requirement of conda envi
 Create a [GitHub issue](https://github.com/liulab-dfci/RIMA_pipeline/issues).
 
 Or contact main developers:\
-Yang Liu: yangliu@ds.dfci.harvard.edu\
+Yang Liu: yang.liu2@utsouthwestern.edu
 Lin Yang: lyang2021nuli@gmail.com 
 
 ## Citing RIMA  
